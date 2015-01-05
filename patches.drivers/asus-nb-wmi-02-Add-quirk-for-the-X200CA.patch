@@ -1,0 +1,49 @@
+From: AceLan Kao <acelan.kao@canonical.com>
+Date: Wed, 9 Jul 2014 16:18:19 +0800
+Subject: asus-nb-wmi: Add ASUSTeK COMPUTER INC. X200CA
+Git-commit: c66263a368490a200a65639ff826f633090936a9
+Patch-mainline: v3.17
+References: boo#911438
+
+BIOS won't light on the wifi-led after S3, so asus-wmi driver needs to
+control the wifi and wifi-led status.
+But, it'll lead to bt status error if asus-wmi driver controls bt as well.
+So, for X200CA, asus-wmi driver controls wifi status only and have to set
+wapf to 1.
+
+Signed-off-by: AceLan Kao <acelan.kao@canonical.com>
+Signed-off-by: Matthew Garrett <matthew.garrett@nebula.com>
+Acked-by: Jean Delvare <jdelvare@suse.de>
+---
+ drivers/platform/x86/asus-nb-wmi.c |   13 +++++++++++++
+ 1 file changed, 13 insertions(+)
+
+--- a/drivers/platform/x86/asus-nb-wmi.c
++++ b/drivers/platform/x86/asus-nb-wmi.c
+@@ -74,6 +74,10 @@ static struct quirk_entry quirk_asus_x40
+ 	.wapf = 4,
+ };
+ 
++static struct quirk_entry quirk_asus_x200ca = {
++	.wapf = 2,
++};
++
+ static int dmi_matched(const struct dmi_system_id *dmi)
+ {
+ 	quirks = dmi->driver_data;
+@@ -216,6 +220,15 @@ static struct dmi_system_id asus_quirks[
+ 		},
+ 		.driver_data = &quirk_asus_x401u,
+ 	},
++	{
++		.callback = dmi_matched,
++		.ident = "ASUSTeK COMPUTER INC. X200CA",
++		.matches = {
++			DMI_MATCH(DMI_SYS_VENDOR, "ASUSTeK COMPUTER INC."),
++			DMI_MATCH(DMI_PRODUCT_NAME, "X200CA"),
++		},
++		.driver_data = &quirk_asus_x200ca,
++	},
+ 	{},
+ };
+ 
