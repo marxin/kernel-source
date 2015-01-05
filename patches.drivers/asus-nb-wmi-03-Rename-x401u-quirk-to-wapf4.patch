@@ -1,0 +1,137 @@
+From: Hans de Goede <hdegoede@redhat.com>
+Date: Mon, 14 Jul 2014 09:14:34 +0200
+Subject: asus-nb-wmi.c: Rename x401u quirk to wapf4
+Git-commit: 378008dfc72baed2d9c0f0a40dababc0e8901207
+Patch-mainline: v3.17
+References: boo#911438
+
+The actual x401u does not use the so named x401u quirk but the x55u quirk.
+All that the x401u quirk does it setting wapf to 4, so rename it to wapf4 to
+stop the confusion.
+
+Signed-off-by: Hans de Goede <hdegoede@redhat.com>
+Signed-off-by: Matthew Garrett <matthew.garrett@nebula.com>
+Acked-by: Jean Delvare <jdelvare@suse.de>
+---
+ drivers/platform/x86/asus-nb-wmi.c |   26 +++++++++++++-------------
+ 1 file changed, 13 insertions(+), 13 deletions(-)
+
+--- a/drivers/platform/x86/asus-nb-wmi.c
++++ b/drivers/platform/x86/asus-nb-wmi.c
+@@ -70,7 +70,7 @@ static struct quirk_entry quirk_asus_x55
+ 	.no_display_toggle = true,
+ };
+ 
+-static struct quirk_entry quirk_asus_x401u = {
++static struct quirk_entry quirk_asus_wapf4 = {
+ 	.wapf = 4,
+ };
+ 
+@@ -101,7 +101,7 @@ static struct dmi_system_id asus_quirks[
+ 			DMI_MATCH(DMI_SYS_VENDOR, "ASUSTeK COMPUTER INC."),
+ 			DMI_MATCH(DMI_PRODUCT_NAME, "X401A"),
+ 		},
+-		.driver_data = &quirk_asus_x401u,
++		.driver_data = &quirk_asus_wapf4,
+ 	},
+ 	{
+ 		.callback = dmi_matched,
+@@ -110,7 +110,7 @@ static struct dmi_system_id asus_quirks[
+ 			DMI_MATCH(DMI_SYS_VENDOR, "ASUSTeK COMPUTER INC."),
+ 			DMI_MATCH(DMI_PRODUCT_NAME, "X401A1"),
+ 		},
+-		.driver_data = &quirk_asus_x401u,
++		.driver_data = &quirk_asus_wapf4,
+ 	},
+ 	{
+ 		.callback = dmi_matched,
+@@ -128,7 +128,7 @@ static struct dmi_system_id asus_quirks[
+ 			DMI_MATCH(DMI_SYS_VENDOR, "ASUSTeK COMPUTER INC."),
+ 			DMI_MATCH(DMI_PRODUCT_NAME, "X501A"),
+ 		},
+-		.driver_data = &quirk_asus_x401u,
++		.driver_data = &quirk_asus_wapf4,
+ 	},
+ 	{
+ 		.callback = dmi_matched,
+@@ -137,7 +137,7 @@ static struct dmi_system_id asus_quirks[
+ 			DMI_MATCH(DMI_SYS_VENDOR, "ASUSTeK COMPUTER INC."),
+ 			DMI_MATCH(DMI_PRODUCT_NAME, "X501A1"),
+ 		},
+-		.driver_data = &quirk_asus_x401u,
++		.driver_data = &quirk_asus_wapf4,
+ 	},
+ 	{
+ 		.callback = dmi_matched,
+@@ -146,7 +146,7 @@ static struct dmi_system_id asus_quirks[
+ 			DMI_MATCH(DMI_SYS_VENDOR, "ASUSTeK COMPUTER INC."),
+ 			DMI_MATCH(DMI_PRODUCT_NAME, "X550CA"),
+ 		},
+-		.driver_data = &quirk_asus_x401u,
++		.driver_data = &quirk_asus_wapf4,
+ 	},
+ 	{
+ 		.callback = dmi_matched,
+@@ -155,7 +155,7 @@ static struct dmi_system_id asus_quirks[
+ 			DMI_MATCH(DMI_SYS_VENDOR, "ASUSTeK COMPUTER INC."),
+ 			DMI_MATCH(DMI_PRODUCT_NAME, "X55A"),
+ 		},
+-		.driver_data = &quirk_asus_x401u,
++		.driver_data = &quirk_asus_wapf4,
+ 	},
+ 	{
+ 		.callback = dmi_matched,
+@@ -164,7 +164,7 @@ static struct dmi_system_id asus_quirks[
+ 			DMI_MATCH(DMI_SYS_VENDOR, "ASUSTeK COMPUTER INC."),
+ 			DMI_MATCH(DMI_PRODUCT_NAME, "X55C"),
+ 		},
+-		.driver_data = &quirk_asus_x401u,
++		.driver_data = &quirk_asus_wapf4,
+ 	},
+ 	{
+ 		.callback = dmi_matched,
+@@ -182,7 +182,7 @@ static struct dmi_system_id asus_quirks[
+ 			DMI_MATCH(DMI_SYS_VENDOR, "ASUSTeK COMPUTER INC."),
+ 			DMI_MATCH(DMI_PRODUCT_NAME, "X55VD"),
+ 		},
+-		.driver_data = &quirk_asus_x401u,
++		.driver_data = &quirk_asus_wapf4,
+ 	},
+ 	{
+ 		.callback = dmi_matched,
+@@ -191,7 +191,7 @@ static struct dmi_system_id asus_quirks[
+ 			DMI_MATCH(DMI_SYS_VENDOR, "ASUSTeK COMPUTER INC."),
+ 			DMI_MATCH(DMI_PRODUCT_NAME, "X75A"),
+ 		},
+-		.driver_data = &quirk_asus_x401u,
++		.driver_data = &quirk_asus_wapf4,
+ 	},
+ 	{
+ 		.callback = dmi_matched,
+@@ -200,7 +200,7 @@ static struct dmi_system_id asus_quirks[
+ 			DMI_MATCH(DMI_SYS_VENDOR, "ASUSTeK COMPUTER INC."),
+ 			DMI_MATCH(DMI_PRODUCT_NAME, "X75VBP"),
+ 		},
+-		.driver_data = &quirk_asus_x401u,
++		.driver_data = &quirk_asus_wapf4,
+ 	},
+ 	{
+ 		.callback = dmi_matched,
+@@ -209,7 +209,7 @@ static struct dmi_system_id asus_quirks[
+ 			DMI_MATCH(DMI_SYS_VENDOR, "ASUSTeK COMPUTER INC."),
+ 			DMI_MATCH(DMI_PRODUCT_NAME, "1015E"),
+ 		},
+-		.driver_data = &quirk_asus_x401u,
++		.driver_data = &quirk_asus_wapf4,
+ 	},
+ 	{
+ 		.callback = dmi_matched,
+@@ -218,7 +218,7 @@ static struct dmi_system_id asus_quirks[
+ 			DMI_MATCH(DMI_SYS_VENDOR, "ASUSTeK COMPUTER INC."),
+ 			DMI_MATCH(DMI_PRODUCT_NAME, "1015U"),
+ 		},
+-		.driver_data = &quirk_asus_x401u,
++		.driver_data = &quirk_asus_wapf4,
+ 	},
+ 	{
+ 		.callback = dmi_matched,
