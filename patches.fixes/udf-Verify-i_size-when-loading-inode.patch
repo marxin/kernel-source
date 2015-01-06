@@ -21,7 +21,7 @@ Index: linux-3.16-openSUSE-13.2/fs/udf/inode.c
 ===================================================================
 --- linux-3.16-openSUSE-13.2.orig/fs/udf/inode.c
 +++ linux-3.16-openSUSE-13.2/fs/udf/inode.c
-@@ -1496,6 +1496,20 @@ static void udf_fill_inode(struct inode
+@@ -1496,6 +1496,24 @@ static void udf_fill_inode(struct inode
  		iinfo->i_checkpoint = le32_to_cpu(efe->checkpoint);
  	}
  
@@ -31,12 +31,16 @@ Index: linux-3.16-openSUSE-13.2/fs/udf/inode.c
 +		 * For file in ICB data is stored in allocation descriptor
 +		 * so sizes should match
 +		 */
-+		if (iinfo->i_lenAlloc != inode->i_size)
-+			goto out;
++		if (iinfo->i_lenAlloc != inode->i_size) {
++			make_bad_inode(inode);
++			return;
++		}
 +		/* File in ICB has to fit in there... */
 +		if (inode->i_size > inode->i_sb->s_blocksize -
-+					udf_file_entry_alloc_offset(inode))
-+			goto out;
++					udf_file_entry_alloc_offset(inode)) {
++			make_bad_inode(inode);
++			return;
++		}
 +	}
 +
  	switch (fe->icbTag.fileType) {
