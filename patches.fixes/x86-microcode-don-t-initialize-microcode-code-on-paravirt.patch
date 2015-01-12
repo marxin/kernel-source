@@ -1,0 +1,38 @@
+From: Boris Ostrovsky <boris.ostrovsky@oracle.com>
+Date: Mon, 1 Dec 2014 16:27:44 -0500
+Subject: x86, microcode: Don't initialize microcode code on paravirt
+Git-commit: a18a0f6850d4b286a5ebf02cd5b22fe496b86349
+Patch-mainline: v3.19-rc1
+References: bsc#903589
+
+Paravirtual guests are not expected to load microcode into processors
+and therefore it is not necessary to initialize microcode loading
+logic.
+
+In fact, under certain circumstances initializing this logic may cause
+the guest to crash. Specifically, 32-bit kernels use __pa_nodebug()
+macro which does not work in Xen (the code path that leads to this macro
+happens during resume when we call mc_bp_resume()->load_ucode_ap()
+->check_loader_disabled_ap())
+
+Signed-off-by: Boris Ostrovsky <boris.ostrovsky@oracle.com>
+Link: http://lkml.kernel.org/r/1417469264-31470-1-git-send-email-boris.ostrovsky@oracle.com
+Signed-off-by: Borislav Petkov <bp@suse.de>
+---
+ arch/x86/kernel/cpu/microcode/core.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/arch/x86/kernel/cpu/microcode/core.c b/arch/x86/kernel/cpu/microcode/core.c
+index 2ce9051174e6..ebd232d7de4d 100644
+--- a/arch/x86/kernel/cpu/microcode/core.c
++++ b/arch/x86/kernel/cpu/microcode/core.c
+@@ -557,7 +557,7 @@ static int __init microcode_init(void)
+ 	struct cpuinfo_x86 *c = &cpu_data(0);
+ 	int error;
+ 
+-	if (dis_ucode_ldr)
++	if (paravirt_enabled() || dis_ucode_ldr)
+ 		return 0;
+ 
+ 	if (c->x86_vendor == X86_VENDOR_INTEL)
+
