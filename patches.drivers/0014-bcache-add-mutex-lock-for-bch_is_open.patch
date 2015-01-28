@@ -1,0 +1,37 @@
+From 4b43ea96a4f87ed7d8b331939b869d3cceb65459 Mon Sep 17 00:00:00 2001
+From: Jianjian Huo <samuel.huo@gmail.com>
+Date: Sun, 13 Jul 2014 09:08:59 -0700
+Subject: [PATCH 14/14] bcache: add mutex lock for bch_is_open
+Git-commit: 789d21dbd9d8889e62c79ec19585fcc97e42ef07
+Patch-mainline: v3.17
+References: bnc#908612
+
+Since bch_is_open will iterate linked list bch_cache_sets and
+uncached_devices, it needs bch_register_lock.
+
+Signed-off-by: Jianjian Huo <samuel.huo@gmail.com>
+Signed-off-by: Joshua Schmid <jschmid@suse.com>
+---
+ drivers/md/bcache/super.c | 2 ++
+ 1 file changed, 2 insertions(+)
+
+diff --git a/drivers/md/bcache/super.c b/drivers/md/bcache/super.c
+index f83b491..e752ea0 100644
+--- a/drivers/md/bcache/super.c
++++ b/drivers/md/bcache/super.c
+@@ -1963,10 +1963,12 @@ static ssize_t register_bcache(struct kobject *k, struct kobj_attribute *attr,
+ 	if (IS_ERR(bdev)) {
+ 		if (bdev == ERR_PTR(-EBUSY)) {
+ 			bdev = lookup_bdev(strim(path));
++			mutex_lock(&bch_register_lock);
+ 			if (!IS_ERR(bdev) && bch_is_open(bdev))
+ 				err = "device already registered";
+ 			else
+ 				err = "device busy";
++			mutex_unlock(&bch_register_lock);
+ 		}
+ 		goto err;
+ 	}
+-- 
+2.1.2
+
