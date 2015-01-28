@@ -1,0 +1,59 @@
+From b4e77d4227684cdabbcace64251a30dabf36d06c Mon Sep 17 00:00:00 2001
+From: Slava Pestov <sp@daterainc.com>
+Date: Thu, 19 Jun 2014 15:05:59 -0700
+Subject: [PATCH 11/14] bcache: fix memory corruption in init error path
+Git-commit: bf0c55c986540483c34ca640f2eef4c3314388b1
+Patch-mainline: v3.17
+References: bnc#908606
+
+If register_cache_set() failed, we would touch ca->set after
+it had already been freed. Also, fix an assertion to catch
+this.
+
+Change-Id: I748e5f5b223e2d9b2602075dec2f997cced2394d
+Signed-off-by: Joshua Schmid <jschmid@suse.com>
+---
+ drivers/md/bcache/super.c | 11 ++++++++---
+ 1 file changed, 8 insertions(+), 3 deletions(-)
+
+diff --git a/drivers/md/bcache/super.c b/drivers/md/bcache/super.c
+index 124e422..85887d0 100644
+--- a/drivers/md/bcache/super.c
++++ b/drivers/md/bcache/super.c
+@@ -1350,8 +1350,11 @@ static void cache_set_free(struct closure *cl)
+ 	bch_journal_free(c);
+ 
+ 	for_each_cache(ca, c, i)
+-		if (ca)
++		if (ca) {
++			ca->set = NULL;
++			c->cache[ca->sb.nr_this_dev] = NULL;
+ 			kobject_put(&ca->kobj);
++		}
+ 
+ 	bch_bset_sort_state_free(&c->sort);
+ 	free_pages((unsigned long) c->uuids, ilog2(bucket_pages(c)));
+@@ -1787,8 +1790,10 @@ void bch_cache_release(struct kobject *kobj)
+ 	struct cache *ca = container_of(kobj, struct cache, kobj);
+ 	unsigned i;
+ 
+-	if (ca->set)
++	if (ca->set) {
++		BUG_ON(ca->set->cache[ca->sb.nr_this_dev] != ca);
+ 		ca->set->cache[ca->sb.nr_this_dev] = NULL;
++	}
+ 
+ 	bio_split_pool_free(&ca->bio_split_hook);
+ 
+@@ -1851,7 +1856,7 @@ static int cache_alloc(struct cache_sb *sb, struct cache *ca)
+ }
+ 
+ static void register_cache(struct cache_sb *sb, struct page *sb_page,
+-				  struct block_device *bdev, struct cache *ca)
++				struct block_device *bdev, struct cache *ca)
+ {
+ 	char name[BDEVNAME_SIZE];
+ 	const char *err = "cannot allocate memory";
+-- 
+2.1.2
+
