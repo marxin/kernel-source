@@ -1,0 +1,30 @@
+From 84539086d933094baaaebd4bdd7d24cfe892b9a7 Mon Sep 17 00:00:00 2001
+From: Slava Pestov <sp@daterainc.com>
+Date: Mon, 30 Jun 2014 22:31:20 -0700
+Subject: [PATCH 07/14] bcache: fix typo in bch_bkey_equal_header
+Git-commit: 8e0948080670f6330229718b15a6a1a011d441ce
+Patch-mainline: v3.17
+References: bnc#908598
+
+Signed-off-by: Kent Overstreet <kmo@daterainc.com>
+Signed-off-by: Joshua Schmid <jschmid@suse.com>
+---
+ drivers/md/bcache/bset.h | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/drivers/md/bcache/bset.h b/drivers/md/bcache/bset.h
+index 5f6728d..ae96462 100644
+--- a/drivers/md/bcache/bset.h
++++ b/drivers/md/bcache/bset.h
+@@ -453,7 +453,7 @@ static inline bool bch_bkey_equal_header(const struct bkey *l,
+ {
+ 	return (KEY_DIRTY(l) == KEY_DIRTY(r) &&
+ 		KEY_PTRS(l) == KEY_PTRS(r) &&
+-		KEY_CSUM(l) == KEY_CSUM(l));
++		KEY_CSUM(l) == KEY_CSUM(r));
+ }
+ 
+ /* Keylists */
+-- 
+2.1.2
+
