@@ -1,0 +1,32 @@
+From: Trond Myklebust <trond.myklebust@primarydata.com>
+Date: Fri, 17 Oct 2014 23:02:52 +0300
+Subject: [PATCH] NFS: Don't try to reclaim delegation open state if recovery
+ failed
+Git-commit: f8ebf7a8ca35dde321f0cd385fee6f1950609367
+Patch-mainline: v3.18
+References: boo#909634
+
+If state recovery failed, then we should not attempt to reclaim delegated
+state.
+
+http://lkml.kernel.org/r/CAN-5tyHwG=Cn2Q9KsHWadewjpTTy_K26ee+UnSvHvG4192p-Xw@mail.gmail.com
+
+Cc: stable@vger.kernel.org
+Signed-off-by: Trond Myklebust <trond.myklebust@primarydata.com>
+Acked-by: NeilBrown <neilb@suse.de>
+
+---
+ fs/nfs/delegation.c |    2 ++
+ 1 file changed, 2 insertions(+)
+
+--- linux-3.16-openSUSE-13.2.orig/fs/nfs/delegation.c
++++ linux-3.16-openSUSE-13.2/fs/nfs/delegation.c
+@@ -109,6 +109,8 @@ again:
+ 			continue;
+ 		if (!test_bit(NFS_DELEGATED_STATE, &state->flags))
+ 			continue;
++		if (!nfs4_valid_open_stateid(state))
++			continue;
+ 		if (!nfs4_stateid_match(&state->stateid, stateid))
+ 			continue;
+ 		get_nfs_open_context(ctx);
