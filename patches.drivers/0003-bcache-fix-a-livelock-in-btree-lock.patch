@@ -1,10 +1,12 @@
-From f6ecd8d22a23fe0842c21e0daa301fc9f3596e9a Mon Sep 17 00:00:00 2001
-From: Zheng Liu <wenqing.lz@taobao.com>
-Date: Sat, 18 Oct 2014 20:51:44 +0800
-Subject: [PATCH 3/5] bcache: fix a livelock in btree lock
+From 65f8b304725a667e139682d077a7a129c1f9c356 Mon Sep 17 00:00:00 2001
+From: Takashi Iwai <tiwai@suse.de>
+Date: Tue, 10 Feb 2015 16:00:48 +0100
+Subject: [PATCH] bcache: fix a livelock in btree lock v2 (bnc#910440).
 Git-commit: f6ecd8d22a23fe0842c21e0daa301fc9f3596e9a
 Patch-mainline: Submitted
 References: bnc#910440
+
+From: Zheng Liu <wenqing.lz <at> taobao.com>
 
 This commit tries to fix a livelock in bcache.  This livelock might
 happen when we causes a huge number of cache misses simultaneously.
@@ -36,24 +38,35 @@ This commit will try to take write btree->lock if it encounters a race
 when we traverse btree.  Although it sacrifice the scalability but we
 can ensure that only one can modify the btree.
 
-Signed-off-by: Zheng Liu <wenqing.lz@taobao.com>
-Signed-off-by: Takashi Iwai <tiwai@suse.de>
+Signed-off-by: Zheng Liu <wenqing.lz <at> taobao.com>
+Tested-by: Joshua Schmid <jschmid <at> suse.com>
+Cc: Joshua Schmid <jschmid <at> suse.com>
+Cc: Zhu Yanhai <zhu.yanhai <at> gmail.com>
+Cc: Kent Overstreet <kmo <at> daterainc.com>
+changelog:
+v2: fix a bug that stops all concurrency writes unconditionally.
 
+Signed-off-by: Oliver Neukum <oneukum@suse.de>
 ---
- drivers/md/bcache/btree.c |    4 +++-
+ drivers/md/bcache/btree.c | 4 +++-
  1 file changed, 3 insertions(+), 1 deletion(-)
 
+diff --git a/drivers/md/bcache/btree.c b/drivers/md/bcache/btree.c
+index c242787..4e11783 100644
 --- a/drivers/md/bcache/btree.c
 +++ b/drivers/md/bcache/btree.c
-@@ -2152,8 +2152,10 @@ int bch_btree_insert_check_key(struct bt
+@@ -2152,8 +2152,10 @@ int bch_btree_insert_check_key(struct btree *b, struct btree_op *op,
  		rw_lock(true, b, b->level);
  
  		if (b->key.ptr[0] != btree_ptr ||
 -		    b->seq != seq + 1)
 +		    b->seq != seq + 1) {
-+			op->lock = b->c->root->level + 1;
++			op->lock = b->level;
  			goto out;
 +		}
  	}
  
  	SET_KEY_PTRS(check_key, 1);
+-- 
+1.8.4.5
+
