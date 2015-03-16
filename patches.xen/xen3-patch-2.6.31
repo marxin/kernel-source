@@ -82,7 +82,7 @@ Automatically created from "patches.kernel.org/patch-2.6.31" by xen-port-patches
  #endif
  #endif
  
---- 13.2.orig/arch/x86/include/asm/required-features.h	2014-10-16 11:41:01.000000000 +0200
+--- 13.2.orig/arch/x86/include/asm/required-features.h	2015-03-05 10:15:49.000000000 +0100
 +++ 13.2/arch/x86/include/asm/required-features.h	2013-03-21 14:47:09.000000000 +0100
 @@ -54,7 +54,7 @@
  #endif
@@ -171,17 +171,17 @@ Automatically created from "patches.kernel.org/patch-2.6.31" by xen-port-patches
  	FIX_WP_TEST,
  #endif
 --- 13.2.orig/arch/x86/include/mach-xen/asm/hypercall.h	2012-10-31 11:13:48.000000000 +0100
-+++ 13.2/arch/x86/include/mach-xen/asm/hypercall.h	2012-10-31 11:16:34.000000000 +0100
-@@ -267,7 +267,7 @@ HYPERVISOR_memory_op(
++++ 13.2/arch/x86/include/mach-xen/asm/hypercall.h	2015-03-05 10:25:48.000000000 +0100
+@@ -272,7 +272,7 @@ HYPERVISOR_memory_op(
  	unsigned int cmd, void *arg)
  {
  	if (arch_use_lazy_mmu_mode())
 -		xen_multicall_flush(false);
 +		xen_multicall_flush();
- 	return _hypercall2(int, memory_op, cmd, arg);
+ 	return _hypercall2(long, memory_op, cmd, arg);
  }
  
-@@ -338,7 +338,7 @@ HYPERVISOR_grant_table_op(
+@@ -333,7 +333,7 @@ HYPERVISOR_grant_table_op(
  	int rc;
  
  	if (arch_use_lazy_mmu_mode())
@@ -2527,7 +2527,7 @@ Automatically created from "patches.kernel.org/patch-2.6.31" by xen-port-patches
  		printk(KERN_DEBUG "MCE: bind virq for DOM0 logging\n");
  		bind_virq_for_mce();
 --- 13.2.orig/arch/x86/kernel/cpu/mcheck/mce_dom0.c	2011-08-15 10:44:51.000000000 +0200
-+++ 13.2/arch/x86/kernel/cpu/mcheck/mce_dom0.c	2011-08-15 11:03:49.000000000 +0200
++++ 13.2/arch/x86/kernel/cpu/mcheck/mce_dom0.c	2015-03-05 10:25:55.000000000 +0100
 @@ -7,12 +7,17 @@
  #include <asm/hypercall.h>
  #include <asm/mce.h>
@@ -2575,8 +2575,8 @@ Automatically created from "patches.kernel.org/patch-2.6.31" by xen-port-patches
  			m.tsc = mc_bank->mc_tsc;
 -			m.res1 = mc_bank->mc_ctrl2;
  			m.bank = mc_bank->mc_bank;
- 			printk(KERN_DEBUG "[CPU%d, BANK%d, addr %llx, state %llx]\n", 
- 						m.bank, m.cpu, m.addr, m.status);
+ 			printk(KERN_DEBUG "[CPU %d bank %d addr %Lx state %Lx]\n",
+ 			       m.cpu, m.bank, m.addr, m.status);
 @@ -115,18 +131,54 @@ end:
  	return IRQ_HANDLED;
  }
@@ -2877,10 +2877,8 @@ Automatically created from "patches.kernel.org/patch-2.6.31" by xen-port-patches
  	CFI_ENDPROC
  
  nmi_stack_fixup:
-Index: current/arch/x86/kernel/entry_64.S
-===================================================================
---- current.orig/arch/x86/kernel/entry_64.S
-+++ current/arch/x86/kernel/entry_64.S
+--- 13.2.orig/arch/x86/kernel/entry_64.S	2014-06-26 14:55:18.000000000 +0200
++++ 13.2/arch/x86/kernel/entry_64.S	2015-03-05 10:26:00.000000000 +0100
 @@ -1297,7 +1297,7 @@ apicinterrupt3 HYPERVISOR_CALLBACK_VECTO
  idtentry debug do_debug has_error_code=0 paranoid=1 shift_ist=DEBUG_STACK
  idtentry int3 do_int3 has_error_code=0 paranoid=1 shift_ist=DEBUG_STACK
@@ -2890,10 +2888,8 @@ Index: current/arch/x86/kernel/entry_64.S
  idtentry xen_debug do_debug has_error_code=0
  idtentry xen_int3 do_int3 has_error_code=0
  idtentry xen_stack_segment do_stack_segment has_error_code=1
-Index: current/arch/x86/kernel/entry_64-xen.S
-===================================================================
---- current.orig/arch/x86/kernel/entry_64-xen.S
-+++ current/arch/x86/kernel/entry_64-xen.S
+--- 13.2.orig/arch/x86/kernel/entry_64-xen.S	2013-05-24 08:22:20.000000000 +0200
++++ 13.2/arch/x86/kernel/entry_64-xen.S	2013-05-24 08:23:11.000000000 +0200
 @@ -139,6 +139,7 @@ ENTRY(ftrace_graph_caller)
  
  	leaq 8(%rbp), %rdi
@@ -3342,7 +3338,7 @@ Index: current/arch/x86/kernel/entry_64-xen.S
  		return 0;
 --- 13.2.orig/arch/x86/kernel/pci-dma-xen.c	2012-04-04 14:08:49.000000000 +0200
 +++ 13.2/arch/x86/kernel/pci-dma-xen.c	2012-04-04 14:30:36.000000000 +0200
-@@ -28,6 +28,8 @@ int no_iommu __initdata;
+@@ -30,6 +30,8 @@ int no_iommu __initdata;
  #ifndef CONFIG_XEN
  /* Set this to 1 if there is a HW IOMMU in the system */
  int iommu_detected __read_mostly = 0;
@@ -3351,7 +3347,7 @@ Index: current/arch/x86/kernel/entry_64-xen.S
  #endif
  
  dma_addr_t bad_dma_address __read_mostly = 0;
-@@ -262,8 +264,12 @@ static __init int iommu_setup(char *p)
+@@ -264,8 +266,12 @@ static __init int iommu_setup(char *p)
  		if (!strncmp(p, "soft", 4))
  			swiotlb = 1;
  #endif
@@ -3365,7 +3361,7 @@ Index: current/arch/x86/kernel/entry_64-xen.S
  		gart_parse_options(p);
  #endif
  
-@@ -371,6 +377,8 @@ static int __init pci_iommu_init(void)
+@@ -382,6 +388,8 @@ static int __init pci_iommu_init(void)
  void pci_iommu_shutdown(void)
  {
  	gart_iommu_shutdown();
@@ -4884,7 +4880,7 @@ Index: current/arch/x86/kernel/entry_64-xen.S
  
  	if (pgd == NULL)
  		goto out;
---- 13.2.orig/arch/x86/pci/i386.c	2014-10-16 11:41:01.000000000 +0200
+--- 13.2.orig/arch/x86/pci/i386.c	2015-03-05 10:15:49.000000000 +0100
 +++ 13.2/arch/x86/pci/i386.c	2014-06-26 14:59:27.000000000 +0200
 @@ -399,12 +399,14 @@ void __init pcibios_resource_survey(void
  		pcibios_allocate_resources(bus, 1);
@@ -4978,7 +4974,7 @@ Index: current/arch/x86/kernel/entry_64-xen.S
  	return new;
  }
  
---- 13.2.orig/drivers/edac/Kconfig	2014-10-16 11:41:01.000000000 +0200
+--- 13.2.orig/drivers/edac/Kconfig	2015-03-05 10:15:49.000000000 +0100
 +++ 13.2/drivers/edac/Kconfig	2013-03-21 14:47:42.000000000 +0100
 @@ -106,6 +106,7 @@ config EDAC_GHES
  config EDAC_AMD64
@@ -4988,7 +4984,7 @@ Index: current/arch/x86/kernel/entry_64-xen.S
  	help
  	  Support for error detection and correction of DRAM ECC errors on
  	  the AMD64 families of memory controllers (K8 and F10h)
---- 13.2.orig/drivers/gpu/drm/ttm/ttm_bo.c	2014-10-16 11:41:01.000000000 +0200
+--- 13.2.orig/drivers/gpu/drm/ttm/ttm_bo.c	2015-03-05 10:15:49.000000000 +0100
 +++ 13.2/drivers/gpu/drm/ttm/ttm_bo.c	2013-12-02 17:49:57.000000000 +0100
 @@ -1378,6 +1378,14 @@ int ttm_bo_global_init(struct drm_global
  		ret = -ENOMEM;
@@ -5005,7 +5001,7 @@ Index: current/arch/x86/kernel/entry_64-xen.S
  
  	INIT_LIST_HEAD(&glob->swap_lru);
  	INIT_LIST_HEAD(&glob->device_list);
---- 13.2.orig/drivers/gpu/drm/ttm/ttm_bo_vm.c	2014-10-16 11:41:01.000000000 +0200
+--- 13.2.orig/drivers/gpu/drm/ttm/ttm_bo_vm.c	2015-03-05 10:15:49.000000000 +0100
 +++ 13.2/drivers/gpu/drm/ttm/ttm_bo_vm.c	2013-12-02 17:49:51.000000000 +0100
 @@ -198,6 +198,9 @@ static int ttm_bo_vm_fault(struct vm_are
  	if (bo->mem.bus.is_iomem) {
@@ -5049,7 +5045,7 @@ Index: current/arch/x86/kernel/entry_64-xen.S
  }
  
  static void msix_set_enable(struct pci_dev *dev, int enable)
-@@ -311,8 +306,11 @@ void pci_restore_msi_state(struct pci_de
+@@ -313,8 +308,11 @@ void pci_restore_msi_state(struct pci_de
  		return;
  
  	pci_intx_for_msi(dev, 0);
@@ -5063,7 +5059,7 @@ Index: current/arch/x86/kernel/entry_64-xen.S
  	if (dev->msix_enabled)
  		msix_set_enable(dev, 0);
  
-@@ -356,16 +354,16 @@ static int msi_capability_init(struct pc
+@@ -358,16 +356,16 @@ static int msi_capability_init(struct pc
  {
  	int pos, pirq;
  
@@ -5083,7 +5079,7 @@ Index: current/arch/x86/kernel/entry_64-xen.S
  	dev->msi_enabled = 1;
  
  	dev->irq = pirq;
-@@ -387,20 +385,32 @@ static int msix_capability_init(struct p
+@@ -389,20 +387,32 @@ static int msix_capability_init(struct p
  {
  	u64 table_base;
  	int pirq, i, j, mapped, pos;
@@ -5119,7 +5115,7 @@ Index: current/arch/x86/kernel/entry_64-xen.S
  	for (i = 0; i < nvec; i++) {
  		mapped = 0;
  		list_for_each_entry(pirq_entry, &dev->msi_list, list) {
-@@ -437,10 +447,13 @@ static int msix_capability_init(struct p
+@@ -439,10 +449,13 @@ static int msix_capability_init(struct p
  		return avail;
  	}
  
@@ -5134,7 +5130,7 @@ Index: current/arch/x86/kernel/entry_64-xen.S
  	return 0;
  }
  
-@@ -560,7 +573,7 @@ EXPORT_SYMBOL(pci_enable_msi_block);
+@@ -562,7 +575,7 @@ EXPORT_SYMBOL(pci_enable_msi_block);
  
  void pci_msi_shutdown(struct pci_dev *dev)
  {
@@ -5143,7 +5139,7 @@ Index: current/arch/x86/kernel/entry_64-xen.S
  	struct msi_dev_list *msi_dev_entry = get_msi_dev_pirq_list(dev);
  
  	if (!pci_msi_enable || !dev || !dev->msi_enabled)
-@@ -582,7 +595,8 @@ void pci_msi_shutdown(struct pci_dev *de
+@@ -584,7 +597,8 @@ void pci_msi_shutdown(struct pci_dev *de
  	msi_unmap_pirq(dev, pirq);
  
  	/* Disable MSI mode */
@@ -5153,7 +5149,7 @@ Index: current/arch/x86/kernel/entry_64-xen.S
  	pci_intx_for_msi(dev, 1);
  	dev->msi_enabled = 0;
  }
-@@ -622,8 +636,8 @@ int pci_msix_table_size(struct pci_dev *
+@@ -624,8 +638,8 @@ int pci_msix_table_size(struct pci_dev *
   * indicates the successful configuration of MSI-X capability structure
   * with new allocated MSI-X irqs. A return of < 0 indicates a failure.
   * Or a return of > 0 indicates that driver request is exceeding the number
@@ -5164,7 +5160,7 @@ Index: current/arch/x86/kernel/entry_64-xen.S
   **/
  int pci_enable_msix(struct pci_dev* dev, struct msix_entry *entries, int nvec)
  {
-@@ -679,7 +693,7 @@ int pci_enable_msix(struct pci_dev* dev,
+@@ -681,7 +695,7 @@ int pci_enable_msix(struct pci_dev* dev,
  
  	nr_entries = pci_msix_table_size(dev);
  	if (nvec > nr_entries)
@@ -6245,7 +6241,7 @@ Index: current/arch/x86/kernel/entry_64-xen.S
  	xen_spinlock_cleanup(cpu);
  }
  
---- 13.2.orig/drivers/xen/evtchn.c	2014-10-16 11:41:01.000000000 +0200
+--- 13.2.orig/drivers/xen/evtchn.c	2015-03-05 10:15:49.000000000 +0100
 +++ 13.2/drivers/xen/evtchn.c	2014-02-18 17:21:34.000000000 +0100
 @@ -50,10 +50,17 @@
  #include <linux/mutex.h>
@@ -6897,7 +6893,7 @@ Index: current/arch/x86/kernel/entry_64-xen.S
  	netfront_accel_vnic *vnic = (netfront_accel_vnic *)np->accel_priv;
  
  	DPRINTK("%s %s\n", __FUNCTION__, dev->nodename);
---- 13.2.orig/drivers/xen/sys-hypervisor.c	2014-10-16 11:41:01.000000000 +0200
+--- 13.2.orig/drivers/xen/sys-hypervisor.c	2015-03-05 10:15:49.000000000 +0100
 +++ 13.2/drivers/xen/sys-hypervisor.c	2012-10-31 11:16:11.000000000 +0100
 @@ -13,14 +13,20 @@
  #include <linux/kobject.h>
@@ -6989,7 +6985,7 @@ Index: current/arch/x86/kernel/entry_64-xen.S
  	xen_properties_destroy();
  	xen_compilation_destroy();
  	xen_sysfs_uuid_destroy();
---- 13.2.orig/drivers/xen/tpmback/xenbus.c	2014-01-22 13:54:01.000000000 +0100
+--- 13.2.orig/drivers/xen/tpmback/xenbus.c	2015-03-05 10:15:49.000000000 +0100
 +++ 13.2/drivers/xen/tpmback/xenbus.c	2011-04-11 15:04:27.000000000 +0200
 @@ -39,7 +39,7 @@ long int tpmback_get_instance(struct bac
  
@@ -7404,7 +7400,7 @@ Index: current/arch/x86/kernel/entry_64-xen.S
 -header-y += xen/public/
  header-y += xen/
  header-y += scsi/
---- 13.2.orig/include/uapi/xen/Kbuild	2014-02-17 17:50:40.000000000 +0100
+--- 13.2.orig/include/uapi/xen/Kbuild	2015-03-05 10:15:49.000000000 +0100
 +++ 13.2/include/uapi/xen/Kbuild	2014-02-18 17:22:08.000000000 +0100
 @@ -1,5 +1,4 @@
  # UAPI Header export list
@@ -7694,7 +7690,7 @@ Index: current/arch/x86/kernel/entry_64-xen.S
  }
  
  void
---- 13.2.orig/mm/init-mm.c	2014-10-16 11:41:01.000000000 +0200
+--- 13.2.orig/mm/init-mm.c	2015-03-05 10:15:49.000000000 +0100
 +++ 13.2/mm/init-mm.c	2011-04-13 13:55:08.000000000 +0200
 @@ -13,6 +13,10 @@
  #define INIT_MM_CONTEXT(name)

@@ -211,7 +211,7 @@ Automatically created from "patches.kernel.org/patch-2.6.32" by xen-port-patches
 -	.quad sys_perf_counter_open
 +	.quad sys_perf_event_open
  ia32_syscall_end:
---- 13.2.orig/arch/x86/include/asm/irq.h	2014-10-16 11:41:01.000000000 +0200
+--- 13.2.orig/arch/x86/include/asm/irq.h	2015-03-05 10:15:49.000000000 +0100
 +++ 13.2/arch/x86/include/asm/irq.h	2014-07-03 11:41:09.000000000 +0200
 @@ -42,7 +42,8 @@ extern int vector_used_by_percpu_irq(uns
  
@@ -223,7 +223,7 @@ Automatically created from "patches.kernel.org/patch-2.6.32" by xen-port-patches
  void arch_trigger_all_cpu_backtrace(bool);
  #define arch_trigger_all_cpu_backtrace arch_trigger_all_cpu_backtrace
  #endif
---- 13.2.orig/arch/x86/include/asm/uv/uv_hub.h	2014-10-16 11:41:01.000000000 +0200
+--- 13.2.orig/arch/x86/include/asm/uv/uv_hub.h	2015-03-05 10:15:49.000000000 +0100
 +++ 13.2/arch/x86/include/asm/uv/uv_hub.h	2011-02-01 14:54:13.000000000 +0100
 @@ -11,7 +11,7 @@
  #ifndef _ASM_X86_UV_UV_HUB_H
@@ -280,8 +280,8 @@ Automatically created from "patches.kernel.org/patch-2.6.32" by xen-port-patches
  static inline void _set_gate(int gate, unsigned type, void *addr,
  			     unsigned dpl, unsigned ist, unsigned seg)
 --- 13.2.orig/arch/x86/include/mach-xen/asm/dma-mapping.h	2011-02-01 14:39:24.000000000 +0100
-+++ 13.2/arch/x86/include/mach-xen/asm/dma-mapping.h	2011-02-01 14:54:13.000000000 +0100
-@@ -1,11 +1,24 @@
++++ 13.2/arch/x86/include/mach-xen/asm/dma-mapping.h	2014-11-27 16:10:04.000000000 +0100
+@@ -1,13 +1,26 @@
  #ifndef _ASM_X86_DMA_MAPPING_H_
  
 +#define phys_to_dma _phys_to_dma_
@@ -289,22 +289,24 @@ Automatically created from "patches.kernel.org/patch-2.6.32" by xen-port-patches
 +
  #include_next <asm/dma-mapping.h>
  
--void dma_generic_free_coherent(struct device *, size_t, void *, dma_addr_t);
 +#undef phys_to_dma
 +#undef dma_to_phys
 +
+ #define ARCH_HAS_DMA_GET_REQUIRED_MASK
+ 
+-void dma_generic_free_coherent(struct device *, size_t, void *, dma_addr_t);
 +static inline dma_addr_t phys_to_dma(struct device *dev, phys_addr_t paddr)
 +{
 +	return phys_to_machine(paddr);
 +}
- 
--#define address_needs_mapping(hwdev, addr, size) \
--	!is_buffer_dma_capable(dma_get_mask(hwdev), addr, size)
++
 +static inline phys_addr_t dma_to_phys(struct device *dev, dma_addr_t daddr)
 +{
 +	return machine_to_phys(daddr);
 +}
-+
+ 
+-#define address_needs_mapping(hwdev, addr, size) \
+-	!is_buffer_dma_capable(dma_get_mask(hwdev), addr, size)
 +void dma_generic_free_coherent(struct device *, size_t, void *, dma_addr_t);
  
  extern int range_straddles_page_boundary(paddr_t p, size_t size);
@@ -725,7 +727,7 @@ Automatically created from "patches.kernel.org/patch-2.6.32" by xen-port-patches
  endif
  
  disabled-obj-$(CONFIG_XEN) := %_uv.o crash.o early-quirks.o i8237.o i8253.o \
---- 13.2.orig/arch/x86/kernel/apic/hw_nmi.c	2014-10-16 11:41:01.000000000 +0200
+--- 13.2.orig/arch/x86/kernel/apic/hw_nmi.c	2015-03-05 10:15:49.000000000 +0100
 +++ 13.2/arch/x86/kernel/apic/hw_nmi.c	2014-07-03 11:42:17.000000000 +0200
 @@ -27,6 +27,10 @@ u64 hw_nmi_get_sample_period(int watchdo
  #endif
@@ -1775,7 +1777,7 @@ Automatically created from "patches.kernel.org/patch-2.6.32" by xen-port-patches
  #endif
  
  /* Make sure %fs and %gs are initialized properly in idle threads */
---- 13.2.orig/arch/x86/kernel/cpu/mcheck/mce-inject.c	2014-10-16 11:41:01.000000000 +0200
+--- 13.2.orig/arch/x86/kernel/cpu/mcheck/mce-inject.c	2015-03-05 10:15:49.000000000 +0100
 +++ 13.2/arch/x86/kernel/cpu/mcheck/mce-inject.c	2013-08-09 14:55:42.000000000 +0200
 @@ -152,7 +152,7 @@ static void raise_mce(struct mce *m)
  	if (context == MCJ_CTX_RANDOM)
@@ -3311,16 +3313,16 @@ Automatically created from "patches.kernel.org/patch-2.6.32" by xen-port-patches
  static u8 __initdata irq_used[MAX_IRQ_SOURCES];
  
 --- 13.2.orig/arch/x86/kernel/pci-dma-xen.c	2012-04-04 14:30:36.000000000 +0200
-+++ 13.2/arch/x86/kernel/pci-dma-xen.c	2012-04-04 14:30:59.000000000 +0200
++++ 13.2/arch/x86/kernel/pci-dma-xen.c	2015-03-05 10:26:25.000000000 +0100
 @@ -2,6 +2,7 @@
  #include <linux/dma-debug.h>
  #include <linux/bootmem.h>
  #include <linux/pci.h>
 +#include <linux/kmemleak.h>
  
- #include <asm/proto.h>
- #include <asm/dma.h>
-@@ -29,18 +30,23 @@ int no_iommu __initdata;
+ #include <xen/interface/memory.h>
+ 
+@@ -31,18 +32,23 @@ int no_iommu __initdata;
  /* Set this to 1 if there is a HW IOMMU in the system */
  int iommu_detected __read_mostly = 0;
  
@@ -3349,7 +3351,7 @@ Automatically created from "patches.kernel.org/patch-2.6.32" by xen-port-patches
  	.dma_mask = &x86_dma_fallback_dev.coherent_dma_mask,
  };
  EXPORT_SYMBOL(x86_dma_fallback_dev);
-@@ -86,6 +92,11 @@ void __init dma32_reserve_bootmem(void)
+@@ -88,6 +94,11 @@ void __init dma32_reserve_bootmem(void)
  	size = roundup(dma32_bootmem_size, align);
  	dma32_bootmem_ptr = __alloc_bootmem_nopanic(size, align,
  				 512ULL<<20);
@@ -3361,7 +3363,7 @@ Automatically created from "patches.kernel.org/patch-2.6.32" by xen-port-patches
  	if (dma32_bootmem_ptr)
  		dma32_bootmem_size = size;
  	else
-@@ -176,7 +187,7 @@ again:
+@@ -178,7 +189,7 @@ again:
  
  #ifndef CONFIG_XEN
  	addr = page_to_phys(page);
@@ -3370,7 +3372,7 @@ Automatically created from "patches.kernel.org/patch-2.6.32" by xen-port-patches
  		__free_pages(page, order);
  
  		if (dma_mask < DMA_BIT_MASK(32) && !(flag & GFP_DMA)) {
-@@ -265,10 +276,8 @@ static __init int iommu_setup(char *p)
+@@ -267,10 +278,8 @@ static __init int iommu_setup(char *p)
  			swiotlb = 1;
  #endif
  #ifndef CONFIG_XEN
@@ -3382,7 +3384,7 @@ Automatically created from "patches.kernel.org/patch-2.6.32" by xen-port-patches
  
  		gart_parse_options(p);
  #endif
-@@ -381,7 +390,7 @@ void pci_iommu_shutdown(void)
+@@ -392,7 +401,7 @@ void pci_iommu_shutdown(void)
  	amd_iommu_shutdown();
  }
  /* Must execute after PCI subsystem */
@@ -4030,7 +4032,7 @@ Automatically created from "patches.kernel.org/patch-2.6.32" by xen-port-patches
  #endif /* CONFIG_X86_32 */
  
  #ifdef CONFIG_XEN
---- 13.2.orig/arch/x86/platform/sfi/sfi.c	2014-10-16 11:41:01.000000000 +0200
+--- 13.2.orig/arch/x86/platform/sfi/sfi.c	2015-03-05 10:15:49.000000000 +0100
 +++ 13.2/arch/x86/platform/sfi/sfi.c	2011-02-02 08:45:00.000000000 +0100
 @@ -32,6 +32,7 @@
  #include <asm/apic.h>
@@ -5768,7 +5770,7 @@ Automatically created from "patches.kernel.org/patch-2.6.32" by xen-port-patches
  				BUG();
  		} else {
  			xen_l1_entry_update(ptep, entry);
---- 13.2.orig/arch/x86/mm/physaddr.c	2014-10-16 11:41:01.000000000 +0200
+--- 13.2.orig/arch/x86/mm/physaddr.c	2015-03-05 10:15:49.000000000 +0100
 +++ 13.2/arch/x86/mm/physaddr.c	2013-03-21 15:12:19.000000000 +0100
 @@ -9,6 +9,10 @@
  
@@ -6052,7 +6054,7 @@ Automatically created from "patches.kernel.org/patch-2.6.32" by xen-port-patches
  
  	pr->cdev = thermal_cooling_device_register("Processor", device,
  						   &processor_cooling_ops);
---- 13.2.orig/drivers/char/agp/agp.h	2014-10-16 11:41:01.000000000 +0200
+--- 13.2.orig/drivers/char/agp/agp.h	2015-03-05 10:15:49.000000000 +0100
 +++ 13.2/drivers/char/agp/agp.h	2011-02-01 14:54:13.000000000 +0100
 @@ -31,6 +31,10 @@
  
@@ -6065,7 +6067,7 @@ Automatically created from "patches.kernel.org/patch-2.6.32" by xen-port-patches
  #define PFX "agpgart: "
  
  //#define AGP_DEBUG 1
---- 13.2.orig/drivers/char/agp/amd-k7-agp.c	2014-10-16 11:41:01.000000000 +0200
+--- 13.2.orig/drivers/char/agp/amd-k7-agp.c	2015-03-05 10:15:49.000000000 +0100
 +++ 13.2/drivers/char/agp/amd-k7-agp.c	2011-02-17 10:18:42.000000000 +0100
 @@ -141,7 +141,7 @@ static int amd_create_gatt_table(struct 
  
@@ -6085,7 +6087,7 @@ Automatically created from "patches.kernel.org/patch-2.6.32" by xen-port-patches
  			page_dir.remapped+GET_PAGE_DIR_OFF(addr));
  		readl(page_dir.remapped+GET_PAGE_DIR_OFF(addr));	/* PCI Posting. */
  	}
---- 13.2.orig/drivers/char/agp/amd64-agp.c	2014-10-16 11:41:01.000000000 +0200
+--- 13.2.orig/drivers/char/agp/amd64-agp.c	2015-03-05 10:15:49.000000000 +0100
 +++ 13.2/drivers/char/agp/amd64-agp.c	2013-01-14 13:52:00.000000000 +0100
 @@ -178,7 +178,7 @@ static const struct aper_size_info_32 am
  
@@ -6105,7 +6107,7 @@ Automatically created from "patches.kernel.org/patch-2.6.32" by xen-port-patches
  			   amd64_aperture_sizes[bridge->aperture_size_idx].size);
  	agp_remove_bridge(bridge);
  	agp_put_bridge(bridge);
---- 13.2.orig/drivers/char/agp/ati-agp.c	2014-10-16 11:41:01.000000000 +0200
+--- 13.2.orig/drivers/char/agp/ati-agp.c	2015-03-05 10:15:49.000000000 +0100
 +++ 13.2/drivers/char/agp/ati-agp.c	2011-02-01 14:54:13.000000000 +0100
 @@ -361,7 +361,7 @@ static int ati_create_gatt_table(struct 
  
@@ -6125,7 +6127,7 @@ Automatically created from "patches.kernel.org/patch-2.6.32" by xen-port-patches
  			page_dir.remapped+GET_PAGE_DIR_OFF(addr));
  		readl(page_dir.remapped+GET_PAGE_DIR_OFF(addr));	/* PCI Posting. */
  	}
---- 13.2.orig/drivers/char/agp/efficeon-agp.c	2014-10-16 11:41:01.000000000 +0200
+--- 13.2.orig/drivers/char/agp/efficeon-agp.c	2015-03-05 10:15:49.000000000 +0100
 +++ 13.2/drivers/char/agp/efficeon-agp.c	2011-02-01 14:54:13.000000000 +0100
 @@ -226,7 +226,7 @@ static int efficeon_create_gatt_table(st
  
@@ -6167,7 +6169,7 @@ Automatically created from "patches.kernel.org/patch-2.6.32" by xen-port-patches
  #define USE_PCI_DMA_API 1
  #else
  #define USE_PCI_DMA_API 0
---- 13.2.orig/drivers/char/agp/sworks-agp.c	2014-10-16 11:41:01.000000000 +0200
+--- 13.2.orig/drivers/char/agp/sworks-agp.c	2015-03-05 10:15:49.000000000 +0100
 +++ 13.2/drivers/char/agp/sworks-agp.c	2011-02-01 14:54:13.000000000 +0100
 @@ -155,7 +155,7 @@ static int serverworks_create_gatt_table
  	/* Create a fake scratch directory */
@@ -6207,7 +6209,7 @@ Automatically created from "patches.kernel.org/patch-2.6.32" by xen-port-patches
  #endif
  
  #endif /* IOATDMA_H */
---- 13.2.orig/drivers/dma/ioat/dma_v2.h	2014-10-16 11:41:01.000000000 +0200
+--- 13.2.orig/drivers/dma/ioat/dma_v2.h	2015-03-05 10:15:49.000000000 +0100
 +++ 13.2/drivers/dma/ioat/dma_v2.h	2013-12-02 17:50:56.000000000 +0100
 @@ -176,4 +176,10 @@ int ioat2_quiesce(struct ioat_chan_commo
  int ioat2_reset_sync(struct ioat_chan_common *chan, unsigned long tmo);
@@ -6220,7 +6222,7 @@ Automatically created from "patches.kernel.org/patch-2.6.32" by xen-port-patches
 +#endif
 +
  #endif /* IOATDMA_V2_H */
---- 13.2.orig/drivers/dma/ioat/hw.h	2014-10-16 11:41:01.000000000 +0200
+--- 13.2.orig/drivers/dma/ioat/hw.h	2015-03-05 10:15:49.000000000 +0100
 +++ 13.2/drivers/dma/ioat/hw.h	2013-05-23 17:33:52.000000000 +0200
 @@ -64,7 +64,11 @@
  #define IOAT_VER_3_3            0x33    /* Version 3.3 */
@@ -6234,7 +6236,7 @@ Automatically created from "patches.kernel.org/patch-2.6.32" by xen-port-patches
  
  struct ioat_dma_descriptor {
  	uint32_t	size;
---- 13.2.orig/drivers/gpu/drm/radeon/radeon_device.c	2014-10-16 11:41:01.000000000 +0200
+--- 13.2.orig/drivers/gpu/drm/radeon/radeon_device.c	2015-03-05 10:15:49.000000000 +0100
 +++ 13.2/drivers/gpu/drm/radeon/radeon_device.c	2013-08-09 14:56:33.000000000 +0200
 @@ -685,6 +685,18 @@ int radeon_dummy_page_init(struct radeon
  	rdev->dummy_page.page = alloc_page(GFP_DMA32 | GFP_KERNEL | __GFP_ZERO);
@@ -6395,7 +6397,7 @@ Automatically created from "patches.kernel.org/patch-2.6.32" by xen-port-patches
  #include "pci.h"
  #include "msi.h"
  
-@@ -467,7 +466,7 @@ static int msix_capability_init(struct p
+@@ -469,7 +468,7 @@ static int msix_capability_init(struct p
   * to determine if MSI/-X are supported for the device. If MSI/-X is
   * supported return 0, else return an error code.
   **/
@@ -6404,7 +6406,7 @@ Automatically created from "patches.kernel.org/patch-2.6.32" by xen-port-patches
  {
  	struct pci_bus *bus;
  	int ret;
-@@ -484,8 +483,9 @@ static int pci_msi_check_device(struct p
+@@ -486,8 +485,9 @@ static int pci_msi_check_device(struct p
  	if (nvec < 1)
  		return -ERANGE;
  
@@ -6416,7 +6418,7 @@ Automatically created from "patches.kernel.org/patch-2.6.32" by xen-port-patches
  	 * the secondary pci_bus.
  	 * We expect only arch-specific PCI host bus controller driver
  	 * or quirks for specific PCI bridges to be setting NO_MSI.
-@@ -601,7 +601,7 @@ void pci_msi_shutdown(struct pci_dev *de
+@@ -603,7 +603,7 @@ void pci_msi_shutdown(struct pci_dev *de
  	dev->msi_enabled = 0;
  }
  
@@ -6425,7 +6427,7 @@ Automatically created from "patches.kernel.org/patch-2.6.32" by xen-port-patches
  {
  	pci_msi_shutdown(dev);
  }
-@@ -639,14 +639,14 @@ int pci_msix_table_size(struct pci_dev *
+@@ -641,14 +641,14 @@ int pci_msix_table_size(struct pci_dev *
   * of irqs or MSI-X vectors available. Driver should use the returned value to
   * re-send its request.
   **/
@@ -6442,7 +6444,7 @@ Automatically created from "patches.kernel.org/patch-2.6.32" by xen-port-patches
  
  	if (!is_initial_xendomain()) {
  #ifdef CONFIG_XEN_PCIDEV_FRONTEND
-@@ -722,7 +722,7 @@ int pci_enable_msix(struct pci_dev* dev,
+@@ -724,7 +724,7 @@ int pci_enable_msix(struct pci_dev* dev,
  }
  EXPORT_SYMBOL(pci_enable_msix);
  
@@ -6451,7 +6453,7 @@ Automatically created from "patches.kernel.org/patch-2.6.32" by xen-port-patches
  {
  	if (!pci_msi_enable || !dev || !dev->msix_enabled)
  		return;
-@@ -743,7 +743,8 @@ void pci_msix_shutdown(struct pci_dev* d
+@@ -745,7 +745,8 @@ void pci_msix_shutdown(struct pci_dev* d
  	}
  	dev->msix_enabled = 0;
  }
@@ -6461,7 +6463,7 @@ Automatically created from "patches.kernel.org/patch-2.6.32" by xen-port-patches
  {
  	pci_msix_shutdown(dev);
  }
-@@ -758,14 +759,14 @@ EXPORT_SYMBOL(pci_disable_msix);
+@@ -760,14 +761,14 @@ EXPORT_SYMBOL(pci_disable_msix);
   * allocated for this device function, are reclaimed to unused state,
   * which may be used later on.
   **/
@@ -6480,7 +6482,7 @@ Automatically created from "patches.kernel.org/patch-2.6.32" by xen-port-patches
  
 --- 13.2.orig/drivers/pci/probe.c	2013-09-26 12:50:35.000000000 +0200
 +++ 13.2/drivers/pci/probe.c	2013-12-02 17:51:03.000000000 +0100
-@@ -1452,6 +1452,10 @@ static unsigned next_fn(struct pci_bus *
+@@ -1456,6 +1456,10 @@ static unsigned next_fn(struct pci_bus *
  	/* dev may be NULL for non-contiguous multifunction devices */
  	if (!dev || dev->multifunction)
  		return (fn + 1) % 8;
@@ -6491,7 +6493,7 @@ Automatically created from "patches.kernel.org/patch-2.6.32" by xen-port-patches
  
  	return 0;
  }
-@@ -1490,9 +1494,12 @@ int pci_scan_slot(struct pci_bus *bus, i
+@@ -1494,9 +1498,12 @@ int pci_scan_slot(struct pci_bus *bus, i
  		return 0; /* Already scanned the entire slot */
  
  	dev = pci_scan_single_device(bus, devfn);
@@ -6506,7 +6508,7 @@ Automatically created from "patches.kernel.org/patch-2.6.32" by xen-port-patches
  		nr++;
  
  	for (fn = next_fn(bus, dev, 0); fn > 0; fn = next_fn(bus, dev, fn)) {
---- 13.2.orig/drivers/sfi/sfi_core.c	2014-10-16 11:41:01.000000000 +0200
+--- 13.2.orig/drivers/sfi/sfi_core.c	2015-03-05 10:15:49.000000000 +0100
 +++ 13.2/drivers/sfi/sfi_core.c	2011-02-01 14:54:13.000000000 +0100
 @@ -486,6 +486,11 @@ void __init sfi_init(void)
  	if (!acpi_disabled)
@@ -6810,7 +6812,7 @@ Automatically created from "patches.kernel.org/patch-2.6.32" by xen-port-patches
  	if (err) {
  		pr_err("Xen suspend can't run on CPU0 (%d)\n", err);
  		goto fail;
---- 13.2.orig/drivers/xen/dbgp.c	2014-10-16 11:41:01.000000000 +0200
+--- 13.2.orig/drivers/xen/dbgp.c	2015-03-05 10:15:49.000000000 +0100
 +++ 13.2/drivers/xen/dbgp.c	2012-05-02 15:15:24.000000000 +0200
 @@ -2,7 +2,11 @@
  #include <linux/usb.h>
@@ -7070,7 +7072,7 @@ Automatically created from "patches.kernel.org/patch-2.6.32" by xen-port-patches
  #include <linux/proc_fs.h>
  #include <linux/notifier.h>
  #include <linux/mutex.h>
---- 13.2.orig/fs/proc/kcore.c	2014-10-16 11:41:01.000000000 +0200
+--- 13.2.orig/fs/proc/kcore.c	2015-03-05 10:15:49.000000000 +0100
 +++ 13.2/fs/proc/kcore.c	2013-05-23 17:32:56.000000000 +0200
 @@ -134,7 +134,7 @@ static void __kcore_update_ram(struct li
  }
@@ -7093,7 +7095,7 @@ Automatically created from "patches.kernel.org/patch-2.6.32" by xen-port-patches
  	ent->type = KCORE_RAM;
  	list_add(&ent->list, &head);
  	__kcore_update_ram(&head);
---- 13.2.orig/include/linux/nmi.h	2014-10-16 11:41:01.000000000 +0200
+--- 13.2.orig/include/linux/nmi.h	2015-03-05 10:15:49.000000000 +0100
 +++ 13.2/include/linux/nmi.h	2011-02-16 09:06:03.000000000 +0100
 @@ -18,6 +18,9 @@
  #include <asm/nmi.h>
@@ -7105,7 +7107,7 @@ Automatically created from "patches.kernel.org/patch-2.6.32" by xen-port-patches
  static inline void touch_nmi_watchdog(void)
  {
  	touch_softlockup_watchdog();
---- 13.2.orig/include/linux/usb/ehci_def.h	2014-10-16 11:41:01.000000000 +0200
+--- 13.2.orig/include/linux/usb/ehci_def.h	2015-03-05 10:15:49.000000000 +0100
 +++ 13.2/include/linux/usb/ehci_def.h	2012-10-23 15:27:11.000000000 +0200
 @@ -223,7 +223,7 @@ extern struct console early_dbgp_console
  

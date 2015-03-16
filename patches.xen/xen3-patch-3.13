@@ -1153,7 +1153,7 @@ Acked-by: jbeulich@suse.com
  #define MAX_CORE_ATTRS		4	/* Maximum no of basic attrs */
  #define TOTAL_ATTRS		(MAX_CORE_ATTRS + 1)
  #define MAX_CORE_DATA		(NUM_REAL_CORES + BASE_SYSFS_ATTR_NO)
---- 13.2.orig/drivers/misc/mic/Kconfig	2014-10-16 11:41:01.000000000 +0200
+--- 13.2.orig/drivers/misc/mic/Kconfig	2015-03-05 10:15:48.000000000 +0100
 +++ 13.2/drivers/misc/mic/Kconfig	2014-04-30 11:34:05.000000000 +0200
 @@ -2,7 +2,7 @@ comment "Intel MIC Host Driver"
  
@@ -1174,7 +1174,7 @@ Acked-by: jbeulich@suse.com
  	help
  	  This enables card driver support for the Intel Many Integrated
 --- 13.2.orig/drivers/pci/msi-xen.c	2013-09-26 15:33:39.000000000 +0200
-+++ 13.2/drivers/pci/msi-xen.c	2013-12-11 16:30:51.000000000 +0100
++++ 13.2/drivers/pci/msi-xen.c	2015-03-05 10:29:42.000000000 +0100
 @@ -236,7 +236,7 @@ static u64 find_table_base(struct pci_de
  	unsigned long flags;
  
@@ -1183,8 +1183,8 @@ Acked-by: jbeulich@suse.com
 +	bar = reg & PCI_MSIX_PBA_BIR;
  
  	flags = pci_resource_flags(dev, bar);
- 	if (flags & (IORESOURCE_DISABLED | IORESOURCE_UNSET | IORESOURCE_BUSY))
-@@ -640,7 +640,7 @@ static int msix_capability_init(struct p
+ 	if (!flags ||
+@@ -642,7 +642,7 @@ static int msix_capability_init(struct p
   * @nvec: how many MSIs have been requested ?
   * @type: are we checking for MSI or MSI-X ?
   *
@@ -1193,7 +1193,7 @@ Acked-by: jbeulich@suse.com
   * to determine if MSI/-X are supported for the device. If MSI/-X is
   * supported return 0, else return an error code.
   **/
-@@ -698,7 +698,7 @@ int pci_enable_msi_block(struct pci_dev 
+@@ -700,7 +700,7 @@ int pci_enable_msi_block(struct pci_dev 
  	u16 msgctl;
  	struct msi_dev_list *msi_dev_entry = get_msi_dev_pirq_list(dev);
  
@@ -1202,7 +1202,7 @@ Acked-by: jbeulich@suse.com
  		return -EINVAL;
  
  	pci_read_config_word(dev, dev->msi_cap + PCI_MSI_FLAGS, &msgctl);
-@@ -757,7 +757,7 @@ int pci_enable_msi_block_auto(struct pci
+@@ -759,7 +759,7 @@ int pci_enable_msi_block_auto(struct pci
  	int ret, nvec;
  	u16 msgctl;
  
@@ -1211,7 +1211,7 @@ Acked-by: jbeulich@suse.com
  		return -EINVAL;
  
  	pci_read_config_word(dev, dev->msi_cap + PCI_MSI_FLAGS, &msgctl);
-@@ -853,7 +853,7 @@ int pci_enable_msix(struct pci_dev *dev,
+@@ -855,7 +855,7 @@ int pci_enable_msix(struct pci_dev *dev,
  	int i, j, temp;
  	struct msi_dev_list *msi_dev_entry = get_msi_dev_pirq_list(dev);
  
@@ -1220,6 +1220,17 @@ Acked-by: jbeulich@suse.com
  		return -EINVAL;
  
  	if (!is_initial_xendomain()) {
+--- 13.2.orig/drivers/powercap/Kconfig	2014-01-20 03:40:07.000000000 +0100
++++ 13.2/drivers/powercap/Kconfig	2014-11-03 14:26:56.000000000 +0100
+@@ -17,7 +17,7 @@ if POWERCAP
+ # Client driver configurations go here.
+ config INTEL_RAPL
+ 	tristate "Intel RAPL Support"
+-	depends on X86
++	depends on X86 && !XEN
+ 	default n
+ 	---help---
+ 	  This enables support for the Intel Running Average Power Limit (RAPL)
 --- 13.2.orig/drivers/xen/netback/common.h	2013-10-29 10:17:45.000000000 +0100
 +++ 13.2/drivers/xen/netback/common.h	2014-01-28 17:45:44.000000000 +0100
 @@ -67,7 +67,9 @@ typedef struct netif_st {

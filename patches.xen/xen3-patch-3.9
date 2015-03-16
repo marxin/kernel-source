@@ -46,7 +46,7 @@ Acked-by: jbeulich@suse.com
  
  	ALIGN
  GLOBAL(stub32_clone)
---- 13.2.orig/arch/x86/include/asm/efi.h	2014-10-16 11:41:01.000000000 +0200
+--- 13.2.orig/arch/x86/include/asm/efi.h	2015-03-05 10:15:48.000000000 +0100
 +++ 13.2/arch/x86/include/asm/efi.h	2014-04-30 11:28:12.000000000 +0200
 @@ -119,7 +119,11 @@ extern u64 efi_setup;
  
@@ -77,7 +77,7 @@ Acked-by: jbeulich@suse.com
  
  static inline unsigned long __phys_addr_nodebug(unsigned long x)
  {
---- 13.2.orig/arch/x86/include/asm/processor.h	2014-10-16 11:41:01.000000000 +0200
+--- 13.2.orig/arch/x86/include/asm/processor.h	2015-03-05 10:15:48.000000000 +0100
 +++ 13.2/arch/x86/include/asm/processor.h	2013-12-03 08:34:25.000000000 +0100
 @@ -973,7 +973,7 @@ extern unsigned long arch_align_stack(un
  extern void free_init_pages(char *what, unsigned long begin, unsigned long end);
@@ -1642,7 +1642,7 @@ Acked-by: jbeulich@suse.com
 -
  	start_kernel();
  }
---- 13.2.orig/arch/x86/kernel/head_64.S	2014-10-16 11:41:01.000000000 +0200
+--- 13.2.orig/arch/x86/kernel/head_64.S	2015-03-05 10:15:48.000000000 +0100
 +++ 13.2/arch/x86/kernel/head_64.S	2013-06-04 13:59:45.000000000 +0200
 @@ -469,7 +469,7 @@ NEXT_PAGE(early_dynamic_pgts)
  
@@ -1692,7 +1692,7 @@ Acked-by: jbeulich@suse.com
  {
  	struct thread_struct *t = &current->thread;
  	unsigned int old = t->iopl >> 12;
---- 13.2.orig/arch/x86/kernel/process.c	2014-10-16 11:41:01.000000000 +0200
+--- 13.2.orig/arch/x86/kernel/process.c	2015-03-05 10:15:48.000000000 +0100
 +++ 13.2/arch/x86/kernel/process.c	2013-07-02 09:49:24.000000000 +0200
 @@ -314,7 +314,7 @@ void default_idle(void)
  EXPORT_SYMBOL(default_idle);
@@ -4572,7 +4572,7 @@ Acked-by: jbeulich@suse.com
  void __init early_iounmap(void __iomem *addr, unsigned long size)
  {
  	unsigned long virt_addr;
---- 13.2.orig/arch/x86/mm/mm_internal.h	2014-10-16 11:41:01.000000000 +0200
+--- 13.2.orig/arch/x86/mm/mm_internal.h	2015-03-05 10:15:48.000000000 +0100
 +++ 13.2/arch/x86/mm/mm_internal.h	2014-02-28 15:02:10.000000000 +0100
 @@ -12,8 +12,15 @@ void early_ioremap_page_table_range_init
  unsigned long kernel_physical_mapping_init(unsigned long start,
@@ -5045,7 +5045,7 @@ Acked-by: jbeulich@suse.com
  	{ 0x36, ANY, 100000 },	/* Atom Cedar Trail/Cedarview (N2xxx, D2xxx) */
  };
  
---- 13.2.orig/drivers/misc/vmw_vmci/Kconfig	2014-10-16 11:41:01.000000000 +0200
+--- 13.2.orig/drivers/misc/vmw_vmci/Kconfig	2015-03-05 10:15:48.000000000 +0100
 +++ 13.2/drivers/misc/vmw_vmci/Kconfig	2013-06-04 13:59:32.000000000 +0200
 @@ -4,7 +4,7 @@
  
@@ -5109,7 +5109,7 @@ Acked-by: jbeulich@suse.com
  }
  
  static u64 find_table_base(struct pci_dev *dev, int pos)
-@@ -265,7 +261,10 @@ static int msi_map_vector(struct pci_dev
+@@ -267,7 +263,10 @@ static int msi_map_vector(struct pci_dev
  	int rc = -EINVAL;
  
  	map_irq.domid = domid;
@@ -5121,7 +5121,7 @@ Acked-by: jbeulich@suse.com
  	map_irq.index = -1;
  	map_irq.pirq = -1;
  	map_irq.bus = dev->bus->number | (pci_domain_nr(dev->bus) << 16);
-@@ -275,6 +274,12 @@ static int msi_map_vector(struct pci_dev
+@@ -277,6 +276,12 @@ static int msi_map_vector(struct pci_dev
  
  	if (pci_seg_supported)
  		rc = HYPERVISOR_physdev_op(PHYSDEVOP_map_pirq, &map_irq);
@@ -5134,7 +5134,7 @@ Acked-by: jbeulich@suse.com
  #if CONFIG_XEN_COMPAT < 0x040200
  	if (rc == -EINVAL && !pci_domain_nr(dev->bus)) {
  		map_irq.type = MAP_PIRQ_TYPE_MSI;
-@@ -283,7 +288,7 @@ static int msi_map_vector(struct pci_dev
+@@ -285,7 +290,7 @@ static int msi_map_vector(struct pci_dev
  		map_irq.bus = dev->bus->number;
  		rc = HYPERVISOR_physdev_op(PHYSDEVOP_map_pirq, &map_irq);
  		if (rc != -EINVAL)
@@ -5143,7 +5143,7 @@ Acked-by: jbeulich@suse.com
  	}
  #endif
  	if (rc)
-@@ -297,20 +302,35 @@ static int msi_map_vector(struct pci_dev
+@@ -299,20 +304,35 @@ static int msi_map_vector(struct pci_dev
  
  	BUG_ON(map_irq.pirq <= 0);
  
@@ -5185,7 +5185,7 @@ Acked-by: jbeulich@suse.com
  	return map_irq.pirq;
  }
  
-@@ -516,9 +536,10 @@ static int msi_capability_init(struct pc
+@@ -518,9 +538,10 @@ static int msi_capability_init(struct pc
  	pos = pci_find_capability(dev, PCI_CAP_ID_MSI);
  	msi_set_enable(dev, pos, 0);	/* Disable MSI during set up */
  
@@ -5198,7 +5198,7 @@ Acked-by: jbeulich@suse.com
  
  	/* Set MSI enabled bits	 */
  	pci_intx_for_msi(dev, 0);
-@@ -599,7 +620,7 @@ static int msix_capability_init(struct p
+@@ -601,7 +622,7 @@ static int msix_capability_init(struct p
  			list_for_each_entry(pirq_entry, &dev->msi_list, list)
  				if (pirq_entry->entry_nr == entries[i].entry)
  					break;
@@ -5207,7 +5207,7 @@ Acked-by: jbeulich@suse.com
  				       msi_dev_entry->owner,
  				       &pirq_entry->kobj);
  			detach_pirq_entry(entries[j].entry, msi_dev_entry);
-@@ -695,7 +716,10 @@ int pci_enable_msi_block(struct pci_dev 
+@@ -697,7 +718,10 @@ int pci_enable_msi_block(struct pci_dev 
  	if (!pos)
  		return -EINVAL;
  	pci_read_config_word(dev, pos + PCI_MSI_FLAGS, &msgctl);
@@ -5219,7 +5219,7 @@ Acked-by: jbeulich@suse.com
  	if (nvec > maxvec)
  		return maxvec;
  
-@@ -708,11 +732,12 @@ int pci_enable_msi_block(struct pci_dev 
+@@ -710,11 +734,12 @@ int pci_enable_msi_block(struct pci_dev 
  		int ret;
  
  		temp = dev->irq;
@@ -5234,7 +5234,7 @@ Acked-by: jbeulich@suse.com
  		dev->msi_enabled = 1;
  		msi_dev_entry->default_irq = temp;
  		populate_msi_sysfs(dev);
-@@ -734,11 +759,39 @@ int pci_enable_msi_block(struct pci_dev 
+@@ -736,11 +761,39 @@ int pci_enable_msi_block(struct pci_dev 
  	status = msi_capability_init(dev, nvec);
  	if ( !status )
  		msi_dev_entry->default_irq = temp;
@@ -5274,7 +5274,7 @@ Acked-by: jbeulich@suse.com
  void pci_msi_shutdown(struct pci_dev *dev)
  {
  	int pirq, pos;
-@@ -749,7 +802,7 @@ void pci_msi_shutdown(struct pci_dev *de
+@@ -751,7 +804,7 @@ void pci_msi_shutdown(struct pci_dev *de
  
  	if (!is_initial_xendomain()) {
  #ifdef CONFIG_XEN_PCIDEV_FRONTEND
@@ -5283,7 +5283,7 @@ Acked-by: jbeulich@suse.com
  		pci_frontend_disable_msi(dev);
  		dev->irq = msi_dev_entry->default_irq;
  		dev->msi_enabled = 0;
-@@ -760,8 +813,8 @@ void pci_msi_shutdown(struct pci_dev *de
+@@ -762,8 +815,8 @@ void pci_msi_shutdown(struct pci_dev *de
  	pirq = dev->irq;
  	/* Restore dev->irq to its default pin-assertion vector */
  	dev->irq = msi_dev_entry->default_irq;
@@ -5294,7 +5294,7 @@ Acked-by: jbeulich@suse.com
  	msi_dev_entry->owner = DOMID_IO;
  	memset(&msi_dev_entry->e.kobj, 0, sizeof(msi_dev_entry->e.kobj));
  
-@@ -850,7 +903,7 @@ int pci_enable_msix(struct pci_dev *dev,
+@@ -852,7 +905,7 @@ int pci_enable_msix(struct pci_dev *dev,
  			}
  			if (mapped)
  				continue;
@@ -5303,7 +5303,7 @@ Acked-by: jbeulich@suse.com
  			attach_pirq_entry(irq, entries[i].entry, msi_dev_entry);
  			entries[i].vector = irq;
  		}
-@@ -958,11 +1011,11 @@ void msi_remove_pci_irq_vectors(struct p
+@@ -960,11 +1013,11 @@ void msi_remove_pci_irq_vectors(struct p
  		if (!pirq_entry)
  			break;
  		if (is_initial_xendomain())
@@ -5317,7 +5317,7 @@ Acked-by: jbeulich@suse.com
  		kfree(pirq_entry);
  	}
  	msi_dev_entry->owner = DOMID_IO;
-@@ -971,7 +1024,7 @@ void msi_remove_pci_irq_vectors(struct p
+@@ -973,7 +1026,7 @@ void msi_remove_pci_irq_vectors(struct p
  
  void pci_no_msi(void)
  {
@@ -5326,7 +5326,7 @@ Acked-by: jbeulich@suse.com
  }
  
  /**
---- 13.2.orig/drivers/thermal/Kconfig	2014-10-16 11:41:01.000000000 +0200
+--- 13.2.orig/drivers/thermal/Kconfig	2015-03-05 10:15:48.000000000 +0100
 +++ 13.2/drivers/thermal/Kconfig	2013-09-26 13:24:10.000000000 +0200
 @@ -189,7 +189,7 @@ config DB8500_CPUFREQ_COOLING
  config INTEL_POWERCLAMP

@@ -7,7 +7,7 @@ Patch-mainline: 3.8
 Automatically created from "patch-3.8" by xen-port-patches.py
 Acked-by: jbeulich@suse.com
 
---- 13.2.orig/Documentation/filesystems/proc.txt	2014-10-16 11:41:01.000000000 +0200
+--- 13.2.orig/Documentation/filesystems/proc.txt	2015-03-05 10:15:48.000000000 +0100
 +++ 13.2/Documentation/filesystems/proc.txt	2013-12-03 08:31:16.000000000 +0100
 @@ -464,6 +464,7 @@ manner. The codes are the following:
      mm  - mixed map area
@@ -485,7 +485,7 @@ Acked-by: jbeulich@suse.com
  	addq $8, %rsp
 --- 13.2.orig/arch/x86/kernel/pci-dma-xen.c	2012-08-20 14:37:06.000000000 +0200
 +++ 13.2/arch/x86/kernel/pci-dma-xen.c	2013-02-06 15:28:03.000000000 +0100
-@@ -55,7 +55,7 @@ struct device x86_dma_fallback_dev = {
+@@ -57,7 +57,7 @@ struct device x86_dma_fallback_dev = {
  EXPORT_SYMBOL(x86_dma_fallback_dev);
  
  /* Number of entries preallocated for DMA-API debugging */
@@ -494,7 +494,7 @@ Acked-by: jbeulich@suse.com
  
  int dma_set_mask(struct device *dev, u64 mask)
  {
-@@ -350,7 +350,7 @@ rootfs_initcall(pci_iommu_init);
+@@ -361,7 +361,7 @@ rootfs_initcall(pci_iommu_init);
  #ifdef CONFIG_PCI
  /* Many VIA bridges seem to corrupt data for DAC. Disable it here */
  
@@ -811,7 +811,7 @@ Acked-by: jbeulich@suse.com
  	}
  #endif
  }
---- 13.2.orig/arch/x86/kernel/topology.c	2014-10-16 11:41:01.000000000 +0200
+--- 13.2.orig/arch/x86/kernel/topology.c	2015-03-05 10:15:48.000000000 +0100
 +++ 13.2/arch/x86/kernel/topology.c	2013-12-03 08:31:51.000000000 +0100
 @@ -37,7 +37,9 @@ static DEFINE_PER_CPU(struct x86_cpu, cp
  
@@ -1189,7 +1189,7 @@ Acked-by: jbeulich@suse.com
  		}
  	}
  
---- 13.2.orig/arch/x86/pci/common.c	2014-10-16 11:41:01.000000000 +0200
+--- 13.2.orig/arch/x86/pci/common.c	2015-03-05 10:15:48.000000000 +0100
 +++ 13.2/arch/x86/pci/common.c	2013-06-20 15:31:28.000000000 +0200
 @@ -625,6 +625,7 @@ unsigned int pcibios_assign_all_busses(v
  
@@ -1643,7 +1643,7 @@ Acked-by: jbeulich@suse.com
  #endif
  xenbus_init(void)
  {
---- 13.2.orig/fs/proc/task_mmu.c	2014-10-16 11:41:01.000000000 +0200
+--- 13.2.orig/fs/proc/task_mmu.c	2015-03-05 10:15:48.000000000 +0100
 +++ 13.2/fs/proc/task_mmu.c	2013-12-03 08:33:41.000000000 +0100
 @@ -574,8 +574,12 @@ static void show_smap_vma_flags(struct s
  		[ilog2(VM_SOFTDIRTY)]	= "sd",
@@ -1658,7 +1658,7 @@ Acked-by: jbeulich@suse.com
  		[ilog2(VM_MERGEABLE)]	= "mg",
  	};
  	size_t i;
---- 13.2.orig/include/linux/clocksource.h	2014-10-16 11:41:01.000000000 +0200
+--- 13.2.orig/include/linux/clocksource.h	2015-03-05 10:15:48.000000000 +0100
 +++ 13.2/include/linux/clocksource.h	2013-05-14 08:46:48.000000000 +0200
 @@ -16,7 +16,9 @@
  #include <linux/timer.h>

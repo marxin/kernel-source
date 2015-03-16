@@ -187,7 +187,7 @@ Acked-by: jbeulich@novell.com
  disabled-obj-$(CONFIG_XEN_UNPRIVILEGED_GUEST) += mpparse_64.o
 -%/head_64.o %/head_64.s: $(if $(CONFIG_XEN),EXTRA_AFLAGS,dummy) :=
 +%/head_64.o %/head_64.s: asflags-$(CONFIG_XEN) :=
---- 13.2.orig/arch/x86/kernel/acpi/processor_extcntl_xen.c	2010-03-22 12:00:53.000000000 +0100
+--- 13.2.orig/arch/x86/kernel/acpi/processor_extcntl_xen.c	2015-03-05 10:15:50.000000000 +0100
 +++ 13.2/arch/x86/kernel/acpi/processor_extcntl_xen.c	2011-01-31 17:56:27.000000000 +0100
 @@ -68,7 +68,7 @@ static int xen_cx_notifier(struct acpi_p
  
@@ -207,7 +207,7 @@ Acked-by: jbeulich@novell.com
  		kfree(buf);
  		return -EINVAL;
  	}
---- 13.2.orig/arch/x86/kernel/cpu/Makefile	2014-10-16 11:41:02.000000000 +0200
+--- 13.2.orig/arch/x86/kernel/cpu/Makefile	2015-03-05 10:15:50.000000000 +0100
 +++ 13.2/arch/x86/kernel/cpu/Makefile	2013-08-09 12:27:55.000000000 +0200
 @@ -48,6 +48,8 @@ obj-$(CONFIG_X86_LOCAL_APIC)		+= perfctr
  
@@ -239,9 +239,9 @@ Acked-by: jbeulich@novell.com
  	c->x86_clflush_size = 32;
  	memset(&c->x86_capability, 0, sizeof c->x86_capability);
  
---- 13.2.orig/arch/x86/kernel/cpu/intel.c	2014-10-16 11:41:02.000000000 +0200
+--- 13.2.orig/arch/x86/kernel/cpu/intel.c	2015-03-05 10:15:50.000000000 +0100
 +++ 13.2/arch/x86/kernel/cpu/intel.c	2014-07-29 11:03:48.000000000 +0200
-@@ -299,6 +299,7 @@ static void srat_detect_node(struct cpui
+@@ -314,6 +314,7 @@ static void srat_detect_node(struct cpui
  #endif
  }
  
@@ -249,7 +249,7 @@ Acked-by: jbeulich@novell.com
  /*
   * find out the number of processor cores on the die
   */
-@@ -316,6 +317,7 @@ static int intel_num_cpu_cores(struct cp
+@@ -331,6 +332,7 @@ static int intel_num_cpu_cores(struct cp
  	else
  		return 1;
  }
@@ -257,7 +257,7 @@ Acked-by: jbeulich@novell.com
  
  static void detect_vmx_virtcap(struct cpuinfo_x86 *c)
  {
-@@ -370,6 +372,7 @@ static void init_intel(struct cpuinfo_x8
+@@ -385,6 +387,7 @@ static void init_intel(struct cpuinfo_x8
  	 */
  	detect_extended_topology(c);
  
@@ -265,7 +265,7 @@ Acked-by: jbeulich@novell.com
  	if (!cpu_has(c, X86_FEATURE_XTOPOLOGY)) {
  		/*
  		 * let's use the legacy cpuid vector 0x1 and 0x4 for topology
-@@ -380,6 +383,7 @@ static void init_intel(struct cpuinfo_x8
+@@ -395,6 +398,7 @@ static void init_intel(struct cpuinfo_x8
  		detect_ht(c);
  #endif
  	}
@@ -597,7 +597,7 @@ Acked-by: jbeulich@novell.com
  	call do_exit
  	CFI_ENDPROC
  ENDPROC(child_rip)
---- 13.2.orig/arch/x86/kernel/fixup.c	2008-01-28 12:24:18.000000000 +0100
+--- 13.2.orig/arch/x86/kernel/fixup.c	2015-03-05 10:15:50.000000000 +0100
 +++ 13.2/arch/x86/kernel/fixup.c	2011-01-31 17:56:27.000000000 +0100
 @@ -34,7 +34,7 @@
  #include <linux/delay.h>
@@ -1051,8 +1051,8 @@ Acked-by: jbeulich@novell.com
  	 */
  	for (i = 0; i < 16; i++) {
  		int idx;
---- 13.2.orig/arch/x86/kernel/pci-dma-xen.c	2011-01-31 17:49:31.000000000 +0100
-+++ 13.2/arch/x86/kernel/pci-dma-xen.c	2012-11-14 12:41:31.000000000 +0100
+--- 13.2.orig/arch/x86/kernel/pci-dma-xen.c	2015-03-05 10:19:40.000000000 +0100
++++ 13.2/arch/x86/kernel/pci-dma-xen.c	2015-03-05 10:20:54.000000000 +0100
 @@ -13,14 +13,13 @@
  #include <linux/pci.h>
  #include <linux/module.h>
@@ -1069,8 +1069,8 @@ Acked-by: jbeulich@novell.com
 +#include <asm/gnttab_dma.h>
  #include <asm/bug.h>
  
- #ifdef __x86_64__
-@@ -106,27 +105,29 @@ int range_straddles_page_boundary(paddr_
+ #include <xen/interface/memory.h>
+@@ -108,27 +107,29 @@ int range_straddles_page_boundary(paddr_
  }
  
  int
@@ -1111,7 +1111,7 @@ Acked-by: jbeulich@novell.com
  		}
  		rc = nents;
  	}
-@@ -137,17 +138,19 @@ dma_map_sg(struct device *hwdev, struct 
+@@ -139,17 +140,19 @@ dma_map_sg(struct device *hwdev, struct 
  EXPORT_SYMBOL(dma_map_sg);
  
  void
@@ -1135,7 +1135,16 @@ Acked-by: jbeulich@novell.com
  	}
  }
  EXPORT_SYMBOL(dma_unmap_sg);
-@@ -258,7 +261,8 @@ void dma_free_coherent(struct device *de
+@@ -214,7 +217,7 @@ u64 dma_get_required_mask(struct device 
+ 	unsigned long max_mfn = HYPERVISOR_memory_op(XENMEM_maximum_ram_page,
+ 						     NULL);
+ 
+-	return (((u64)1 << (__fls(max_mfn - 1) + 1 + PAGE_SHIFT)) - 1)
++	return DMA_BIT_MASK(__fls(max_mfn - 1) + 1 + PAGE_SHIFT)
+ 	       & *dev->dma_mask;
+ }
+ EXPORT_SYMBOL_GPL(dma_get_required_mask);
+@@ -270,7 +273,8 @@ void dma_free_coherent(struct device *de
  {
  	struct dma_coherent_mem *mem = dev ? dev->dma_mem : NULL;
  	int order = get_order(size);
@@ -2704,7 +2713,7 @@ Acked-by: jbeulich@novell.com
  {
  	memset(pmd, 0, PTRS_PER_PMD*sizeof(pmd_t));
  }
---- 13.2.orig/arch/x86/pci/pcifront.c	2009-03-18 10:39:31.000000000 +0100
+--- 13.2.orig/arch/x86/pci/pcifront.c	2015-03-05 10:15:50.000000000 +0100
 +++ 13.2/arch/x86/pci/pcifront.c	2011-01-31 17:56:27.000000000 +0100
 @@ -31,7 +31,7 @@ static int __init pcifront_x86_stub_init
  	if (raw_pci_ops)
@@ -2715,7 +2724,7 @@ Acked-by: jbeulich@novell.com
  
  	/* Copied from arch/i386/pci/common.c */
  	pci_cache_line_size = 32 >> 2;
---- 13.2.orig/drivers/acpi/processor_core.c	2014-10-16 11:41:02.000000000 +0200
+--- 13.2.orig/drivers/acpi/processor_core.c	2015-03-05 10:15:50.000000000 +0100
 +++ 13.2/drivers/acpi/processor_core.c	2013-12-02 16:51:12.000000000 +0100
 @@ -187,11 +187,21 @@ int acpi_map_cpuid(int apic_id, u32 acpi
  	}
@@ -2781,7 +2790,7 @@ Acked-by: jbeulich@novell.com
  
  
  static inline int
---- 13.2.orig/drivers/cpuidle/Kconfig	2014-10-16 11:41:02.000000000 +0200
+--- 13.2.orig/drivers/cpuidle/Kconfig	2015-03-05 10:15:50.000000000 +0100
 +++ 13.2/drivers/cpuidle/Kconfig	2013-09-26 12:40:55.000000000 +0200
 @@ -2,6 +2,7 @@ menu "CPU Idle"
  
@@ -2791,7 +2800,7 @@ Acked-by: jbeulich@novell.com
  	default y if ACPI || PPC_PSERIES
  	select CPU_IDLE_GOV_LADDER if (!NO_HZ && !NO_HZ_IDLE)
  	select CPU_IDLE_GOV_MENU if (NO_HZ || NO_HZ_IDLE)
---- 13.2.orig/drivers/dma/Kconfig	2014-10-16 11:41:02.000000000 +0200
+--- 13.2.orig/drivers/dma/Kconfig	2015-03-05 10:15:50.000000000 +0100
 +++ 13.2/drivers/dma/Kconfig	2014-01-07 16:24:29.000000000 +0100
 @@ -63,7 +63,7 @@ config INTEL_IOATDMA
  	depends on PCI && X86
@@ -2802,14 +2811,14 @@ Acked-by: jbeulich@novell.com
  	help
  	  Enable support for the Intel(R) I/OAT DMA engine present
  	  in recent Intel Xeon chipsets.
---- 13.2.orig/drivers/dma/ioat/Makefile	2014-10-16 11:41:02.000000000 +0200
+--- 13.2.orig/drivers/dma/ioat/Makefile	2015-03-05 10:15:50.000000000 +0100
 +++ 13.2/drivers/dma/ioat/Makefile	2011-01-31 17:56:27.000000000 +0100
 @@ -1,2 +1,3 @@
  obj-$(CONFIG_INTEL_IOATDMA) += ioatdma.o
 -ioatdma-y := pci.o dma.o dma_v2.o dma_v3.o dca.o
 +dca-$(CONFIG_DCA) := dca.o
 +ioatdma-y := pci.o dma.o dma_v2.o dma_v3.o $(dca-y) $(dca-m)
---- 13.2.orig/drivers/dma/ioat/dca.c	2014-10-16 11:41:02.000000000 +0200
+--- 13.2.orig/drivers/dma/ioat/dca.c	2015-03-05 10:15:50.000000000 +0100
 +++ 13.2/drivers/dma/ioat/dca.c	2013-05-23 17:09:55.000000000 +0200
 @@ -707,3 +707,15 @@ struct dca_provider *ioat3_dca_init(stru
  
@@ -2827,7 +2836,7 @@ Acked-by: jbeulich@novell.com
 +	free_dca_provider(device->dca);
 +	device->dca = NULL;
 +}
---- 13.2.orig/drivers/dma/ioat/dma.h	2014-10-16 11:41:02.000000000 +0200
+--- 13.2.orig/drivers/dma/ioat/dma.h	2015-03-05 10:15:50.000000000 +0100
 +++ 13.2/drivers/dma/ioat/dma.h	2013-12-02 16:51:24.000000000 +0100
 @@ -360,4 +360,22 @@ void ioat_stop(struct ioat_chan_common *
  extern const struct sysfs_ops ioat_sysfs_ops;
@@ -2852,7 +2861,7 @@ Acked-by: jbeulich@novell.com
 +#endif
 +
  #endif /* IOATDMA_H */
---- 13.2.orig/drivers/dma/ioat/pci.c	2014-10-16 11:41:02.000000000 +0200
+--- 13.2.orig/drivers/dma/ioat/pci.c	2015-03-05 10:15:50.000000000 +0100
 +++ 13.2/drivers/dma/ioat/pci.c	2013-12-02 16:51:25.000000000 +0100
 @@ -29,7 +29,6 @@
  #include <linux/module.h>
@@ -2988,7 +2997,7 @@ Acked-by: jbeulich@novell.com
  	struct oprofile_cpu_buffer *cpu_buf = &__get_cpu_var(op_cpu_buffer);
 --- 13.2.orig/drivers/pci/msi-xen.c	2013-04-26 10:34:42.000000000 +0200
 +++ 13.2/drivers/pci/msi-xen.c	2013-04-26 10:43:22.000000000 +0200
-@@ -278,6 +278,12 @@ static int msi_map_vector(struct pci_dev
+@@ -280,6 +280,12 @@ static int msi_map_vector(struct pci_dev
  		map_irq.pirq : evtchn_map_pirq(-1, map_irq.pirq));
  }
  
@@ -3001,7 +3010,7 @@ Acked-by: jbeulich@novell.com
  #ifdef CONFIG_PM
  void pci_restore_msi_state(struct pci_dev *dev)
  {
-@@ -286,7 +292,7 @@ void pci_restore_msi_state(struct pci_de
+@@ -288,7 +294,7 @@ void pci_restore_msi_state(struct pci_de
  	if (!dev->msi_enabled && !dev->msix_enabled)
  		return;
  
@@ -3010,7 +3019,7 @@ Acked-by: jbeulich@novell.com
  	if (dev->msi_enabled)
  		msi_set_enable(dev, 0);
  	if (dev->msix_enabled)
-@@ -338,7 +344,7 @@ static int msi_capability_init(struct pc
+@@ -340,7 +346,7 @@ static int msi_capability_init(struct pc
  		return -EBUSY;
  
  	/* Set MSI enabled bits	 */
@@ -3019,7 +3028,7 @@ Acked-by: jbeulich@novell.com
  	msi_set_enable(dev, 1);
  	dev->msi_enabled = 1;
  
-@@ -412,7 +418,7 @@ static int msix_capability_init(struct p
+@@ -414,7 +420,7 @@ static int msix_capability_init(struct p
  		return avail;
  	}
  
@@ -3028,7 +3037,7 @@ Acked-by: jbeulich@novell.com
  	msix_set_enable(dev, 1);
  	dev->msix_enabled = 1;
  
-@@ -547,7 +553,7 @@ void pci_disable_msi(struct pci_dev* dev
+@@ -549,7 +555,7 @@ void pci_disable_msi(struct pci_dev* dev
  
  	/* Disable MSI mode */
  	msi_set_enable(dev, 0);
@@ -3037,7 +3046,7 @@ Acked-by: jbeulich@novell.com
  	dev->msi_enabled = 0;
  }
  EXPORT_SYMBOL(pci_disable_msi);
-@@ -670,7 +676,7 @@ void pci_disable_msix(struct pci_dev* de
+@@ -672,7 +678,7 @@ void pci_disable_msix(struct pci_dev* de
  	/* Disable MSI mode */
  	if (is_initial_xendomain()) {
  		msix_set_enable(dev, 0);
@@ -3120,7 +3129,7 @@ Acked-by: jbeulich@novell.com
  	return -ENOMEM;
  }
  
---- 13.2.orig/drivers/xen/blkback/blkback-pagemap.c	2009-06-09 15:01:37.000000000 +0200
+--- 13.2.orig/drivers/xen/blkback/blkback-pagemap.c	2015-03-05 10:15:50.000000000 +0100
 +++ 13.2/drivers/xen/blkback/blkback-pagemap.c	2011-01-31 17:56:27.000000000 +0100
 @@ -38,8 +38,8 @@ blkback_pagemap_set(int idx, struct page
  
@@ -3151,7 +3160,7 @@ Acked-by: jbeulich@novell.com
  		BUG();
  	}
  
---- 13.2.orig/drivers/xen/blkback/vbd.c	2011-06-30 15:37:44.000000000 +0200
+--- 13.2.orig/drivers/xen/blkback/vbd.c	2015-03-05 10:15:50.000000000 +0100
 +++ 13.2/drivers/xen/blkback/vbd.c	2011-06-30 16:32:27.000000000 +0200
 @@ -133,18 +133,18 @@ void vbd_resize(blkif_t *blkif)
  	struct xenbus_device *dev = blkif->be->dev;
@@ -3566,7 +3575,7 @@ Acked-by: jbeulich@novell.com
  		return irq;
  	}
  
---- 13.2.orig/drivers/xen/core/cpu_hotplug.c	2013-01-30 10:25:34.000000000 +0100
+--- 13.2.orig/drivers/xen/core/cpu_hotplug.c	2015-03-05 10:15:50.000000000 +0100
 +++ 13.2/drivers/xen/core/cpu_hotplug.c	2013-01-30 10:36:33.000000000 +0100
 @@ -36,7 +36,7 @@ static void vcpu_hotplug(unsigned int cp
  	sprintf(dir, "cpu/%u", cpu);
@@ -3651,7 +3660,7 @@ Acked-by: jbeulich@novell.com
  		       irq, type_from_irq(irq), index_from_irq(irq), xen_pirq);
  		return -EINVAL;
  	}
---- 13.2.orig/drivers/xen/core/firmware.c	2012-06-12 15:05:58.000000000 +0200
+--- 13.2.orig/drivers/xen/core/firmware.c	2015-03-05 10:15:50.000000000 +0100
 +++ 13.2/drivers/xen/core/firmware.c	2012-06-12 15:13:59.000000000 +0200
 @@ -1,4 +1,5 @@
  #include <linux/kernel.h>
@@ -4634,7 +4643,7 @@ Acked-by: jbeulich@novell.com
  	unsigned int irq;
  	unsigned int copying_receiver;
  	unsigned int carrier;
---- 13.2.orig/drivers/xen/xen-pciback/slot.c	2009-03-18 10:39:32.000000000 +0100
+--- 13.2.orig/drivers/xen/xen-pciback/slot.c	2015-03-05 10:15:50.000000000 +0100
 +++ 13.2/drivers/xen/xen-pciback/slot.c	2011-01-31 17:56:27.000000000 +0100
 @@ -64,9 +64,9 @@ int pciback_add_pci_dev(struct pciback_d
  	for (bus = 0; bus < PCI_BUS_NBR; bus++)
@@ -4649,7 +4658,7 @@ Acked-by: jbeulich@novell.com
  				slot_dev->slots[bus][slot] = dev;
  				goto unlock;
  			}
---- 13.2.orig/drivers/xen/pcifront/Makefile	2007-06-12 13:13:45.000000000 +0200
+--- 13.2.orig/drivers/xen/pcifront/Makefile	2015-03-05 10:15:50.000000000 +0100
 +++ 13.2/drivers/xen/pcifront/Makefile	2011-01-31 17:56:27.000000000 +0100
 @@ -2,6 +2,4 @@ obj-y += pcifront.o
  
@@ -4990,7 +4999,7 @@ Acked-by: jbeulich@novell.com
  	return -ENOMEM;
  }
  
---- 13.2.orig/drivers/xen/scsiback/translate.c	2008-07-21 11:00:33.000000000 +0200
+--- 13.2.orig/drivers/xen/scsiback/translate.c	2015-03-05 10:15:50.000000000 +0100
 +++ 13.2/drivers/xen/scsiback/translate.c	2011-01-31 17:56:27.000000000 +0100
 @@ -62,8 +62,8 @@ int scsiback_add_translation_entry(struc
  		if ((entry->v.chn == v->chn) &&
@@ -5012,7 +5021,7 @@ Acked-by: jbeulich@novell.com
  		err = -ENOMEM;
  		goto out;
  	}
---- 13.2.orig/drivers/xen/scsiback/xenbus.c	2012-01-20 14:18:49.000000000 +0100
+--- 13.2.orig/drivers/xen/scsiback/xenbus.c	2015-03-05 10:15:50.000000000 +0100
 +++ 13.2/drivers/xen/scsiback/xenbus.c	2011-06-30 16:32:56.000000000 +0200
 @@ -101,14 +101,13 @@ struct scsi_device *scsiback_get_scsi_de
  
@@ -5190,7 +5199,7 @@ Acked-by: jbeulich@novell.com
  
  		spin_lock_irqsave(&fwd_set->fwd_lock, flags);
  		/*
---- 13.2.orig/drivers/xen/sfc_netback/accel_msg.c	2008-02-20 09:32:49.000000000 +0100
+--- 13.2.orig/drivers/xen/sfc_netback/accel_msg.c	2015-03-05 10:15:50.000000000 +0100
 +++ 13.2/drivers/xen/sfc_netback/accel_msg.c	2011-01-31 17:56:27.000000000 +0100
 @@ -57,11 +57,11 @@ static void netback_accel_msg_tx_localma
  {
@@ -5316,7 +5325,7 @@ Acked-by: jbeulich@novell.com
  
  		if (ip->protocol == IPPROTO_TCP) {
  			struct tcphdr *tcp = (struct tcphdr *)
---- 13.2.orig/drivers/xen/sfc_netutil/accel_msg_iface.c	2008-02-20 09:32:49.000000000 +0100
+--- 13.2.orig/drivers/xen/sfc_netutil/accel_msg_iface.c	2015-03-05 10:15:50.000000000 +0100
 +++ 13.2/drivers/xen/sfc_netutil/accel_msg_iface.c	2011-01-31 17:56:27.000000000 +0100
 @@ -36,7 +36,7 @@
  #else
@@ -5327,7 +5336,7 @@ Acked-by: jbeulich@novell.com
  		       __FUNCTION__, _p);				\
  		return _errval;						\
  	}
---- 13.2.orig/drivers/xen/sfc_netutil/accel_util.h	2008-02-20 09:32:49.000000000 +0100
+--- 13.2.orig/drivers/xen/sfc_netutil/accel_util.h	2015-03-05 10:15:50.000000000 +0100
 +++ 13.2/drivers/xen/sfc_netutil/accel_util.h	2011-01-31 17:56:27.000000000 +0100
 @@ -63,9 +63,6 @@
  			DPRINTK("%s at %s:%d\n", #exp, __FILE__, __LINE__); \
@@ -5548,7 +5557,7 @@ Acked-by: jbeulich@novell.com
  		goto out;
  	}
  
---- 13.2.orig/drivers/xen/usbback/xenbus.c	2011-12-21 10:02:58.000000000 +0100
+--- 13.2.orig/drivers/xen/usbback/xenbus.c	2015-03-05 10:15:50.000000000 +0100
 +++ 13.2/drivers/xen/usbback/xenbus.c	2011-06-30 16:33:08.000000000 +0200
 @@ -240,9 +240,9 @@ static int connect_rings(usbif_t *usbif)
  		return err;
@@ -5597,7 +5606,7 @@ Acked-by: jbeulich@novell.com
  }
  
  static inline void remove_debug_file(struct usbfront_info *info)
---- 13.2.orig/drivers/xen/usbfront/usbfront-hcd.c	2009-10-15 11:45:41.000000000 +0200
+--- 13.2.orig/drivers/xen/usbfront/usbfront-hcd.c	2015-03-05 10:15:50.000000000 +0100
 +++ 13.2/drivers/xen/usbfront/usbfront-hcd.c	2011-01-31 17:56:27.000000000 +0100
 @@ -114,7 +114,6 @@ static void xenhcd_stop(struct usb_hcd *
   * non-error returns are promise to giveback the urb later
@@ -5633,7 +5642,7 @@ Acked-by: jbeulich@novell.com
  
  done:
 --- 13.2.orig/drivers/xen/usbfront/usbfront-q.c	2011-01-31 17:29:16.000000000 +0100
-+++ 13.2/drivers/xen/usbfront/usbfront-q.c	2011-01-31 17:56:27.000000000 +0100
++++ 13.2/drivers/xen/usbfront/usbfront-q.c	2014-12-04 12:45:23.000000000 +0100
 @@ -151,7 +151,7 @@ static int map_urb_for_request(struct us
  
  		ret = gnttab_alloc_grant_references(USBIF_MAX_SEGMENTS_PER_REQUEST, &gref_head);
@@ -5643,13 +5652,21 @@ Acked-by: jbeulich@novell.com
  			return -ENOMEM;
  		}
  
-@@ -236,7 +236,8 @@ __acquires(info->lock)
+@@ -221,6 +221,7 @@ __releases(info->lock)
+ __acquires(info->lock)
+ {
+ 	struct urb_priv *urbp = (struct urb_priv *) urb->hcpriv;
++	int urbp_status = urbp->status;
+ 
+ 	list_del_init(&urbp->list);
+ 	free_urb_priv(urbp);
+@@ -236,7 +237,8 @@ __acquires(info->lock)
  		COUNT(info->stats.complete);
  	}
  	spin_unlock(&info->lock);
 -	usb_hcd_giveback_urb(info_to_hcd(info), urb);
 +	usb_hcd_giveback_urb(info_to_hcd(info), urb,
-+			     urbp->status <= 0 ? urbp->status : urb->status);
++			     urbp_status <= 0 ? urbp_status : urb->status);
  	spin_lock(&info->lock);
  }
  
@@ -6143,7 +6160,7 @@ Acked-by: jbeulich@novell.com
  		return max_cstate;
  }
  
---- 13.2.orig/arch/x86/include/mach-xen/asm/agp.h	2007-06-22 09:08:06.000000000 +0200
+--- 13.2.orig/arch/x86/include/mach-xen/asm/agp.h	2015-03-05 10:15:50.000000000 +0100
 +++ 13.2/arch/x86/include/mach-xen/asm/agp.h	2011-01-31 17:56:27.000000000 +0100
 @@ -1,20 +1,22 @@
 -#ifndef AGP_H
@@ -6297,8 +6314,8 @@ Acked-by: jbeulich@novell.com
 +# include "fixmap_64.h"
 +#endif
 --- /dev/null	1970-01-01 00:00:00.000000000 +0000
-+++ 13.2/arch/x86/include/mach-xen/asm/hypercall.h	2012-10-31 11:11:46.000000000 +0100
-@@ -0,0 +1,424 @@
++++ 13.2/arch/x86/include/mach-xen/asm/hypercall.h	2015-03-05 10:21:00.000000000 +0100
+@@ -0,0 +1,419 @@
 +/******************************************************************************
 + * hypercall.h
 + *
@@ -6461,6 +6478,11 @@ Acked-by: jbeulich@novell.com
 +	__res;							\
 +})
 +
++#if CONFIG_XEN_COMPAT <= 0x030002
++int __must_check HYPERVISOR_event_channel_op_compat(int, void *);
++int __must_check HYPERVISOR_physdev_op_compat(int, void *);
++#endif
++
 +#ifdef CONFIG_X86_32
 +# include "hypercall_32.h"
 +#else
@@ -6563,13 +6585,13 @@ Acked-by: jbeulich@novell.com
 +	return _hypercall1(unsigned long, get_debugreg, reg);
 +}
 +
-+static inline int __must_check
++static inline long __must_check
 +HYPERVISOR_memory_op(
 +	unsigned int cmd, void *arg)
 +{
 +	if (arch_use_lazy_mmu_mode())
 +		xen_multicall_flush(false);
-+	return _hypercall2(int, memory_op, cmd, arg);
++	return _hypercall2(long, memory_op, cmd, arg);
 +}
 +
 +static inline int __must_check
@@ -6586,13 +6608,8 @@ Acked-by: jbeulich@novell.com
 +	int rc = _hypercall2(int, event_channel_op, cmd, arg);
 +
 +#if CONFIG_XEN_COMPAT <= 0x030002
-+	if (unlikely(rc == -ENOSYS)) {
-+		struct evtchn_op op;
-+		op.cmd = cmd;
-+		memcpy(&op.u, arg, sizeof(op.u));
-+		rc = _hypercall1(int, event_channel_op_compat, &op);
-+		memcpy(arg, &op.u, sizeof(op.u));
-+	}
++	if (unlikely(rc == -ENOSYS))
++		rc = HYPERVISOR_event_channel_op_compat(cmd, arg);
 +#endif
 +
 +	return rc;
@@ -6619,13 +6636,8 @@ Acked-by: jbeulich@novell.com
 +	int rc = _hypercall2(int, physdev_op, cmd, arg);
 +
 +#if CONFIG_XEN_COMPAT <= 0x030002
-+	if (unlikely(rc == -ENOSYS)) {
-+		struct physdev_op op;
-+		op.cmd = cmd;
-+		memcpy(&op.u, arg, sizeof(op.u));
-+		rc = _hypercall1(int, physdev_op_compat, &op);
-+		memcpy(arg, &op.u, sizeof(op.u));
-+	}
++	if (unlikely(rc == -ENOSYS))
++		rc = HYPERVISOR_physdev_op_compat(cmd, arg);
 +#endif
 +
 +	return rc;
@@ -7159,8 +7171,8 @@ Acked-by: jbeulich@novell.com
 -
 -
 -#endif /* __HYPERCALL_H__ */
---- 13.2.orig/arch/x86/include/mach-xen/asm/hypercall_64.h	2012-10-31 10:59:05.000000000 +0100
-+++ 13.2/arch/x86/include/mach-xen/asm/hypercall_64.h	2012-10-31 11:11:50.000000000 +0100
+--- 13.2.orig/arch/x86/include/mach-xen/asm/hypercall_64.h	2015-03-05 10:18:46.000000000 +0100
++++ 13.2/arch/x86/include/mach-xen/asm/hypercall_64.h	2015-03-05 10:21:01.000000000 +0100
 @@ -1,202 +1,10 @@
 -/******************************************************************************
 - * hypercall.h
@@ -7398,7 +7410,7 @@ Acked-by: jbeulich@novell.com
  
  static inline long __must_check
  HYPERVISOR_set_timer_op(
-@@ -235,34 +23,6 @@ HYPERVISOR_set_timer_op(
+@@ -235,56 +23,12 @@ HYPERVISOR_set_timer_op(
  }
  
  static inline int __must_check
@@ -7433,16 +7445,16 @@ Acked-by: jbeulich@novell.com
  HYPERVISOR_update_descriptor(
  	unsigned long ma, unsigned long word)
  {
-@@ -270,22 +30,6 @@ HYPERVISOR_update_descriptor(
+ 	return _hypercall2(int, update_descriptor, ma, word);
  }
  
- static inline int __must_check
+-static inline long __must_check
 -HYPERVISOR_memory_op(
 -	unsigned int cmd, void *arg)
 -{
 -	if (arch_use_lazy_mmu_mode())
 -		xen_multicall_flush(false);
--	return _hypercall2(int, memory_op, cmd, arg);
+-	return _hypercall2(long, memory_op, cmd, arg);
 -}
 -
 -static inline int __must_check
@@ -7452,10 +7464,9 @@ Acked-by: jbeulich@novell.com
 -	return _hypercall2(int, multicall, call_list, nr_calls);
 -}
 -
--static inline int __must_check
+ static inline int __must_check
  HYPERVISOR_update_va_mapping(
  	unsigned long va, pte_t new_val, unsigned long flags)
- {
 @@ -295,57 +39,6 @@ HYPERVISOR_update_va_mapping(
  }
  
@@ -8391,7 +8402,7 @@ Acked-by: jbeulich@novell.com
 +} while (0)
 +
 +#endif
---- 13.2.orig/arch/x86/include/asm/mmu.h	2014-10-16 11:41:02.000000000 +0200
+--- 13.2.orig/arch/x86/include/asm/mmu.h	2015-03-05 10:15:50.000000000 +0100
 +++ 13.2/arch/x86/include/asm/mmu.h	2014-06-26 14:34:30.000000000 +0200
 @@ -16,6 +16,9 @@ typedef struct {
  	/* True if mm supports a task running in 32 bit compatibility mode. */
@@ -8432,7 +8443,7 @@ Acked-by: jbeulich@novell.com
  /* add a backtrace entry, to be called from the ->backtrace callback */
  void oprofile_add_trace(unsigned long eip);
  
---- 13.2.orig/include/uapi/linux/sysctl.h	2014-10-16 11:41:02.000000000 +0200
+--- 13.2.orig/include/uapi/linux/sysctl.h	2015-03-05 10:15:50.000000000 +0100
 +++ 13.2/include/uapi/linux/sysctl.h	2011-01-31 17:56:27.000000000 +0100
 @@ -59,6 +59,7 @@ enum
  	CTL_BUS=8,		/* Busses */
@@ -8442,7 +8453,7 @@ Acked-by: jbeulich@novell.com
  	CTL_ARLAN=254,		/* arlan wireless driver */
  	CTL_S390DBF=5677,	/* s390 debug */
  	CTL_SUNRPC=7249,	/* sunrpc debug */
---- 13.2.orig/include/xen/cpu_hotplug.h	2007-08-16 18:07:01.000000000 +0200
+--- 13.2.orig/include/xen/cpu_hotplug.h	2015-03-05 10:15:50.000000000 +0100
 +++ 13.2/include/xen/cpu_hotplug.h	2011-01-31 17:56:27.000000000 +0100
 @@ -25,8 +25,8 @@ void cpu_bringup(void);
  static inline int smp_suspend(void)
@@ -8455,7 +8466,7 @@ Acked-by: jbeulich@novell.com
  		return -EOPNOTSUPP;
  	}
  	return 0;
---- 13.2.orig/include/xen/gnttab.h	2014-01-30 09:17:00.000000000 +0100
+--- 13.2.orig/include/xen/gnttab.h	2015-03-05 10:15:50.000000000 +0100
 +++ 13.2/include/xen/gnttab.h	2012-03-12 13:39:32.000000000 +0100
 @@ -174,11 +174,11 @@ gnttab_set_replace_op(struct gnttab_unma
  		BUG_ON(__ret);							\
@@ -8508,7 +8519,7 @@ Acked-by: jbeulich@novell.com
  			       "TCP/UDP packet, dropping a protocol"
  			       " %d packet\n", iph->protocol);
  		goto out;
---- 13.2.orig/include/xen/pcifront.h	2013-04-26 09:53:53.000000000 +0200
+--- 13.2.orig/include/xen/pcifront.h	2015-03-05 10:15:50.000000000 +0100
 +++ 13.2/include/xen/pcifront.h	2013-04-26 11:45:57.000000000 +0200
 @@ -15,26 +15,7 @@ void pci_frontend_disable_msi(struct pci
  int pci_frontend_enable_msix(struct pci_dev *, struct msix_entry *, int nvec);
@@ -8613,7 +8624,7 @@ Acked-by: jbeulich@novell.com
  #endif
  	VMCOREINFO_SYMBOL(_stext);
  	VMCOREINFO_SYMBOL(vmap_area_list);
---- 13.2.orig/kernel/sysctl_binary.c	2014-10-16 11:41:02.000000000 +0200
+--- 13.2.orig/kernel/sysctl_binary.c	2015-03-05 10:15:50.000000000 +0100
 +++ 13.2/kernel/sysctl_binary.c	2013-08-09 12:28:28.000000000 +0200
 @@ -872,6 +872,14 @@ static const struct bin_table bin_bus_ta
  };

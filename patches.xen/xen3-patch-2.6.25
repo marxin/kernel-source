@@ -3027,9 +3027,19 @@ Automatically created from "patches.kernel.org/patch-2.6.25" by xen-port-patches
  		/*
  		 * For PCI devices assign IRQs in order, avoiding gaps
  		 * due to unused I/O APIC pins.
---- 13.2.orig/arch/x86/kernel/pci-dma-xen.c	2012-11-14 12:41:31.000000000 +0100
-+++ 13.2/arch/x86/kernel/pci-dma-xen.c	2011-01-31 18:01:51.000000000 +0100
-@@ -431,3 +431,23 @@ dma_sync_single_for_device(struct device
+--- 13.2.orig/arch/x86/kernel/pci-dma-xen.c	2015-03-05 10:20:54.000000000 +0100
++++ 13.2/arch/x86/kernel/pci-dma-xen.c	2014-11-27 15:59:41.000000000 +0100
+@@ -217,8 +217,7 @@ u64 dma_get_required_mask(struct device 
+ 	unsigned long max_mfn = HYPERVISOR_memory_op(XENMEM_maximum_ram_page,
+ 						     NULL);
+ 
+-	return DMA_BIT_MASK(__fls(max_mfn - 1) + 1 + PAGE_SHIFT)
+-	       & *dev->dma_mask;
++	return DMA_BIT_MASK(__fls(max_mfn - 1) + 1 + PAGE_SHIFT);
+ }
+ EXPORT_SYMBOL_GPL(dma_get_required_mask);
+ 
+@@ -443,3 +442,23 @@ dma_sync_single_for_device(struct device
  		swiotlb_sync_single_for_device(dev, dma_handle, size, direction);
  }
  EXPORT_SYMBOL(dma_sync_single_for_device);
@@ -4404,7 +4414,7 @@ Automatically created from "patches.kernel.org/patch-2.6.25" by xen-port-patches
 +	unsigned long range_end = mm->brk + 0x02000000;
 +	return randomize_range(mm->brk, range_end, 0) ? : mm->brk;
 +}
---- 13.2.orig/arch/x86/kernel/rtc.c	2014-10-16 11:41:02.000000000 +0200
+--- 13.2.orig/arch/x86/kernel/rtc.c	2015-03-05 10:15:49.000000000 +0100
 +++ 13.2/arch/x86/kernel/rtc.c	2013-08-09 12:31:17.000000000 +0200
 @@ -31,6 +31,7 @@ EXPORT_SYMBOL(cmos_lock);
  DEFINE_SPINLOCK(rtc_lock);
@@ -11948,7 +11958,7 @@ Automatically created from "patches.kernel.org/patch-2.6.25" by xen-port-patches
  vdso32.so-$(CONFIG_XEN)		+= $(xen-vdso32-y)
  
  vdso32-images			= $(vdso32.so-y:%=vdso32-%.so)
---- 13.2.orig/arch/x86/vdso/vdso32/syscall.S	2014-10-16 11:41:02.000000000 +0200
+--- 13.2.orig/arch/x86/vdso/vdso32/syscall.S	2015-03-05 10:15:49.000000000 +0100
 +++ 13.2/arch/x86/vdso/vdso32/syscall.S	2011-01-31 18:01:51.000000000 +0100
 @@ -19,8 +19,10 @@ __kernel_vsyscall:
  .Lpush_ebp:
@@ -12679,7 +12689,7 @@ Automatically created from "patches.kernel.org/patch-2.6.25" by xen-port-patches
  static void msi_set_enable(struct pci_dev *dev, int enable)
  {
  	int pos;
-@@ -284,7 +292,6 @@ static void pci_intx_for_msi(struct pci_
+@@ -286,7 +294,6 @@ static void pci_intx_for_msi(struct pci_
  		pci_intx(dev, enable);
  }
  
@@ -12687,7 +12697,7 @@ Automatically created from "patches.kernel.org/patch-2.6.25" by xen-port-patches
  void pci_restore_msi_state(struct pci_dev *dev)
  {
  	int rc = -ENOSYS;
-@@ -321,7 +328,7 @@ void pci_restore_msi_state(struct pci_de
+@@ -323,7 +330,7 @@ void pci_restore_msi_state(struct pci_de
  #endif
  	WARN(rc && rc != -ENOSYS, "restore_msi -> %d\n", rc);
  }
@@ -12696,7 +12706,7 @@ Automatically created from "patches.kernel.org/patch-2.6.25" by xen-port-patches
  
  /**
   * msi_capability_init - configure device's MSI capability structure
-@@ -724,12 +731,3 @@ void pci_msi_init_pci_dev(struct pci_dev
+@@ -726,12 +733,3 @@ void pci_msi_init_pci_dev(struct pci_dev
  {
  	INIT_LIST_HEAD(&dev->msi_list);
  }
@@ -12709,7 +12719,7 @@ Automatically created from "patches.kernel.org/patch-2.6.25" by xen-port-patches
 -{
 -	return 0;
 -}
---- 13.2.orig/drivers/pci/pci.c	2014-01-07 16:03:38.000000000 +0100
+--- 13.2.orig/drivers/pci/pci.c	2015-03-05 10:15:49.000000000 +0100
 +++ 13.2/drivers/pci/pci.c	2014-06-26 14:41:35.000000000 +0200
 @@ -473,7 +473,13 @@ int pci_wait_for_pending(struct pci_dev 
   * Restore the BAR values for a given device, so as to make it
@@ -12989,7 +12999,7 @@ Automatically created from "patches.kernel.org/patch-2.6.25" by xen-port-patches
  			blktap_request_free(tap, request);
  		}
  
---- 13.2.orig/drivers/xen/blktap2/ring.c	2011-04-11 13:43:15.000000000 +0200
+--- 13.2.orig/drivers/xen/blktap2/ring.c	2015-03-05 10:15:49.000000000 +0100
 +++ 13.2/drivers/xen/blktap2/ring.c	2011-01-31 18:01:51.000000000 +0100
 @@ -103,8 +103,8 @@ blktap_ring_clear_pte(struct vm_area_str
  	 * mapped region.
@@ -13013,7 +13023,7 @@ Automatically created from "patches.kernel.org/patch-2.6.25" by xen-port-patches
  
  	if (count)
  		if (HYPERVISOR_grant_table_op(GNTTABOP_unmap_grant_ref,
---- 13.2.orig/drivers/xen/core/Makefile	2012-10-31 10:29:18.000000000 +0100
+--- 13.2.orig/drivers/xen/core/Makefile	2015-03-05 10:15:49.000000000 +0100
 +++ 13.2/drivers/xen/core/Makefile	2011-11-03 12:12:01.000000000 +0100
 @@ -11,5 +11,6 @@ obj-$(CONFIG_SYS_HYPERVISOR)	+= hypervis
  obj-$(CONFIG_HOTPLUG_CPU)	+= cpu_hotplug.o
@@ -13210,8 +13220,8 @@ Automatically created from "patches.kernel.org/patch-2.6.25" by xen-port-patches
  
  	ctxt.ctrlreg[3] = xen_pfn_to_cr3(virt_to_mfn(init_level4_pgt));
 --- /dev/null	1970-01-01 00:00:00.000000000 +0000
-+++ 13.2/drivers/xen/core/spinlock.c	2014-03-11 10:15:23.000000000 +0100
-@@ -0,0 +1,403 @@
++++ 13.2/drivers/xen/core/spinlock.c	2015-01-12 15:17:55.000000000 +0100
+@@ -0,0 +1,401 @@
 +/*
 + *	Xen spinlock functions
 + *
@@ -13483,11 +13493,9 @@ Automatically created from "patches.kernel.org/patch-2.6.25" by xen-port-patches
 +		}
 +
 +#if CONFIG_XEN_SPINLOCK_ACQUIRE_NESTING
-+		if (upcall_mask > flags) {
-+			spinning.irq_count = __get_cpu_var(_irq_count);
-+			smp_wmb();
-+			raw_local_irq_restore(flags);
-+		}
++		spinning.irq_count = __get_cpu_var(_irq_count);
++		smp_wmb();
++		raw_local_irq_restore(flags);
 +#endif
 +
 +		if (!test_evtchn(__get_cpu_var(poll_evtchn)) &&
@@ -13792,7 +13800,7 @@ Automatically created from "patches.kernel.org/patch-2.6.25" by xen-port-patches
  	.resume		= xenoprof_resume,
  	.suspend	= xenoprof_suspend
  };
---- 13.2.orig/arch/x86/include/uapi/asm/e820.h	2014-10-16 11:41:02.000000000 +0200
+--- 13.2.orig/arch/x86/include/uapi/asm/e820.h	2015-03-05 10:15:49.000000000 +0100
 +++ 13.2/arch/x86/include/uapi/asm/e820.h	2013-01-08 11:47:19.000000000 +0100
 @@ -60,7 +60,11 @@ struct e820map {
  	struct e820entry map[E820_X_MAX];
@@ -13806,7 +13814,7 @@ Automatically created from "patches.kernel.org/patch-2.6.25" by xen-port-patches
  #define ISA_END_ADDRESS		0x100000
  
  #define BIOS_BEGIN		0x000a0000
---- 13.2.orig/arch/x86/include/asm/hardirq.h	2014-10-16 11:41:02.000000000 +0200
+--- 13.2.orig/arch/x86/include/asm/hardirq.h	2015-03-05 10:15:49.000000000 +0100
 +++ 13.2/arch/x86/include/asm/hardirq.h	2013-05-23 17:11:22.000000000 +0200
 @@ -21,11 +21,15 @@ typedef struct {
  #ifdef CONFIG_SMP
@@ -15922,7 +15930,7 @@ Automatically created from "patches.kernel.org/patch-2.6.25" by xen-port-patches
 -#define mfn_to_virt(m)		(__va(mfn_to_pfn(m) << PAGE_SHIFT))
 -
  #endif /* _I386_MADDR_H */
---- 13.2.orig/arch/x86/include/mach-xen/asm/maddr_64.h	2011-08-08 12:54:10.000000000 +0200
+--- 13.2.orig/arch/x86/include/mach-xen/asm/maddr_64.h	2015-03-05 10:15:49.000000000 +0100
 +++ 13.2/arch/x86/include/mach-xen/asm/maddr_64.h	2011-08-09 10:48:35.000000000 +0200
 @@ -1,124 +1,6 @@
  #ifndef _X86_64_MADDR_H
@@ -21270,7 +21278,7 @@ Automatically created from "patches.kernel.org/patch-2.6.25" by xen-port-patches
  void leave_mm(int cpu);
  #else
  static inline void leave_mm(int cpu)
---- 13.2.orig/arch/x86/include/asm/ptrace.h	2014-10-16 11:41:02.000000000 +0200
+--- 13.2.orig/arch/x86/include/asm/ptrace.h	2015-03-05 10:15:49.000000000 +0100
 +++ 13.2/arch/x86/include/asm/ptrace.h	2013-01-08 11:47:39.000000000 +0100
 @@ -223,7 +223,9 @@ static inline unsigned long regs_get_ker
  }
@@ -21335,7 +21343,7 @@ Automatically created from "patches.kernel.org/patch-2.6.25" by xen-port-patches
  	PG_savepinned = PG_dirty,
 --- 13.2.orig/include/linux/pci.h	2014-06-26 14:13:57.000000000 +0200
 +++ 13.2/include/linux/pci.h	2014-01-07 16:26:09.000000000 +0100
-@@ -984,6 +984,9 @@ void pci_update_resource(struct pci_dev 
+@@ -987,6 +987,9 @@ void pci_update_resource(struct pci_dev 
  int __must_check pci_assign_resource(struct pci_dev *dev, int i);
  int __must_check pci_reassign_resource(struct pci_dev *dev, int i, resource_size_t add_size, resource_size_t align);
  int pci_select_bars(struct pci_dev *dev, unsigned long flags);

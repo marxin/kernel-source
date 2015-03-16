@@ -71,7 +71,7 @@ Acked-by: jbeulich@suse.com
  	orl     $TS_COMPAT,TI_status+THREAD_INFO(%rsp,RIP-ARGOFFSET)
  	testl   $_TIF_WORK_SYSCALL_ENTRY,TI_flags+THREAD_INFO(%rsp,RIP-ARGOFFSET)
  	jnz   cstar_tracesys
---- 13.2.orig/arch/x86/include/asm/io_apic.h	2014-10-16 11:41:01.000000000 +0200
+--- 13.2.orig/arch/x86/include/asm/io_apic.h	2015-03-05 10:15:48.000000000 +0100
 +++ 13.2/arch/x86/include/asm/io_apic.h	2013-03-21 15:35:08.000000000 +0100
 @@ -186,6 +186,7 @@ extern void mp_save_irq(struct mpc_intsr
  
@@ -101,7 +101,7 @@ Acked-by: jbeulich@suse.com
  {
 --- 13.2.orig/arch/x86/include/mach-xen/asm/dma-mapping.h	2012-04-11 14:25:16.000000000 +0200
 +++ 13.2/arch/x86/include/mach-xen/asm/dma-mapping.h	2012-06-14 11:23:26.000000000 +0200
-@@ -18,9 +18,6 @@ static inline phys_addr_t dma_to_phys(st
+@@ -23,9 +23,6 @@ static inline phys_addr_t dma_to_phys(st
  	return machine_to_phys(daddr);
  }
  
@@ -1786,7 +1786,7 @@ Acked-by: jbeulich@suse.com
  	 * there is a real-mode segmented pointer pointing to the
 --- 13.2.orig/arch/x86/kernel/pci-dma-xen.c	2012-04-11 14:25:52.000000000 +0200
 +++ 13.2/arch/x86/kernel/pci-dma-xen.c	2012-06-19 12:14:10.000000000 +0200
-@@ -131,6 +131,7 @@ void *dma_generic_alloc_coherent(struct 
+@@ -133,6 +133,7 @@ void *dma_generic_alloc_coherent(struct 
  {
  	unsigned long dma_mask;
  	struct page *page;
@@ -1794,7 +1794,7 @@ Acked-by: jbeulich@suse.com
  #ifndef CONFIG_XEN
  	dma_addr_t addr;
  #else
-@@ -146,7 +147,11 @@ again:
+@@ -148,7 +149,11 @@ again:
  #else
  	flag &= ~(__GFP_DMA | __GFP_DMA32);
  #endif
@@ -1807,7 +1807,7 @@ Acked-by: jbeulich@suse.com
  	if (!page)
  		return NULL;
  
-@@ -178,17 +183,20 @@ again:
+@@ -180,17 +185,20 @@ again:
  #endif
  }
  
@@ -3099,7 +3099,7 @@ Acked-by: jbeulich@suse.com
  	if (num_online_cpus() == 1)
  		alternatives_smp_switch(1);
 --- 13.2.orig/drivers/xen/core/spinlock.c	2014-01-07 17:17:01.000000000 +0100
-+++ 13.2/drivers/xen/core/spinlock.c	2014-03-11 10:30:27.000000000 +0100
++++ 13.2/drivers/xen/core/spinlock.c	2015-03-05 10:28:51.000000000 +0100
 @@ -88,9 +88,9 @@ static inline void sequence(void)
  	unsigned int rm_idx;
  
@@ -3190,7 +3190,7 @@ Acked-by: jbeulich@suse.com
  
  		/*
  		 * Check again to make sure it didn't become free while
-@@ -271,19 +271,19 @@ bool xen_spin_wait(arch_spinlock_t *lock
+@@ -271,17 +271,17 @@ bool xen_spin_wait(arch_spinlock_t *lock
  			 * without rechecking the lock.
  			 */
  			if (spinning.prev)
@@ -3200,12 +3200,10 @@ Acked-by: jbeulich@suse.com
  		}
  
  #if CONFIG_XEN_SPINLOCK_ACQUIRE_NESTING
- 		if (upcall_mask > flags) {
--			spinning.irq_count = percpu_read(_irq_count);
-+			spinning.irq_count = __this_cpu_read(_irq_count);
- 			smp_wmb();
- 			arch_local_irq_restore(flags);
- 		}
+-		spinning.irq_count = percpu_read(_irq_count);
++		spinning.irq_count = __this_cpu_read(_irq_count);
+ 		smp_wmb();
+ 		arch_local_irq_restore(flags);
  #endif
  
 -		if (!test_evtchn(percpu_read(poll_evtchn)) &&
@@ -3213,7 +3211,7 @@ Acked-by: jbeulich@suse.com
  		    HYPERVISOR_poll_no_timeout(&__get_cpu_var(poll_evtchn), 1))
  			BUG();
  
-@@ -293,7 +293,7 @@ bool xen_spin_wait(arch_spinlock_t *lock
+@@ -291,7 +291,7 @@ bool xen_spin_wait(arch_spinlock_t *lock
  		spinning.irq_count = UINT_MAX;
  #endif
  
@@ -3222,7 +3220,7 @@ Acked-by: jbeulich@suse.com
  			inc_irq_stat(irq_lock_count);
  			break;
  		}
-@@ -305,7 +305,7 @@ bool xen_spin_wait(arch_spinlock_t *lock
+@@ -303,7 +303,7 @@ bool xen_spin_wait(arch_spinlock_t *lock
  	 */
  
  	/* announce we're done */
@@ -3231,7 +3229,7 @@ Acked-by: jbeulich@suse.com
  	if (!CONFIG_XEN_SPINLOCK_ACQUIRE_NESTING)
  		arch_local_irq_disable();
  	sequence();
-@@ -339,7 +339,7 @@ void xen_spin_kick(const arch_spinlock_t
+@@ -337,7 +337,7 @@ void xen_spin_kick(const arch_spinlock_t
  	if (unlikely(!cpu_online(local)))
  		stop = start = cpumask_cycle(local, cpu_online_mask);
  #if CONFIG_XEN_SPINLOCK_ACQUIRE_NESTING
@@ -3240,7 +3238,7 @@ Acked-by: jbeulich@suse.com
  		start = local;
  #endif
  	else {
-@@ -355,7 +355,7 @@ void xen_spin_kick(const arch_spinlock_t
+@@ -353,7 +353,7 @@ void xen_spin_kick(const arch_spinlock_t
  
  		flags = arch_local_irq_save();
  		if (cpu == local)

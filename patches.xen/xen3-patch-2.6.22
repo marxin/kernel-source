@@ -638,7 +638,7 @@ Acked-by: jbeulich@novell.com
  #include <asm/io.h>
  #include <xen/balloon.h>
  #include <xen/gnttab.h>
-@@ -275,7 +276,7 @@ int dma_declare_coherent_memory(struct d
+@@ -287,7 +288,7 @@ int dma_declare_coherent_memory(struct d
  {
  	void __iomem *mem_base = NULL;
  	int pages = size >> PAGE_SHIFT;
@@ -647,7 +647,7 @@ Acked-by: jbeulich@novell.com
  
  	if ((flags & (DMA_MEMORY_MAP | DMA_MEMORY_IO)) == 0)
  		goto out;
-@@ -348,6 +349,32 @@ void *dma_mark_declared_memory_occupied(
+@@ -360,6 +361,32 @@ void *dma_mark_declared_memory_occupied(
  EXPORT_SYMBOL(dma_mark_declared_memory_occupied);
  #endif /* ARCH_HAS_DMA_DECLARE_COHERENT_MEMORY */
  
@@ -2393,7 +2393,7 @@ Acked-by: jbeulich@novell.com
  #include <xen/interface/physdev.h>
  
  /* Set EXTENT bits starting at BASE in BITMAP to value TURN_ON. */
---- 13.2.orig/arch/x86/kernel/ldt-xen.c	2007-06-12 13:13:01.000000000 +0200
+--- 13.2.orig/arch/x86/kernel/ldt-xen.c	2015-03-05 10:15:50.000000000 +0100
 +++ 13.2/arch/x86/kernel/ldt-xen.c	2011-01-31 17:32:29.000000000 +0100
 @@ -13,7 +13,6 @@
  #include <linux/string.h>
@@ -3029,7 +3029,7 @@ Acked-by: jbeulich@novell.com
  	if (err <= 0) {
  		WPRINTK("bind_listening_port_to_irqhandler failed "
  			"(err=%d)\n", err);
---- 13.2.orig/drivers/hwmon/Kconfig	2014-10-16 11:41:02.000000000 +0200
+--- 13.2.orig/drivers/hwmon/Kconfig	2015-03-05 10:15:50.000000000 +0100
 +++ 13.2/drivers/hwmon/Kconfig	2013-09-26 12:37:23.000000000 +0200
 @@ -565,7 +565,7 @@ config SENSORS_IIO_HWMON
  
@@ -3564,7 +3564,7 @@ Acked-by: jbeulich@novell.com
  
  static int msi_get_dev_owner(struct pci_dev *dev)
  {
-@@ -279,11 +278,6 @@ static int msi_map_vector(struct pci_dev
+@@ -281,11 +280,6 @@ static int msi_map_vector(struct pci_dev
  		map_irq.pirq : evtchn_map_pirq(-1, map_irq.pirq));
  }
  
@@ -3576,7 +3576,7 @@ Acked-by: jbeulich@novell.com
  #ifdef CONFIG_PM
  void pci_restore_msi_state(struct pci_dev *dev)
  {
-@@ -383,7 +377,7 @@ static int msix_capability_init(struct p
+@@ -385,7 +379,7 @@ static int msix_capability_init(struct p
  	/* MSI-X Table Initialization */
  	for (i = 0; i < nvec; i++) {
  		mapped = 0;
@@ -3585,7 +3585,7 @@ Acked-by: jbeulich@novell.com
  			if (pirq_entry->entry_nr == entries[i].entry) {
  				printk(KERN_WARNING "msix entry %d for dev %02x:%02x:%01x are \
  				       not freed before acquire again.\n", entries[i].entry,
-@@ -426,21 +420,32 @@ static int msix_capability_init(struct p
+@@ -428,21 +422,32 @@ static int msix_capability_init(struct p
  }
  
  /**
@@ -3622,7 +3622,7 @@ Acked-by: jbeulich@novell.com
  	/* Any bridge which does NOT route MSI transactions from it's
  	 * secondary bus to it's primary bus must set NO_MSI flag on
  	 * the secondary pci_bus.
-@@ -451,6 +456,13 @@ int pci_msi_supported(struct pci_dev * d
+@@ -453,6 +458,13 @@ int pci_msi_supported(struct pci_dev * d
  		if (bus->bus_flags & PCI_BUS_FLAGS_NO_MSI)
  			return -EINVAL;
  
@@ -3636,7 +3636,7 @@ Acked-by: jbeulich@novell.com
  	return 0;
  }
  
-@@ -466,14 +478,11 @@ int pci_msi_supported(struct pci_dev * d
+@@ -468,14 +480,11 @@ int pci_msi_supported(struct pci_dev * d
   **/
  int pci_enable_msi(struct pci_dev* dev)
  {
@@ -3654,7 +3654,7 @@ Acked-by: jbeulich@novell.com
  		return status;
  
  	if (!is_initial_xendomain()) {
-@@ -497,10 +506,6 @@ int pci_enable_msi(struct pci_dev* dev)
+@@ -499,10 +508,6 @@ int pci_enable_msi(struct pci_dev* dev)
  
  	temp = dev->irq;
  
@@ -3665,7 +3665,7 @@ Acked-by: jbeulich@novell.com
  	/* Check whether driver already requested for MSI-X irqs */
  	if (dev->msix_enabled) {
  		printk(KERN_INFO "PCI: %s: Can't enable MSI.  "
-@@ -515,18 +520,14 @@ int pci_enable_msi(struct pci_dev* dev)
+@@ -517,18 +522,14 @@ int pci_enable_msi(struct pci_dev* dev)
  
  	return status;
  }
@@ -3686,7 +3686,7 @@ Acked-by: jbeulich@novell.com
  		return;
  
  	if (!is_initial_xendomain()) {
-@@ -549,6 +550,7 @@ void pci_disable_msi(struct pci_dev* dev
+@@ -551,6 +552,7 @@ void pci_disable_msi(struct pci_dev* dev
  	pci_intx(dev, 1);		/* enable intx */
  	dev->msi_enabled = 0;
  }
@@ -3694,7 +3694,7 @@ Acked-by: jbeulich@novell.com
  
  /**
   * pci_enable_msix - configure device's MSI-X capability structure
-@@ -572,7 +574,7 @@ int pci_enable_msix(struct pci_dev* dev,
+@@ -574,7 +576,7 @@ int pci_enable_msix(struct pci_dev* dev,
  	u16 control;
  	struct msi_dev_list *msi_dev_entry = get_msi_dev_pirq_list(dev);
  
@@ -3703,7 +3703,7 @@ Acked-by: jbeulich@novell.com
   		return -EINVAL;
  
  	if (!is_initial_xendomain()) {
-@@ -592,7 +594,7 @@ int pci_enable_msix(struct pci_dev* dev,
+@@ -594,7 +596,7 @@ int pci_enable_msix(struct pci_dev* dev,
  		for (i = 0; i < nvec; i++) {
  			int mapped = 0;
  
@@ -3712,7 +3712,7 @@ Acked-by: jbeulich@novell.com
  				if (pirq_entry->entry_nr == entries[i].entry) {
  					irq = pirq_entry->pirq;
  					BUG_ON(entries[i].vector != evtchn_get_xen_pirq(irq));
-@@ -613,14 +615,11 @@ int pci_enable_msix(struct pci_dev* dev,
+@@ -615,14 +617,11 @@ int pci_enable_msix(struct pci_dev* dev,
  #endif
  	}
  
@@ -3729,7 +3729,7 @@ Acked-by: jbeulich@novell.com
  	pci_read_config_word(dev, msi_control_reg(pos), &control);
  	nr_entries = multi_msix_capable(control);
  	if (nvec > nr_entries)
-@@ -652,15 +651,11 @@ int pci_enable_msix(struct pci_dev* dev,
+@@ -654,15 +653,11 @@ int pci_enable_msix(struct pci_dev* dev,
  
  	return status;
  }
@@ -3747,7 +3747,7 @@ Acked-by: jbeulich@novell.com
  		return;
  
  	if (!is_initial_xendomain())
-@@ -679,6 +674,7 @@ void pci_disable_msix(struct pci_dev* de
+@@ -681,6 +676,7 @@ void pci_disable_msix(struct pci_dev* de
  	}
  	dev->msix_enabled = 0;
  }
@@ -3755,7 +3755,7 @@ Acked-by: jbeulich@novell.com
  
  /**
   * msi_remove_pci_irq_vectors - reclaim MSI(X) irqs to unused state
-@@ -701,16 +697,14 @@ void msi_remove_pci_irq_vectors(struct p
+@@ -703,16 +699,14 @@ void msi_remove_pci_irq_vectors(struct p
  	msi_dev_entry = get_msi_dev_pirq_list(dev);
  
  	spin_lock_irqsave(&msi_dev_entry->pirq_list_lock, flags);
@@ -3780,7 +3780,7 @@ Acked-by: jbeulich@novell.com
  	spin_unlock_irqrestore(&msi_dev_entry->pirq_list_lock, flags);
  	dev->irq = msi_dev_entry->default_irq;
  }
-@@ -720,12 +714,16 @@ void pci_no_msi(void)
+@@ -722,12 +716,16 @@ void pci_no_msi(void)
  	pci_msi_enable = 0;
  }
  
@@ -3816,7 +3816,7 @@ Acked-by: jbeulich@novell.com
  	if (err <= 0) {
  		xenbus_dev_fatal(dev, err,
  				 "bind_listening_port_to_irqhandler");
---- 13.2.orig/drivers/xen/core/machine_reboot.c	2011-10-17 10:45:09.000000000 +0200
+--- 13.2.orig/drivers/xen/core/machine_reboot.c	2015-03-05 10:15:50.000000000 +0100
 +++ 13.2/drivers/xen/core/machine_reboot.c	2011-01-31 17:32:29.000000000 +0100
 @@ -80,6 +80,8 @@ static void post_suspend(int suspend_can
  #ifdef CONFIG_SMP
@@ -4230,7 +4230,7 @@ Acked-by: jbeulich@novell.com
  				      "net-be-dbg",
  				      &netif_be_dbg);
  #endif
---- 13.2.orig/drivers/xen/netback/xenbus.c	2014-01-22 13:54:01.000000000 +0100
+--- 13.2.orig/drivers/xen/netback/xenbus.c	2015-03-05 10:15:50.000000000 +0100
 +++ 13.2/drivers/xen/netback/xenbus.c	2013-12-11 10:01:36.000000000 +0100
 @@ -19,6 +19,7 @@
  
@@ -4350,7 +4350,7 @@ Acked-by: jbeulich@novell.com
  		xenbus_switch_state(dev, XenbusStateClosing);
  		break;
  
---- 13.2.orig/drivers/xen/netfront/accel.c	2009-05-04 10:01:03.000000000 +0200
+--- 13.2.orig/drivers/xen/netfront/accel.c	2015-03-05 10:15:50.000000000 +0100
 +++ 13.2/drivers/xen/netfront/accel.c	2011-01-31 17:32:29.000000000 +0100
 @@ -548,7 +548,7 @@ static void accelerator_remove_hooks(str
  
@@ -4499,7 +4499,7 @@ Acked-by: jbeulich@novell.com
  					     "pcifront", pdev);
  	if (err < 0) {
  		xenbus_dev_fatal(pdev->xdev, err,
---- 13.2.orig/drivers/xen/scsiback/emulate.c	2014-07-29 10:43:04.000000000 +0200
+--- 13.2.orig/drivers/xen/scsiback/emulate.c	2015-03-05 10:15:50.000000000 +0100
 +++ 13.2/drivers/xen/scsiback/emulate.c	2012-01-09 11:04:26.000000000 +0100
 @@ -153,8 +153,9 @@ static int __copy_to_sg(struct scatterli
  	return -ENOMEM;
@@ -4513,7 +4513,7 @@ Acked-by: jbeulich@novell.com
  {
  	void *from;
  	void *to = buf;
---- 13.2.orig/drivers/xen/scsifront/xenbus.c	2012-12-06 15:59:02.000000000 +0100
+--- 13.2.orig/drivers/xen/scsifront/xenbus.c	2015-03-05 10:15:50.000000000 +0100
 +++ 13.2/drivers/xen/scsifront/xenbus.c	2012-11-14 12:38:02.000000000 +0100
 @@ -99,7 +99,7 @@ static int scsifront_alloc_ring(struct v
  
@@ -4524,7 +4524,7 @@ Acked-by: jbeulich@novell.com
  
  	if (err <= 0) {
  		xenbus_dev_fatal(dev, err, "bind_listening_port_to_irqhandler");
---- 13.2.orig/drivers/xen/sfc_netback/accel_fwd.c	2008-04-02 12:34:02.000000000 +0200
+--- 13.2.orig/drivers/xen/sfc_netback/accel_fwd.c	2015-03-05 10:15:50.000000000 +0100
 +++ 13.2/drivers/xen/sfc_netback/accel_fwd.c	2011-01-31 17:32:29.000000000 +0100
 @@ -308,7 +308,7 @@ static struct netback_accel *for_a_vnic(
  static inline int packet_is_arp_reply(struct sk_buff *skb)
@@ -4551,7 +4551,7 @@ Acked-by: jbeulich@novell.com
  
  		DPRINTK("%s: found gratuitous ARP for " MAC_FMT "\n",
  			__FUNCTION__, MAC_ARG(mac));
---- 13.2.orig/drivers/xen/sfc_netback/accel_solarflare.c	2010-01-18 15:23:12.000000000 +0100
+--- 13.2.orig/drivers/xen/sfc_netback/accel_solarflare.c	2015-03-05 10:15:50.000000000 +0100
 +++ 13.2/drivers/xen/sfc_netback/accel_solarflare.c	2011-01-31 17:32:29.000000000 +0100
 @@ -113,7 +113,7 @@ bend_dl_tx_packet(struct efx_dl_device *
  	BUG_ON(port == NULL);
@@ -4653,7 +4653,7 @@ Acked-by: jbeulich@novell.com
  	skb->protocol = eth_type_trans(skb, net_dev);
  	/* CHECKSUM_UNNECESSARY as hardware has done it already */
  	skb->ip_summed = CHECKSUM_UNNECESSARY;
---- 13.2.orig/drivers/xen/sfc_netfront/accel_xenbus.c	2008-02-20 09:32:49.000000000 +0100
+--- 13.2.orig/drivers/xen/sfc_netfront/accel_xenbus.c	2015-03-05 10:15:50.000000000 +0100
 +++ 13.2/drivers/xen/sfc_netfront/accel_xenbus.c	2011-01-31 17:32:29.000000000 +0100
 @@ -356,7 +356,7 @@ static int vnic_setup_domU_shared_state(
  	/* Create xenbus msg event channel */
@@ -4673,7 +4673,7 @@ Acked-by: jbeulich@novell.com
  	if (err < 0) {
  		EPRINTK("Couldn't bind net event channel\n");
  		goto fail_net_irq;
---- 13.2.orig/drivers/xen/usbfront/xenbus.c	2012-10-04 11:18:40.000000000 +0200
+--- 13.2.orig/drivers/xen/usbfront/xenbus.c	2015-03-05 10:15:50.000000000 +0100
 +++ 13.2/drivers/xen/usbfront/xenbus.c	2012-03-12 13:33:24.000000000 +0100
 @@ -109,7 +109,7 @@ static int setup_rings(struct xenbus_dev
  	info->conn_ring_ref = err;
@@ -4739,7 +4739,7 @@ Acked-by: jbeulich@novell.com
  	if (error)
  		return error;
  
---- 13.2.orig/arch/x86/include/asm/boot.h	2014-10-16 11:41:02.000000000 +0200
+--- 13.2.orig/arch/x86/include/asm/boot.h	2015-03-05 10:15:50.000000000 +0100
 +++ 13.2/arch/x86/include/asm/boot.h	2013-01-08 11:40:00.000000000 +0100
 @@ -11,7 +11,7 @@
  				& ~(CONFIG_PHYSICAL_ALIGN - 1))
@@ -4970,7 +4970,7 @@ Acked-by: jbeulich@novell.com
  	FIX_SHARED_INFO,
  #define NR_FIX_ISAMAPS	256
  	FIX_ISAMAP_END,
---- 13.2.orig/arch/x86/include/mach-xen/asm/gnttab_dma.h	2012-11-14 12:23:04.000000000 +0100
+--- 13.2.orig/arch/x86/include/mach-xen/asm/gnttab_dma.h	2015-03-05 10:15:50.000000000 +0100
 +++ 13.2/arch/x86/include/mach-xen/asm/gnttab_dma.h	2012-11-14 12:55:32.000000000 +0100
 @@ -33,7 +33,7 @@ static inline maddr_t gnttab_dma_map_pag
  					  unsigned long offset)
@@ -5336,7 +5336,7 @@ Acked-by: jbeulich@novell.com
 -void vmalloc_sync_all(void);
 -
  #endif /* _I386_PGTABLE_3LEVEL_H */
---- 13.2.orig/arch/x86/include/mach-xen/asm/pgtable-3level-defs.h	2007-06-12 13:14:02.000000000 +0200
+--- 13.2.orig/arch/x86/include/mach-xen/asm/pgtable-3level-defs.h	2015-03-05 10:15:50.000000000 +0100
 +++ 13.2/arch/x86/include/mach-xen/asm/pgtable-3level-defs.h	2011-01-31 17:32:29.000000000 +0100
 @@ -1,7 +1,7 @@
  #ifndef _I386_PGTABLE_3LEVEL_DEFS_H
@@ -6047,7 +6047,7 @@ Acked-by: jbeulich@novell.com
  #include <asm/acpi.h>
  
  /*
---- 13.2.orig/arch/x86/include/mach-xen/asm/irqflags_64.h	2007-06-12 13:14:13.000000000 +0200
+--- 13.2.orig/arch/x86/include/mach-xen/asm/irqflags_64.h	2015-03-05 10:15:50.000000000 +0100
 +++ 13.2/arch/x86/include/mach-xen/asm/irqflags_64.h	2011-01-31 17:32:29.000000000 +0100
 @@ -9,6 +9,7 @@
   */
@@ -6104,7 +6104,7 @@ Acked-by: jbeulich@novell.com
  
  #else /* __ASSEMBLY__: */
  # ifdef CONFIG_TRACE_IRQFLAGS
---- 13.2.orig/arch/x86/include/mach-xen/asm/mmu_context_64.h	2007-06-12 13:14:13.000000000 +0200
+--- 13.2.orig/arch/x86/include/mach-xen/asm/mmu_context_64.h	2015-03-05 10:15:50.000000000 +0100
 +++ 13.2/arch/x86/include/mach-xen/asm/mmu_context_64.h	2011-01-31 17:32:29.000000000 +0100
 @@ -9,6 +9,9 @@
  #include <asm/pgtable.h>
@@ -6116,7 +6116,7 @@ Acked-by: jbeulich@novell.com
  /*
   * possibly do the LDT unload here?
   */
---- 13.2.orig/arch/x86/include/mach-xen/asm/pgalloc_64.h	2010-09-23 15:39:04.000000000 +0200
+--- 13.2.orig/arch/x86/include/mach-xen/asm/pgalloc_64.h	2015-03-05 10:15:50.000000000 +0100
 +++ 13.2/arch/x86/include/mach-xen/asm/pgalloc_64.h	2011-01-31 17:32:29.000000000 +0100
 @@ -1,7 +1,6 @@
  #ifndef _X86_64_PGALLOC_H
@@ -6530,7 +6530,7 @@ Acked-by: jbeulich@novell.com
  
  #define __flush_tlb()	xen_tlb_flush()
  
---- 13.2.orig/include/linux/msi.h	2014-10-16 11:41:02.000000000 +0200
+--- 13.2.orig/include/linux/msi.h	2015-03-05 10:15:50.000000000 +0100
 +++ 13.2/include/linux/msi.h	2013-08-09 12:19:14.000000000 +0200
 @@ -4,6 +4,8 @@
  #include <linux/kobject.h>
@@ -6602,7 +6602,7 @@ Acked-by: jbeulich@novell.com
  		goto out;
  
  	if (csum) {
---- 13.2.orig/kernel/irq/chip.c	2014-10-16 11:41:02.000000000 +0200
+--- 13.2.orig/kernel/irq/chip.c	2015-03-05 10:15:50.000000000 +0100
 +++ 13.2/kernel/irq/chip.c	2013-03-21 14:16:10.000000000 +0100
 @@ -88,6 +88,7 @@ int irq_set_handler_data(unsigned int ir
  }
@@ -6630,7 +6630,7 @@ Acked-by: jbeulich@novell.com
  EXPORT_SYMBOL(swiotlb_map_single);
  EXPORT_SYMBOL(swiotlb_unmap_single);
  EXPORT_SYMBOL(swiotlb_map_sg);
---- 13.2.orig/mm/vmalloc.c	2014-10-16 11:41:02.000000000 +0200
+--- 13.2.orig/mm/vmalloc.c	2015-03-05 10:15:50.000000000 +0100
 +++ 13.2/mm/vmalloc.c	2013-12-02 16:49:19.000000000 +0100
 @@ -1567,6 +1567,13 @@ static void *__vmalloc_area_node(struct 
  	struct page **pages;
@@ -6672,7 +6672,7 @@ Acked-by: jbeulich@novell.com
  #else
  #define GFP_VMALLOC32 GFP_KERNEL
  #endif
---- 13.2.orig/scripts/Makefile.xen.awk	2007-08-06 15:10:49.000000000 +0200
+--- 13.2.orig/scripts/Makefile.xen.awk	2015-03-05 10:15:50.000000000 +0100
 +++ 13.2/scripts/Makefile.xen.awk	2011-01-31 17:32:29.000000000 +0100
 @@ -13,7 +13,7 @@ BEGIN {
  	next
