@@ -58,7 +58,7 @@ Automatically created from "patches.kernel.org/patch-2.6.34" by xen-port-patches
  	.quad sys_modify_ldt
  	.quad compat_sys_adjtimex
  	.quad sys32_mprotect		/* 125 */
---- 13.1.orig/arch/x86/include/asm/i8259.h	2014-04-08 17:00:40.000000000 +0200
+--- 13.1.orig/arch/x86/include/asm/i8259.h	2015-03-05 14:08:45.000000000 +0100
 +++ 13.1/arch/x86/include/asm/i8259.h	2011-04-13 13:58:56.000000000 +0200
 @@ -54,6 +54,7 @@ extern struct irq_chip i8259A_chip;
  
@@ -2039,7 +2039,7 @@ Automatically created from "patches.kernel.org/patch-2.6.34" by xen-port-patches
  #include <linux/pci.h>
  #include <linux/kmemleak.h>
  
-@@ -35,7 +36,7 @@ int iommu_detected __read_mostly = 0;
+@@ -37,7 +38,7 @@ int iommu_detected __read_mostly = 0;
   * This variable becomes 1 if iommu=pt is passed on the kernel command line.
   * If this variable is 1, IOMMU implementations do no DMA translation for
   * devices and allow every device to access to whole physical memory. This is
@@ -2048,7 +2048,7 @@ Automatically created from "patches.kernel.org/patch-2.6.34" by xen-port-patches
   * guests and not for driver dma translation.
   */
  int iommu_pass_through __read_mostly;
-@@ -63,7 +64,7 @@ int dma_set_mask(struct device *dev, u64
+@@ -65,7 +66,7 @@ int dma_set_mask(struct device *dev, u64
  }
  EXPORT_SYMBOL(dma_set_mask);
  
@@ -2057,7 +2057,7 @@ Automatically created from "patches.kernel.org/patch-2.6.34" by xen-port-patches
  static __initdata void *dma32_bootmem_ptr;
  static unsigned long dma32_bootmem_size __initdata = (128ULL<<20);
  
-@@ -114,6 +115,14 @@ static void __init dma32_free_bootmem(vo
+@@ -116,6 +117,14 @@ static void __init dma32_free_bootmem(vo
  	dma32_bootmem_ptr = NULL;
  	dma32_bootmem_size = 0;
  }
@@ -2072,7 +2072,7 @@ Automatically created from "patches.kernel.org/patch-2.6.34" by xen-port-patches
  #endif
  
  static struct dma_map_ops swiotlb_dma_ops = {
-@@ -135,10 +144,9 @@ static struct dma_map_ops swiotlb_dma_op
+@@ -137,10 +146,9 @@ static struct dma_map_ops swiotlb_dma_op
  
  void __init pci_iommu_alloc(void)
  {
@@ -3901,7 +3901,7 @@ Automatically created from "patches.kernel.org/patch-2.6.34" by xen-port-patches
  #include <linux/version.h>
  #include <linux/list.h>
  
---- 13.1.orig/drivers/xen/sfc_netutil/accel_cuckoo_hash.c	2014-04-08 17:00:40.000000000 +0200
+--- 13.1.orig/drivers/xen/sfc_netutil/accel_cuckoo_hash.c	2015-03-05 14:08:45.000000000 +0100
 +++ 13.1/drivers/xen/sfc_netutil/accel_cuckoo_hash.c	2011-02-01 15:03:03.000000000 +0100
 @@ -24,6 +24,7 @@
  

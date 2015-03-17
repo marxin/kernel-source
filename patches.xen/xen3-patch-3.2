@@ -16,7 +16,7 @@ Acked-by: jbeulich@suse.com
 +	.quad compat_sys_process_vm_readv
 +	.quad compat_sys_process_vm_writev
  ia32_syscall_end:
---- 13.1.orig/arch/x86/include/asm/mach_traps.h	2014-04-08 17:00:40.000000000 +0200
+--- 13.1.orig/arch/x86/include/asm/mach_traps.h	2015-03-05 14:08:45.000000000 +0100
 +++ 13.1/arch/x86/include/asm/mach_traps.h	2011-11-28 11:36:37.000000000 +0100
 @@ -5,6 +5,8 @@
  #ifndef _ASM_X86_MACH_DEFAULT_MACH_TRAPS_H
@@ -57,6 +57,18 @@ Acked-by: jbeulich@suse.com
  static inline void reassert_nmi(void)
  {
  	int old_reg = -1;
+--- 13.1.orig/arch/x86/include/mach-xen/asm/dma-mapping.h	2014-11-27 16:10:04.000000000 +0100
++++ 13.1/arch/x86/include/mach-xen/asm/dma-mapping.h	2014-11-27 16:11:43.000000000 +0100
+@@ -8,6 +8,9 @@
+ #undef phys_to_dma
+ #undef dma_to_phys
+ 
++#ifndef _LINUX_DMA_MAPPING_H
++# error Must include linux/dma-mapping.h instead!
++#endif
+ #define ARCH_HAS_DMA_GET_REQUIRED_MASK
+ 
+ static inline dma_addr_t phys_to_dma(struct device *dev, phys_addr_t paddr)
 --- 13.1.orig/arch/x86/include/mach-xen/asm/irq_vectors.h	2011-02-15 17:50:13.000000000 +0100
 +++ 13.1/arch/x86/include/mach-xen/asm/irq_vectors.h	2011-11-17 16:00:04.000000000 +0100
 @@ -65,22 +65,13 @@ static inline int invalid_vm86_irq(int i
@@ -1857,7 +1869,7 @@ Acked-by: jbeulich@suse.com
  
  #include <asm/apic.h>
  #include <asm/io_apic.h>
---- 13.1.orig/arch/x86/kernel/nmi.c	2014-04-08 17:00:40.000000000 +0200
+--- 13.1.orig/arch/x86/kernel/nmi.c	2015-03-05 14:08:45.000000000 +0100
 +++ 13.1/arch/x86/kernel/nmi.c	2013-08-09 15:25:46.000000000 +0200
 @@ -224,15 +224,12 @@ pci_serr_error(unsigned char reason, str
  	pr_emerg("Dazed and confused, but trying to continue\n");
@@ -1904,7 +1916,7 @@ Acked-by: jbeulich@suse.com
  #include <linux/bootmem.h>
  #include <linux/gfp.h>
  #include <linux/pci.h>
-@@ -180,8 +181,8 @@ void dma_generic_free_coherent(struct de
+@@ -182,8 +183,8 @@ void dma_generic_free_coherent(struct de
  #endif
  
  /*
@@ -2379,7 +2391,7 @@ Acked-by: jbeulich@suse.com
  	depends on PCI_MMCONFIG
  	help
  	  Support for error detection and correction the Intel
---- 13.1.orig/drivers/edac/sb_edac.c	2014-04-08 17:00:40.000000000 +0200
+--- 13.1.orig/drivers/edac/sb_edac.c	2015-03-05 14:08:45.000000000 +0100
 +++ 13.1/drivers/edac/sb_edac.c	2013-05-23 17:47:43.000000000 +0200
 @@ -1557,7 +1557,11 @@ static int sbridge_mce_check_error(struc
  		mce->socketid, mce->apicid);
@@ -3103,7 +3115,7 @@ Acked-by: jbeulich@suse.com
  			/*
  			 * If we interrupted another spinlock while it was
  			 * blocking, make sure it doesn't block (again)
-@@ -312,10 +315,11 @@ bool xen_spin_wait(arch_spinlock_t *lock
+@@ -310,10 +313,11 @@ bool xen_spin_wait(arch_spinlock_t *lock
  	sequence(SEQ_REMOVE_BIAS);
  	arch_local_irq_restore(upcall_mask);
  	smp_rmb();
@@ -3117,7 +3129,7 @@ Acked-by: jbeulich@suse.com
  
  	return false;
  }
-@@ -329,7 +333,7 @@ static inline unsigned int cpumask_cycle
+@@ -327,7 +331,7 @@ static inline unsigned int cpumask_cycle
  	return nxt;
  }
  
@@ -3126,7 +3138,7 @@ Acked-by: jbeulich@suse.com
  {
  	unsigned int local = raw_smp_processor_id(), start, stop = local, cpu;
  
-@@ -348,7 +352,6 @@ void xen_spin_kick(const arch_spinlock_t
+@@ -346,7 +350,6 @@ void xen_spin_kick(const arch_spinlock_t
  			return;
  	}
  
@@ -3134,7 +3146,7 @@ Acked-by: jbeulich@suse.com
  	for (cpu = start; ; ) {
  		unsigned int flags;
  		atomic_t *rm_ctr = NULL;
-@@ -379,11 +382,11 @@ void xen_spin_kick(const arch_spinlock_t
+@@ -377,11 +380,11 @@ void xen_spin_kick(const arch_spinlock_t
  
  		for (; spinning; spinning = spinning->prev)
  			if (spinning->lock == lock &&
@@ -3150,7 +3162,7 @@ Acked-by: jbeulich@suse.com
  #endif
  				break;
  			}
-@@ -394,9 +397,9 @@ void xen_spin_kick(const arch_spinlock_t
+@@ -392,9 +395,9 @@ void xen_spin_kick(const arch_spinlock_t
  
  		if (unlikely(spinning)) {
  #if CONFIG_XEN_SPINLOCK_ACQUIRE_NESTING
@@ -4082,7 +4094,7 @@ Acked-by: jbeulich@suse.com
  
  #endif /* CONFIG_PARAVIRT_XEN */
  
---- 13.1.orig/include/xen/blkif.h	2014-04-08 17:00:40.000000000 +0200
+--- 13.1.orig/include/xen/blkif.h	2015-03-05 14:08:45.000000000 +0100
 +++ 13.1/include/xen/blkif.h	2012-04-04 10:27:25.000000000 +0200
 @@ -46,12 +46,21 @@ struct blkif_x86_32_request {
  	blkif_sector_t sector_number;/* start sector idx on disk (r/w only)  */

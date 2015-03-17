@@ -642,7 +642,7 @@ Automatically created from "patches.kernel.org/patch-2.6.35" by xen-port-patches
  static void print_MP_intsrc_info(struct mpc_intsrc *m)
 --- 13.1.orig/arch/x86/kernel/pci-dma-xen.c	2012-04-04 14:10:44.000000000 +0200
 +++ 13.1/arch/x86/kernel/pci-dma-xen.c	2012-04-04 14:10:49.000000000 +0200
-@@ -133,8 +133,6 @@ static struct dma_map_ops swiotlb_dma_op
+@@ -135,8 +135,6 @@ static struct dma_map_ops swiotlb_dma_op
  	.unmap_page = swiotlb_unmap_page,
  	.sync_single_for_cpu = swiotlb_sync_single_for_cpu,
  	.sync_single_for_device = swiotlb_sync_single_for_device,
@@ -1856,7 +1856,7 @@ Automatically created from "patches.kernel.org/patch-2.6.35" by xen-port-patches
  }
  
  static void *memtype_seq_start(struct seq_file *seq, loff_t *pos)
---- 13.1.orig/arch/x86/mm/pat_internal.h	2014-06-23 14:00:27.000000000 +0200
+--- 13.1.orig/arch/x86/mm/pat_internal.h	2015-03-05 14:08:45.000000000 +0100
 +++ 13.1/arch/x86/mm/pat_internal.h	2011-04-13 14:02:46.000000000 +0200
 @@ -21,6 +21,10 @@ static inline char *cattr_name(unsigned 
  	case _PAGE_CACHE_UC_MINUS:	return "uncached-minus";
@@ -1950,7 +1950,7 @@ Automatically created from "patches.kernel.org/patch-2.6.35" by xen-port-patches
  
  	if (processor_pm_external())
  		processor_notify_external(pr,
---- 13.1.orig/drivers/gpu/drm/ttm/ttm_page_alloc.c	2014-06-23 14:00:27.000000000 +0200
+--- 13.1.orig/drivers/gpu/drm/ttm/ttm_page_alloc.c	2015-03-05 14:08:45.000000000 +0100
 +++ 13.1/drivers/gpu/drm/ttm/ttm_page_alloc.c	2012-04-10 17:05:48.000000000 +0200
 @@ -491,6 +491,19 @@ static int ttm_alloc_new_pages(struct li
  	for (i = 0, cpages = 0; i < count; ++i) {

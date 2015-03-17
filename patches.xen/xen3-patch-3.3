@@ -485,7 +485,7 @@ Acked-by: jbeulich@suse.com
 -	.quad compat_sys_process_vm_readv
 -	.quad compat_sys_process_vm_writev
 -ia32_syscall_end:
---- 13.1.orig/arch/x86/include/asm/debugreg.h	2014-02-10 16:07:57.000000000 +0100
+--- 13.1.orig/arch/x86/include/asm/debugreg.h	2015-03-05 14:08:45.000000000 +0100
 +++ 13.1/arch/x86/include/asm/debugreg.h	2013-01-08 12:02:11.000000000 +0100
 @@ -93,7 +93,7 @@ extern void aout_dump_debugregs(struct u
  
@@ -1523,7 +1523,7 @@ Acked-by: jbeulich@suse.com
  	inc_irq_stat(x86_platform_ipis);
  
  	if (x86_platform_ipi_callback)
---- 13.1.orig/arch/x86/kernel/irq_64.c	2014-02-10 16:07:57.000000000 +0100
+--- 13.1.orig/arch/x86/kernel/irq_64.c	2015-03-05 14:08:45.000000000 +0100
 +++ 13.1/arch/x86/kernel/irq_64.c	2012-05-11 10:57:43.000000000 +0200
 @@ -39,7 +39,9 @@ static inline void stack_overflow_check(
  {
@@ -1616,7 +1616,7 @@ Acked-by: jbeulich@suse.com
  static int __init update_mp_table(void)
 --- 13.1.orig/arch/x86/kernel/pci-dma-xen.c	2012-04-04 14:32:31.000000000 +0200
 +++ 13.1/arch/x86/kernel/pci-dma-xen.c	2012-04-04 14:32:53.000000000 +0200
-@@ -42,6 +42,15 @@ int iommu_detected __read_mostly = 0;
+@@ -44,6 +44,15 @@ int iommu_detected __read_mostly = 0;
   * guests and not for driver dma translation.
   */
  int iommu_pass_through __read_mostly;
@@ -1632,7 +1632,7 @@ Acked-by: jbeulich@suse.com
  #endif
  
  extern struct iommu_table_entry __iommu_table[], __iommu_table_end[];
-@@ -233,6 +242,8 @@ static __init int iommu_setup(char *p)
+@@ -235,6 +244,8 @@ static __init int iommu_setup(char *p)
  #ifndef CONFIG_XEN
  		if (!strncmp(p, "pt", 2))
  			iommu_pass_through = 1;
@@ -2738,7 +2738,7 @@ Acked-by: jbeulich@suse.com
  	 * The return value is ignored as the calls cannot fail.
  	 * Large pages for identity mappings are not used at boot time
  	 * and hence no memory allocations during large page split.
---- 13.1.orig/drivers/acpi/osl.c	2014-02-10 16:07:57.000000000 +0100
+--- 13.1.orig/drivers/acpi/osl.c	2015-03-05 14:08:45.000000000 +0100
 +++ 13.1/drivers/acpi/osl.c	2013-03-21 15:29:15.000000000 +0100
 @@ -325,8 +325,12 @@ acpi_map_lookup_virt(void __iomem *virt,
  }
@@ -2783,7 +2783,7 @@ Acked-by: jbeulich@suse.com
  static int acpi_processor_get_performance_control(struct acpi_processor *pr)
  {
 --- 13.1.orig/drivers/pci/msi-xen.c	2011-11-17 15:56:06.000000000 +0100
-+++ 13.1/drivers/pci/msi-xen.c	2013-04-26 10:54:27.000000000 +0200
++++ 13.1/drivers/pci/msi-xen.c	2014-10-06 13:19:54.000000000 +0200
 @@ -38,18 +38,21 @@ static int pci_seg_supported = 1;
  static LIST_HEAD(msi_dev_head);
  DEFINE_SPINLOCK(msi_dev_lock);
@@ -2933,7 +2933,7 @@ Acked-by: jbeulich@suse.com
  	if (unmap.domid == DOMID_SELF)
  		evtchn_map_pirq(pirq, 0);
  
-@@ -235,13 +258,11 @@ static u64 find_table_base(struct pci_de
+@@ -237,13 +260,11 @@ static u64 find_table_base(struct pci_de
  /*
   * Protected by msi_lock
   */
@@ -2949,7 +2949,7 @@ Acked-by: jbeulich@suse.com
  
  	map_irq.domid = domid;
  	map_irq.type = MAP_PIRQ_TYPE_MSI_SEG;
-@@ -340,6 +361,142 @@ void pci_restore_msi_state(struct pci_de
+@@ -342,6 +363,142 @@ void pci_restore_msi_state(struct pci_de
  }
  EXPORT_SYMBOL_GPL(pci_restore_msi_state);
  
@@ -3092,7 +3092,7 @@ Acked-by: jbeulich@suse.com
  /**
   * msi_capability_init - configure device's MSI capability structure
   * @dev: pointer to the pci_dev data structure of MSI device function
-@@ -353,6 +510,7 @@ EXPORT_SYMBOL_GPL(pci_restore_msi_state)
+@@ -355,6 +512,7 @@ EXPORT_SYMBOL_GPL(pci_restore_msi_state)
   */
  static int msi_capability_init(struct pci_dev *dev, int nvec)
  {
@@ -3100,7 +3100,7 @@ Acked-by: jbeulich@suse.com
  	int pos, pirq;
  	u16 control;
  
-@@ -361,7 +519,7 @@ static int msi_capability_init(struct pc
+@@ -363,7 +521,7 @@ static int msi_capability_init(struct pc
  
  	pci_read_config_word(dev, msi_control_reg(pos), &control);
  
@@ -3109,7 +3109,7 @@ Acked-by: jbeulich@suse.com
  	if (pirq < 0)
  		return -EBUSY;
  
-@@ -370,7 +528,8 @@ static int msi_capability_init(struct pc
+@@ -372,7 +530,8 @@ static int msi_capability_init(struct pc
  	msi_set_enable(dev, pos, 1);
  	dev->msi_enabled = 1;
  
@@ -3119,7 +3119,7 @@ Acked-by: jbeulich@suse.com
  	return 0;
  }
  
-@@ -431,7 +590,8 @@ static int msix_capability_init(struct p
+@@ -433,7 +592,8 @@ static int msix_capability_init(struct p
  		}
  		if (mapped)
  			continue;
@@ -3129,7 +3129,7 @@ Acked-by: jbeulich@suse.com
  		if (pirq < 0)
  			break;
  		attach_pirq_entry(pirq, entries[i].entry, msi_dev_entry);
-@@ -441,7 +601,12 @@ static int msix_capability_init(struct p
+@@ -443,7 +603,12 @@ static int msix_capability_init(struct p
  	if (i != nvec) {
  		int avail = i - 1;
  		for (j = --i; j >= 0; j--) {
@@ -3143,7 +3143,7 @@ Acked-by: jbeulich@suse.com
  			detach_pirq_entry(entries[j].entry, msi_dev_entry);
  			entries[j].vector = 0;
  		}
-@@ -456,6 +621,7 @@ static int msix_capability_init(struct p
+@@ -458,6 +623,7 @@ static int msix_capability_init(struct p
  	/* Set MSI-X enabled bits and unmask the function */
  	pci_intx_for_msi(dev, 0);
  	dev->msix_enabled = 1;
@@ -3151,7 +3151,7 @@ Acked-by: jbeulich@suse.com
  
  	control &= ~PCI_MSIX_FLAGS_MASKALL;
  	pci_write_config_word(dev, pos + PCI_MSIX_FLAGS, control);
-@@ -554,7 +720,7 @@ int pci_enable_msi_block(struct pci_dev 
+@@ -556,7 +722,7 @@ int pci_enable_msi_block(struct pci_dev 
  		dev->irq = evtchn_map_pirq(-1, dev->irq);
  		dev->msi_enabled = 1;
  		msi_dev_entry->default_irq = temp;
@@ -3160,7 +3160,7 @@ Acked-by: jbeulich@suse.com
  		return ret;
  #else
  		return -EOPNOTSUPP;
-@@ -599,7 +765,10 @@ void pci_msi_shutdown(struct pci_dev *de
+@@ -601,7 +767,10 @@ void pci_msi_shutdown(struct pci_dev *de
  	pirq = dev->irq;
  	/* Restore dev->irq to its default pin-assertion vector */
  	dev->irq = msi_dev_entry->default_irq;
@@ -3172,7 +3172,7 @@ Acked-by: jbeulich@suse.com
  
  	/* Disable MSI mode */
  	pos = pci_find_capability(dev, PCI_CAP_ID_MSI);
-@@ -611,6 +780,8 @@ void pci_msi_shutdown(struct pci_dev *de
+@@ -613,6 +782,8 @@ void pci_msi_shutdown(struct pci_dev *de
  void pci_disable_msi(struct pci_dev *dev)
  {
  	pci_msi_shutdown(dev);
@@ -3181,7 +3181,7 @@ Acked-by: jbeulich@suse.com
  }
  EXPORT_SYMBOL(pci_disable_msi);
  
-@@ -688,6 +859,7 @@ int pci_enable_msix(struct pci_dev *dev,
+@@ -690,6 +861,7 @@ int pci_enable_msix(struct pci_dev *dev,
  			attach_pirq_entry(irq, entries[i].entry, msi_dev_entry);
  			entries[i].vector = irq;
  		}
@@ -3189,7 +3189,7 @@ Acked-by: jbeulich@suse.com
  		return 0;
  #else
  		return -EOPNOTSUPP;
-@@ -754,6 +926,8 @@ void pci_msix_shutdown(struct pci_dev *d
+@@ -756,6 +928,8 @@ void pci_msix_shutdown(struct pci_dev *d
  void pci_disable_msix(struct pci_dev *dev)
  {
  	pci_msix_shutdown(dev);
@@ -3198,7 +3198,7 @@ Acked-by: jbeulich@suse.com
  }
  EXPORT_SYMBOL(pci_disable_msix);
  
-@@ -780,13 +954,16 @@ void msi_remove_pci_irq_vectors(struct p
+@@ -782,13 +956,16 @@ void msi_remove_pci_irq_vectors(struct p
  	spin_lock_irqsave(&msi_dev_entry->pirq_list_lock, flags);
  	list_for_each_entry_safe(pirq_entry, tmp, &dev->msi_list, list) {
  		if (is_initial_xendomain())
@@ -3216,7 +3216,7 @@ Acked-by: jbeulich@suse.com
  	dev->irq = msi_dev_entry->default_irq;
  }
  
-@@ -809,5 +986,21 @@ EXPORT_SYMBOL(pci_msi_enabled);
+@@ -811,5 +988,23 @@ EXPORT_SYMBOL(pci_msi_enabled);
  
  void pci_msi_init_pci_dev(struct pci_dev *dev)
  {
@@ -3226,12 +3226,14 @@ Acked-by: jbeulich@suse.com
 +	/* Disable the msi hardware to avoid screaming interrupts
 +	 * during boot.  This is the power on reset default so
 +	 * usually this should be a noop.
-+	 * But on a Xen host don't do this for IOMMUs which the hypervisor
-+	 * is in control of (and hence has already enabled on purpose).
++	 * But on a Xen host don't do this for
++	 * - IOMMUs which the hypervisor is in control of (and hence has
++	 *   already enabled on purpose),
++	 * - unprivileged domains.
 +	 */
-+	if (is_initial_xendomain()
-+	    && (dev->class >> 8) == PCI_CLASS_SYSTEM_IOMMU
-+	    && dev->vendor == PCI_VENDOR_ID_AMD)
++	if (!is_initial_xendomain()
++	    || ((dev->class >> 8) == PCI_CLASS_SYSTEM_IOMMU
++	        && dev->vendor == PCI_VENDOR_ID_AMD))
 +		return;
 +	pos = pci_find_capability(dev, PCI_CAP_ID_MSI);
 +	if (pos)
@@ -3931,7 +3933,7 @@ Acked-by: jbeulich@suse.com
  }
  
  #ifndef CONFIG_X86_LOCAL_APIC
---- 13.1.orig/drivers/xen/core/spinlock.c	2013-10-14 15:04:01.000000000 +0200
+--- 13.1.orig/drivers/xen/core/spinlock.c	2014-03-11 10:27:46.000000000 +0100
 +++ 13.1/drivers/xen/core/spinlock.c	2012-07-26 09:42:00.000000000 +0200
 @@ -38,7 +38,7 @@ struct rm_seq {
  };
@@ -4921,7 +4923,7 @@ Acked-by: jbeulich@suse.com
  /* For xenbus internal use. */
  enum {
  	XENBUS_XSD_UNCOMMITTED = 0,
---- 13.1.orig/drivers/xen/xenbus/xenbus_dev_backend.c	2014-02-10 16:07:57.000000000 +0100
+--- 13.1.orig/drivers/xen/xenbus/xenbus_dev_backend.c	2015-03-05 14:08:45.000000000 +0100
 +++ 13.1/drivers/xen/xenbus/xenbus_dev_backend.c	2013-08-09 15:29:19.000000000 +0200
 @@ -9,7 +9,9 @@
  #include <linux/capability.h>
@@ -4975,7 +4977,7 @@ Acked-by: jbeulich@suse.com
 +void xenbus_ring_ops_init(void);
 +
  #endif
---- 13.1.orig/include/linux/pci_ids.h	2014-02-10 16:07:57.000000000 +0100
+--- 13.1.orig/include/linux/pci_ids.h	2015-03-05 14:08:45.000000000 +0100
 +++ 13.1/include/linux/pci_ids.h	2012-06-21 08:31:17.000000000 +0200
 @@ -75,6 +75,7 @@
  #define PCI_CLASS_SYSTEM_RTC		0x0803
