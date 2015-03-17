@@ -1,0 +1,28 @@
+From: jbeulich@suse.com
+Subject: fix kABI after "x86: use custom dma_get_required_mask()"
+Patch-mainline: n/a
+
+--- 13.1.orig/arch/x86/kernel/pci-dma-xen.c	2013-02-06 15:28:03.000000000 +0100
++++ 13.1/arch/x86/kernel/pci-dma-xen.c	2014-12-09 08:53:42.000000000 +0100
+@@ -268,7 +268,9 @@ u64 dma_get_required_mask(struct device 
+ 
+ 	return DMA_BIT_MASK(__fls(max_mfn - 1) + 1 + PAGE_SHIFT);
+ }
++#ifndef __GENKSYMS__
+ EXPORT_SYMBOL_GPL(dma_get_required_mask);
++#endif
+ 
+ static int check_pages_physically_contiguous(unsigned long pfn,
+ 					     unsigned int offset,
+--- 13.1.orig/drivers/base/platform.c	2013-09-02 22:46:10.000000000 +0200
++++ 13.1/drivers/base/platform.c	2014-12-09 08:55:47.000000000 +0100
+@@ -934,6 +934,9 @@ u64 dma_get_required_mask(struct device 
+ 	}
+ 	return mask;
+ }
++#endif
++#if !defined(ARCH_HAS_DMA_GET_REQUIRED_MASK) || \
++    (defined(__GENKSYMS__) && defined(CONFIG_X86) && defined(CONFIG_XEN))
+ EXPORT_SYMBOL_GPL(dma_get_required_mask);
+ #endif
+ 
