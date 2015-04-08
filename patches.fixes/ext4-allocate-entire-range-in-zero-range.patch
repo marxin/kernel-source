@@ -5,7 +5,7 @@ Subject: ext4: allocate entire range in zero range
 Git-commit: 0f2af21aae11972fa924374ddcf52e88347cf5a8
 Git-repo: git://git.kernel.org/pub/scm/linux/kernel/git/tytso/ext4.git
 Patch-mainline: expected 4.1
-References: bnc#919032
+References: bnc#919032 CVE-2015-0275
 
 Currently there is a bug in zero range code which causes zero range
 calls to only allocate block aligned portion of the range, while
