@@ -15,19 +15,19 @@ Signed-off-by: Alex Deucher <alexander.deucher@amd.com>
 Cc: stable@vger.kernel.org
 Signed-off-by: Jiri Slaby <jslaby@suse.cz>
 ---
- drivers/gpu/drm/radeon/atombios_dp.c | 20 +++++++++++---------
+ drivers/gpu/drm/radeon/atombios_dp.c |   20 +++++++++++---------
  1 file changed, 11 insertions(+), 9 deletions(-)
 
-diff --git a/drivers/gpu/drm/radeon/atombios_dp.c b/drivers/gpu/drm/radeon/atombios_dp.c
-index 3e3290c203c6..b435c859dcbc 100644
 --- a/drivers/gpu/drm/radeon/atombios_dp.c
 +++ b/drivers/gpu/drm/radeon/atombios_dp.c
-@@ -421,19 +421,21 @@ bool radeon_dp_getdpcd(struct radeon_connector *radeon_connector)
+@@ -405,22 +405,24 @@ bool radeon_dp_getdpcd(struct radeon_con
  {
  	struct radeon_connector_atom_dig *dig_connector = radeon_connector->con_priv;
  	u8 msg[DP_DPCD_SIZE];
 -	int ret;
 +	int ret, i;
+ 
+ 	char dpcd_hex_dump[DP_DPCD_SIZE * 3];
  
 -	ret = drm_dp_dpcd_read(&radeon_connector->ddc_bus->aux, DP_DPCD_REV, msg,
 -			       DP_DPCD_SIZE);
@@ -39,10 +39,11 @@ index 3e3290c203c6..b435c859dcbc 100644
 +		if (ret == DP_DPCD_SIZE) {
 +			memcpy(dig_connector->dpcd, msg, DP_DPCD_SIZE);
  
--		DRM_DEBUG_KMS("DPCD: %*ph\n", (int)sizeof(dig_connector->dpcd),
--			      dig_connector->dpcd);
-+			DRM_DEBUG_KMS("DPCD: %*ph\n", (int)sizeof(dig_connector->dpcd),
-+				      dig_connector->dpcd);
+-		hex_dump_to_buffer(dig_connector->dpcd, sizeof(dig_connector->dpcd),
++			hex_dump_to_buffer(dig_connector->dpcd, sizeof(dig_connector->dpcd),
+ 				   32, 1, dpcd_hex_dump, sizeof(dpcd_hex_dump), false);
+-		DRM_DEBUG_KMS("DPCD: %s\n", dpcd_hex_dump);
++			DRM_DEBUG_KMS("DPCD: %s\n", dpcd_hex_dump);
  
 -		radeon_dp_probe_oui(radeon_connector);
 +			radeon_dp_probe_oui(radeon_connector);
@@ -53,6 +54,3 @@ index 3e3290c203c6..b435c859dcbc 100644
  	}
  	dig_connector->dpcd[0] = 0;
  	return false;
--- 
-2.4.1
-
