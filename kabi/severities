@@ -10,4 +10,6 @@
 
 drivers/message/fusion/*	PASS
 drivers/staging/*		PASS
-
+system_trusted_keyring		PASS
+iov_iter_get_pages		PASS
+arch/x86/kvm/*                  PASS
