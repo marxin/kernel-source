@@ -1,0 +1,79 @@
+From: Jeff Mahoney <jeffm@suse.com>
+Subject: kabi: Fix CRC for dma_get_required_mask
+Patch-mainline: Never; KABI fix
+
+dma_get_required_mask was initially defined in drivers/base/platform.c and
+a new version was created for Xen in arch/x86/kernel/pci-dma-xen.c.  This is
+fine but a number of types became undeclared where they were declared before,
+resulting in the CRC changing.
+
+This patch moves it into a new file that can use the same includes
+as drivers/base/platform.c and the CRC is restored. It's hacky, but kABI
+fixes usually are.
+
+Signed-off-by: Jeff Mahoney <jeffm@suse.com>
+---
+ arch/x86/kernel/Makefile           |    1 +
+ arch/x86/kernel/pci-dma-xen-kabi.c |   27 +++++++++++++++++++++++++++
+ arch/x86/kernel/pci-dma-xen.c      |   10 ----------
+ 3 files changed, 28 insertions(+), 10 deletions(-)
+
+--- a/arch/x86/kernel/Makefile
++++ b/arch/x86/kernel/Makefile
+@@ -108,6 +108,7 @@ obj-$(CONFIG_TRACING)			+= tracepoint.o
+ obj-$(CONFIG_IOSF_MBI)			+= iosf_mbi.o
+ 
+ obj-$(CONFIG_X86_XEN)		+= fixup.o
++obj-$(CONFIG_XEN)		+= pci-dma-xen-kabi.o
+ 
+ ###
+ # 64 bit specific files
+--- /dev/null
++++ b/arch/x86/kernel/pci-dma-xen-kabi.c
+@@ -0,0 +1,27 @@
++/* Stupid, but it works. This is to keep the crc for dma_get_required_mask. */
++#include <linux/string.h>
++#include <linux/platform_device.h>
++#include <linux/of_device.h>
++#include <linux/of_irq.h>
++#include <linux/module.h>
++#include <linux/init.h>
++#include <linux/dma-mapping.h>
++#include <linux/bootmem.h>
++#include <linux/err.h>
++#include <linux/slab.h>
++#include <linux/pm_runtime.h>
++#include <linux/idr.h>
++#include <linux/acpi.h>
++#include "../../../drivers/base/base.h"
++#include "../../../drivers/base/power/power.h"
++
++#include <xen/interface/memory.h>
++
++u64 dma_get_required_mask(struct device *dev)
++{
++	unsigned long max_mfn = HYPERVISOR_memory_op(XENMEM_maximum_ram_page,
++						     NULL);
++
++	return DMA_BIT_MASK(__fls(max_mfn - 1) + 1 + PAGE_SHIFT);
++}
++EXPORT_SYMBOL_GPL(dma_get_required_mask);
+--- a/arch/x86/kernel/pci-dma-xen.c
++++ b/arch/x86/kernel/pci-dma-xen.c
+@@ -267,16 +267,6 @@ static __init int iommu_setup(char *p)
+ 	return 0;
+ }
+ early_param("iommu", iommu_setup);
+-
+-u64 dma_get_required_mask(struct device *dev)
+-{
+-	unsigned long max_mfn = HYPERVISOR_memory_op(XENMEM_maximum_ram_page,
+-						     NULL);
+-
+-	return DMA_BIT_MASK(__fls(max_mfn - 1) + 1 + PAGE_SHIFT);
+-}
+-EXPORT_SYMBOL_GPL(dma_get_required_mask);
+-
+ static int check_pages_physically_contiguous(unsigned long pfn,
+ 					     unsigned int offset,
+ 					     size_t length)
