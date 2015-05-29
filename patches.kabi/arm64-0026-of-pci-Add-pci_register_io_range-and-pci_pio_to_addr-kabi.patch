@@ -1,0 +1,29 @@
+From: Jiri Slaby <jslaby@suse.cz>
+Subject: kABI: protect linux/slab.h include in of/address
+Patch-mainline: never, kabi
+
+Our patch
+patches.arch/arm64-0026-of-pci-Add-pci_register_io_range-and-pci_pio_to_addr.patch
+added #include <linux/slab.h> to drivers/of/address.c. It made struct
+kmem_cache defined for the kABI checker. Hence it reports kABI changes
+now.
+
+So, protect the include by __GENKSYMS__.
+
+Signed-off-by: Jiri Slaby <jslaby@suse.cz>
+---
+ drivers/of/address.c |    2 ++
+ 1 file changed, 2 insertions(+)
+
+--- a/drivers/of/address.c
++++ b/drivers/of/address.c
+@@ -6,7 +6,9 @@
+ #include <linux/of_address.h>
+ #include <linux/pci_regs.h>
+ #include <linux/sizes.h>
++#ifndef __GENKSYMS__
+ #include <linux/slab.h>
++#endif
+ #include <linux/string.h>
+ 
+ /* Max address size we deal with */
