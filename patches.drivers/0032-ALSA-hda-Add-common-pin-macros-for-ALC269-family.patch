@@ -1,0 +1,57 @@
+From fea185e28e7c9f37a298f4184580f310e4eefd7b Mon Sep 17 00:00:00 2001
+From: David Henningsson <david.henningsson@canonical.com>
+Date: Wed, 3 Sep 2014 10:23:04 +0200
+Subject: [PATCH] ALSA: hda - Add common pin macros for ALC269 family
+Git-commit: fea185e28e7c9f37a298f4184580f310e4eefd7b
+Patch-mainline: 3.18-rc1
+References: boo#934755
+
+This will be used in a later patch to make the pin quirk table shorter.
+
+Signed-off-by: David Henningsson <david.henningsson@canonical.com>
+Signed-off-by: Takashi Iwai <tiwai@suse.de>
+
+---
+ sound/pci/hda/patch_realtek.c |   31 +++++++++++++++++++++++++++++++
+ 1 file changed, 31 insertions(+)
+
+--- a/sound/pci/hda/patch_realtek.c
++++ b/sound/pci/hda/patch_realtek.c
+@@ -5080,6 +5080,37 @@ static const struct hda_model_fixup alc2
+ 	{}
+ };
+ 
++#define ALC255_STANDARD_PINS \
++	{0x18, 0x411111f0}, \
++	{0x19, 0x411111f0}, \
++	{0x1a, 0x411111f0}, \
++	{0x1b, 0x411111f0}, \
++	{0x1e, 0x411111f0}
++
++#define ALC282_STANDARD_PINS \
++	{0x14, 0x90170110}, \
++	{0x18, 0x411111f0}, \
++	{0x1a, 0x411111f0}, \
++	{0x1b, 0x411111f0}, \
++	{0x1e, 0x411111f0}
++
++#define ALC290_STANDARD_PINS \
++	{0x12, 0x99a30130}, \
++	{0x13, 0x40000000}, \
++	{0x16, 0x411111f0}, \
++	{0x17, 0x411111f0}, \
++	{0x19, 0x411111f0}, \
++	{0x1b, 0x411111f0}, \
++	{0x1e, 0x411111f0}
++
++#define ALC292_STANDARD_PINS \
++	{0x14, 0x90170110}, \
++	{0x15, 0x0221401f}, \
++	{0x1a, 0x411111f0}, \
++	{0x1b, 0x411111f0}, \
++	{0x1d, 0x40700001}, \
++	{0x1e, 0x411111f0}
++
+ static const struct snd_hda_pin_quirk alc269_pin_fixup_tbl[] = {
+ 	SND_HDA_PIN_QUIRK(0x10ec0255, 0x1028, "Dell", ALC255_FIXUP_DELL1_MIC_NO_PRESENCE,
+ 		{0x12, 0x90a60140},

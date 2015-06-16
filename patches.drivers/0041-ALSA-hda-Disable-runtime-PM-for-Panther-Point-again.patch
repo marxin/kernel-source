@@ -1,0 +1,32 @@
+From de5d0ad506cb10ab143e2ffb9def7607e3671f83 Mon Sep 17 00:00:00 2001
+From: Takashi Iwai <tiwai@suse.de>
+Date: Wed, 25 Feb 2015 07:53:31 +0100
+Subject: [PATCH] ALSA: hda - Disable runtime PM for Panther Point again
+Git-commit: de5d0ad506cb10ab143e2ffb9def7607e3671f83
+Patch-mainline: 4.0-rc2
+References: boo#934755
+
+This is essentially a partial revert of the commit [b1920c21102a:
+'alsa: hda - Enable runtime PM on Panther Point'].  There was a bug
+report showing the HD-audio bus hang during runtime PM on HP Spectre
+XT.
+
+Reported-by: Dang Sananikone <dang.sananikone@gmail.com>
+Cc: <stable@vger.kernel.org>
+Signed-off-by: Takashi Iwai <tiwai@suse.de>
+
+---
+ sound/pci/hda/hda_intel.c |    2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+--- a/sound/pci/hda/hda_intel.c
++++ b/sound/pci/hda/hda_intel.c
+@@ -1775,7 +1775,7 @@ static const struct pci_device_id azx_id
+ 	  .driver_data = AZX_DRIVER_PCH | AZX_DCAPS_INTEL_PCH_NOPM },
+ 	/* Panther Point */
+ 	{ PCI_DEVICE(0x8086, 0x1e20),
+-	  .driver_data = AZX_DRIVER_PCH | AZX_DCAPS_INTEL_PCH },
++	  .driver_data = AZX_DRIVER_PCH | AZX_DCAPS_INTEL_PCH_NOPM },
+ 	/* Lynx Point */
+ 	{ PCI_DEVICE(0x8086, 0x8c20),
+ 	  .driver_data = AZX_DRIVER_PCH | AZX_DCAPS_INTEL_PCH },
