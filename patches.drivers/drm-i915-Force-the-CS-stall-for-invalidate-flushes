@@ -1,0 +1,42 @@
+From 592e9ed9fdfd03d514c1ad9707208357bc15072e Mon Sep 17 00:00:00 2001
+From: Chris Wilson <chris@chris-wilson.co.uk>
+Date: Tue, 16 Dec 2014 08:44:32 +0000
+Subject: [PATCH] drm/i915: Force the CS stall for invalidate flushes
+References: boo#935913
+Mime-version: 1.0
+Content-type: text/plain; charset=UTF-8
+Content-transfer-encoding: 8bit
+Git-commit: add284a3a2481e759d6bec35f6444c32c8ddc383
+Patch-mainline: 3.19-rc2
+
+commit add284a3a2481e759d6bec35f6444c32c8ddc383 upstream.
+
+In order to act as a full command barrier by itself, we need to tell the
+pipecontrol to actually stall the command streamer while the flush runs.
+We require the full command barrier before operations like
+MI_SET_CONTEXT, which currently rely on a prior invalidate flush.
+
+Reference: https://bugs.freedesktop.org/show_bug.cgi?id=83677
+Cc: Simon Farnsworth <simon@farnz.org.uk>
+Cc: Daniel Vetter <daniel@ffwll.ch>
+Cc: Ville Syrjälä <ville.syrjala@linux.intel.com>
+Signed-off-by: Chris Wilson <chris@chris-wilson.co.uk>
+Cc: stable@vger.kernel.org
+Signed-off-by: Jani Nikula <jani.nikula@intel.com>
+Signed-off-by: Takashi Iwai <tiwai@suse.de>
+
+---
+ drivers/gpu/drm/i915/intel_ringbuffer.c |    2 ++
+ 1 file changed, 2 insertions(+)
+
+--- a/drivers/gpu/drm/i915/intel_ringbuffer.c
++++ b/drivers/gpu/drm/i915/intel_ringbuffer.c
+@@ -359,6 +359,8 @@ gen7_render_ring_flush(struct intel_engi
+ 		flags |= PIPE_CONTROL_QW_WRITE;
+ 		flags |= PIPE_CONTROL_GLOBAL_GTT_IVB;
+ 
++		flags |= PIPE_CONTROL_STALL_AT_SCOREBOARD;
++
+ 		/* Workaround: we must issue a pipe_control with CS-stall bit
+ 		 * set before a pipe_control command that has the state cache
+ 		 * invalidate bit set. */
