@@ -1,0 +1,59 @@
+From 63ec1fe41608a25fa1061db78f654cf1599abad3 Mon Sep 17 00:00:00 2001
+From: Daniel Vetter <daniel.vetter@ffwll.ch>
+Date: Fri, 14 Nov 2014 10:09:49 +0100
+Subject: [PATCH] drm/i915: Kick fbdev before vgacon
+References: boo#935913
+Git-commit: 0485c9dc24ec0939b42ca5104c0373297506b555
+Patch-mainline: 3.18-rc6
+
+commit 0485c9dc24ec0939b42ca5104c0373297506b555 upstream.
+
+It's magic, but it seems to work.
+
+This fixes a regression introduced in
+
+commit 1bb9e632a0aeee1121e652ee4dc80e5e6f14bcd2
+Author: Daniel Vetter <daniel.vetter@ffwll.ch>
+Date: Tue Jul 8 10:02:43 2014 +0200
+
+    drm/i915: Only unbind vgacon, not other console drivers
+
+My best guess is that the vga fbdev driver falls over if we rip out
+parts of vgacon. Hooray.
+
+Bugzilla: https://bugs.freedesktop.org/show_bug.cgi?id=82439
+Cc: stable@vger.kernel.org (v3.16+)
+Reported-and-tested-by: Lv Zheng <lv.zheng@intel.com>
+Signed-off-by: Daniel Vetter <daniel.vetter@intel.com>
+Acked-by: Chris Wilson <chris@chris-wilson.co.uk>
+Signed-off-by: Jani Nikula <jani.nikula@intel.com>
+Signed-off-by: Takashi Iwai <tiwai@suse.de>
+
+---
+ drivers/gpu/drm/i915/i915_dma.c |   10 ++++++----
+ 1 file changed, 6 insertions(+), 4 deletions(-)
+
+--- a/drivers/gpu/drm/i915/i915_dma.c
++++ b/drivers/gpu/drm/i915/i915_dma.c
+@@ -1662,15 +1662,17 @@ int i915_driver_load(struct drm_device *
+ 		goto out_regs;
+ 
+ 	if (drm_core_check_feature(dev, DRIVER_MODESET)) {
+-		ret = i915_kick_out_vgacon(dev_priv);
++		/* WARNING: Apparently we must kick fbdev drivers before vgacon,
++		 * otherwise the vga fbdev driver falls over. */
++		ret = i915_kick_out_firmware_fb(dev_priv);
+ 		if (ret) {
+-			DRM_ERROR("failed to remove conflicting VGA console\n");
++			DRM_ERROR("failed to remove conflicting framebuffer drivers\n");
+ 			goto out_gtt;
+ 		}
+ 
+-		ret = i915_kick_out_firmware_fb(dev_priv);
++		ret = i915_kick_out_vgacon(dev_priv);
+ 		if (ret) {
+-			DRM_ERROR("failed to remove conflicting framebuffer drivers\n");
++			DRM_ERROR("failed to remove conflicting VGA console\n");
+ 			goto out_gtt;
+ 		}
+ 	}
