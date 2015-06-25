@@ -5,8 +5,8 @@ References: bnc#472783
 
 Automatically created from "patches.arch/x86_64-unwind-annotations" by xen-port-patches.py
 
---- 13.2.orig/arch/x86/kernel/entry_64-xen.S	2014-06-27 16:50:43.000000000 +0200
-+++ 13.2/arch/x86/kernel/entry_64-xen.S	2014-08-06 12:41:19.000000000 +0200
+--- a/arch/x86/kernel/entry_64-xen.S
++++ b/arch/x86/kernel/entry_64-xen.S
 @@ -168,23 +168,16 @@ NMI_MASK = 0x80000000
  	.endm
  
@@ -98,7 +98,7 @@ Automatically created from "patches.arch/x86_64-unwind-annotations" by xen-port-
  	movl $1,%ebx
  	movl $MSR_GS_BASE,%ecx
  	rdmsr
-@@ -835,7 +831,7 @@ ENTRY(\sym)
+@@ -838,7 +834,7 @@ ENTRY(\sym)
  	call error_entry
  	.endif
  
@@ -107,7 +107,7 @@ Automatically created from "patches.arch/x86_64-unwind-annotations" by xen-port-
  
  	.if \paranoid
  	.if \shift_ist != -1
-@@ -1141,25 +1137,24 @@ END(paranoid_exit)
+@@ -1144,25 +1140,24 @@ END(paranoid_exit)
   * returns in "no swapgs flag" in %ebx.
   */
  ENTRY(error_entry)
@@ -148,7 +148,7 @@ Automatically created from "patches.arch/x86_64-unwind-annotations" by xen-port-
  #ifndef CONFIG_XEN
  	xorl %ebx,%ebx
  	testl $3,CS+8(%rsp)
-@@ -1179,6 +1174,7 @@ error_sti:
+@@ -1182,6 +1177,7 @@ error_sti:
   * for these here too.
   */
  error_kernelspace:

@@ -16,8 +16,8 @@ Update Aug 01 2012 jbeulich:
 
 Automatically created from "patches.suse/stack-unwind" by xen-port-patches.py
 
---- 13.2.orig/arch/x86/kernel/entry_32-xen.S	2014-07-29 11:21:59.000000000 +0200
-+++ 13.2/arch/x86/kernel/entry_32-xen.S	2014-06-27 16:51:37.000000000 +0200
+--- a/arch/x86/kernel/entry_32-xen.S
++++ b/arch/x86/kernel/entry_32-xen.S
 @@ -1166,6 +1166,41 @@ ENTRY(fixup_4gb_segment)
  	CFI_ENDPROC
  END(fixup_4gb_segment)
@@ -60,9 +60,9 @@ Automatically created from "patches.suse/stack-unwind" by xen-port-patches.py
  #ifdef CONFIG_FUNCTION_TRACER
  #ifdef CONFIG_DYNAMIC_FTRACE
  
---- 13.2.orig/arch/x86/kernel/entry_64-xen.S	2015-03-05 10:43:13.000000000 +0100
-+++ 13.2/arch/x86/kernel/entry_64-xen.S	2014-06-27 16:50:43.000000000 +0200
-@@ -1027,6 +1027,40 @@ ENTRY(do_softirq_own_stack)
+--- a/arch/x86/kernel/entry_64-xen.S
++++ b/arch/x86/kernel/entry_64-xen.S
+@@ -1030,6 +1030,40 @@ ENTRY(do_softirq_own_stack)
  	CFI_ENDPROC
  END(do_softirq_own_stack)
  
