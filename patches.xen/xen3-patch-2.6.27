@@ -13,8 +13,8 @@ have been needed - see SLE11 SPn).
 
 2.6.28/arch/x86/kernel/cpu/common_64-xen.c
 
---- 13.1.orig/arch/x86/Kconfig	2013-08-09 12:36:40.000000000 +0200
-+++ 13.1/arch/x86/Kconfig	2013-08-09 12:53:27.000000000 +0200
+--- a/arch/x86/Kconfig
++++ b/arch/x86/Kconfig
 @@ -1553,7 +1553,7 @@ config MTRR
  config MTRR_SANITIZER
  	def_bool y
@@ -24,8 +24,8 @@ have been needed - see SLE11 SPn).
  	---help---
  	  Convert MTRR layout from continuous to discrete, so X drivers can
  	  add writeback entries.
---- 13.1.orig/arch/x86/Kconfig.debug	2013-08-09 12:32:08.000000000 +0200
-+++ 13.1/arch/x86/Kconfig.debug	2013-08-09 12:53:28.000000000 +0200
+--- a/arch/x86/Kconfig.debug
++++ b/arch/x86/Kconfig.debug
 @@ -25,6 +25,7 @@ config STRICT_DEVMEM
  config X86_VERBOSE_BOOTUP
  	bool "Enable verbose x86 bootup info messages"
@@ -42,8 +42,8 @@ have been needed - see SLE11 SPn).
  
  config X86_DECODER_SELFTEST
  	bool "x86 instruction decoder selftest"
---- 13.1.orig/arch/x86/Makefile	2013-03-21 14:20:53.000000000 +0100
-+++ 13.1/arch/x86/Makefile	2013-03-21 14:31:15.000000000 +0100
+--- a/arch/x86/Makefile
++++ b/arch/x86/Makefile
 @@ -147,8 +147,8 @@ KBUILD_CFLAGS += $(call cc-option,-mno-s
  KBUILD_CFLAGS += $(call cc-option,-mno-avx,)
  
@@ -55,8 +55,8 @@ have been needed - see SLE11 SPn).
  
  KBUILD_CFLAGS += $(mflags-y)
  KBUILD_AFLAGS += $(mflags-y)
---- 13.1.orig/arch/x86/ia32/ia32entry-xen.S	2011-01-31 18:07:35.000000000 +0100
-+++ 13.1/arch/x86/ia32/ia32entry-xen.S	2011-02-01 14:38:38.000000000 +0100
+--- a/arch/x86/ia32/ia32entry-xen.S
++++ b/arch/x86/ia32/ia32entry-xen.S
 @@ -15,6 +15,16 @@
  #include <asm/irqflags.h>
  #include <linux/linkage.h>
@@ -298,8 +298,8 @@ have been needed - see SLE11 SPn).
 +	.quad sys_pipe2
 +	.quad sys_inotify_init1
  ia32_syscall_end:
---- 13.1.orig/arch/x86/kernel/Makefile	2013-08-09 12:36:34.000000000 +0200
-+++ 13.1/arch/x86/kernel/Makefile	2013-08-09 12:53:22.000000000 +0200
+--- a/arch/x86/kernel/Makefile
++++ b/arch/x86/kernel/Makefile
 @@ -122,9 +122,11 @@ ifeq ($(CONFIG_X86_64),y)
  	obj-$(CONFIG_PCI_MMCONFIG)	+= mmconf-fam10h_64.o
  	obj-y				+= vsmp_64.o
@@ -315,8 +315,8 @@ have been needed - see SLE11 SPn).
 +	i8259.o irqinit_$(BITS).o pci-swiotlb_64.o reboot.o smpboot.o \
 +	tlb_$(BITS).o tsc.o tsc_sync.o vsmp_64.o
 +disabled-obj-$(CONFIG_XEN_UNPRIVILEGED_GUEST) += probe_roms_32.o
---- 13.1.orig/arch/x86/kernel/acpi/boot.c	2013-08-09 12:36:20.000000000 +0200
-+++ 13.1/arch/x86/kernel/acpi/boot.c	2013-08-09 12:53:18.000000000 +0200
+--- a/arch/x86/kernel/acpi/boot.c
++++ b/arch/x86/kernel/acpi/boot.c
 @@ -1368,6 +1368,7 @@ static int __init dmi_disable_acpi(const
  	return 0;
  }
@@ -360,8 +360,8 @@ have been needed - see SLE11 SPn).
  
  	/*
  	 * If acpi_disabled, bail out
---- 13.1.orig/arch/x86/kernel/amd_nb.c	2015-03-05 14:08:45.000000000 +0100
-+++ 13.1/arch/x86/kernel/amd_nb.c	2013-05-23 17:18:02.000000000 +0200
+--- a/arch/x86/kernel/amd_nb.c
++++ b/arch/x86/kernel/amd_nb.c
 @@ -18,6 +18,10 @@ static u32 *flush_words;
  const struct pci_device_id amd_nb_misc_ids[] = {
  	{ PCI_DEVICE(PCI_VENDOR_ID_AMD, PCI_DEVICE_ID_AMD_K8_NB_MISC) },
@@ -373,8 +373,8 @@ have been needed - see SLE11 SPn).
  	{ PCI_DEVICE(PCI_VENDOR_ID_AMD, PCI_DEVICE_ID_AMD_15H_NB_F3) },
  	{ PCI_DEVICE(PCI_VENDOR_ID_AMD, PCI_DEVICE_ID_AMD_15H_M10H_F3) },
  	{ PCI_DEVICE(PCI_VENDOR_ID_AMD, PCI_DEVICE_ID_AMD_15H_M30H_NB_F3) },
---- 13.1.orig/arch/x86/kernel/apic/apic-xen.c	2011-02-24 15:45:13.000000000 +0100
-+++ 13.1/arch/x86/kernel/apic/apic-xen.c	2011-02-01 14:38:38.000000000 +0100
+--- a/arch/x86/kernel/apic/apic-xen.c
++++ b/arch/x86/kernel/apic/apic-xen.c
 @@ -59,7 +59,10 @@ static cpumask_t timer_bcast_ipi;
  /*
   * Debug level, exported for io_apic.c
@@ -387,8 +387,8 @@ have been needed - see SLE11 SPn).
  
  #ifndef CONFIG_XEN
  static int modern_apic(void)
---- 13.1.orig/arch/x86/kernel/cpu/amd.c	2015-03-05 14:08:45.000000000 +0100
-+++ 13.1/arch/x86/kernel/cpu/amd.c	2013-05-23 17:18:07.000000000 +0200
+--- a/arch/x86/kernel/cpu/amd.c
++++ b/arch/x86/kernel/cpu/amd.c
 @@ -680,6 +680,7 @@ static void init_amd(struct cpuinfo_x86 
  		fam10h_check_enable_mmcfg();
  	}
@@ -405,8 +405,8 @@ have been needed - see SLE11 SPn).
  
  	/*
  	 * Family 0x12 and above processors have APIC timer
---- 13.1.orig/arch/x86/kernel/cpu/bugs_64.c	2015-03-05 14:08:45.000000000 +0100
-+++ 13.1/arch/x86/kernel/cpu/bugs_64.c	2011-02-01 14:38:38.000000000 +0100
+--- a/arch/x86/kernel/cpu/bugs_64.c
++++ b/arch/x86/kernel/cpu/bugs_64.c
 @@ -20,6 +20,7 @@ void __init check_bugs(void)
  #endif
  	alternative_instructions();
@@ -421,8 +421,8 @@ have been needed - see SLE11 SPn).
  		set_memory_4k((unsigned long)__va(0), 1);
 +#endif
  }
---- 13.1.orig/arch/x86/kernel/cpu/common-xen.c	2012-07-05 11:22:48.000000000 +0200
-+++ 13.1/arch/x86/kernel/cpu/common-xen.c	2012-07-05 11:25:20.000000000 +0200
+--- a/arch/x86/kernel/cpu/common-xen.c
++++ b/arch/x86/kernel/cpu/common-xen.c
 @@ -13,6 +13,7 @@
  #include <asm/mtrr.h>
  #include <asm/mce.h>
@@ -485,8 +485,8 @@ have been needed - see SLE11 SPn).
  
  	if (!have_cpuid_p()) {
  		/*
---- 13.1.orig/arch/x86/kernel/e820-xen.c	2011-01-31 18:07:35.000000000 +0100
-+++ 13.1/arch/x86/kernel/e820-xen.c	2011-09-23 15:48:48.000000000 +0200
+--- a/arch/x86/kernel/e820-xen.c
++++ b/arch/x86/kernel/e820-xen.c
 @@ -17,178 +17,54 @@
  #include <linux/kexec.h>
  #include <linux/module.h>
@@ -2565,8 +2565,8 @@ have been needed - see SLE11 SPn).
 +	printk(KERN_INFO "Xen-provided physical RAM map:\n");
 +	_e820_print_map(&e820, who);
  }
---- 13.1.orig/arch/x86/kernel/early_printk-xen.c	2011-01-31 18:07:35.000000000 +0100
-+++ 13.1/arch/x86/kernel/early_printk-xen.c	2011-02-01 14:38:38.000000000 +0100
+--- a/arch/x86/kernel/early_printk-xen.c
++++ b/arch/x86/kernel/early_printk-xen.c
 @@ -225,7 +225,7 @@ static struct console simnow_console = {
  static struct console *early_console = &early_vga_console;
  static int early_console_initialized;
@@ -2576,8 +2576,8 @@ have been needed - see SLE11 SPn).
  {
  	char buf[512];
  	int n;
---- 13.1.orig/arch/x86/kernel/entry_32-xen.S	2011-01-31 18:07:35.000000000 +0100
-+++ 13.1/arch/x86/kernel/entry_32-xen.S	2013-01-30 10:41:33.000000000 +0100
+--- a/arch/x86/kernel/entry_32-xen.S
++++ b/arch/x86/kernel/entry_32-xen.S
 @@ -51,15 +51,26 @@
  #include <asm/percpu.h>
  #include <asm/dwarf2.h>
@@ -2876,9 +2876,9 @@ have been needed - see SLE11 SPn).
  	cmpl $nr_syscalls,%eax
  	jb syscall_call
  	jmp syscall_exit
---- 13.1.orig/arch/x86/kernel/entry_64.S	2015-03-05 14:08:45.000000000 +0100
-+++ 13.1/arch/x86/kernel/entry_64.S	2013-08-09 12:53:13.000000000 +0200
-@@ -1436,7 +1436,7 @@ ENTRY(arch_unwind_init_running)
+--- a/arch/x86/kernel/entry_64.S
++++ b/arch/x86/kernel/entry_64.S
+@@ -1439,7 +1439,7 @@ ENTRY(arch_unwind_init_running)
  END(arch_unwind_init_running)
  #endif
  
@@ -2887,7 +2887,7 @@ have been needed - see SLE11 SPn).
  zeroentry xen_hypervisor_callback xen_do_hypervisor_callback
  
  /*
-@@ -1536,7 +1536,7 @@ END(xen_failsafe_callback)
+@@ -1539,7 +1539,7 @@ END(xen_failsafe_callback)
  apicinterrupt3 HYPERVISOR_CALLBACK_VECTOR \
  	xen_hvm_callback_vector xen_evtchn_do_upcall
  
@@ -2896,8 +2896,8 @@ have been needed - see SLE11 SPn).
  
  #if IS_ENABLED(CONFIG_HYPERV)
  apicinterrupt3 HYPERVISOR_CALLBACK_VECTOR \
---- 13.1.orig/arch/x86/kernel/entry_64-xen.S	2011-10-07 11:33:31.000000000 +0200
-+++ 13.1/arch/x86/kernel/entry_64-xen.S	2011-10-07 11:35:11.000000000 +0200
+--- a/arch/x86/kernel/entry_64-xen.S
++++ b/arch/x86/kernel/entry_64-xen.S
 @@ -53,12 +53,124 @@
  #include <asm/hw_irq.h>
  #include <asm/page.h>
@@ -3335,8 +3335,8 @@ have been needed - see SLE11 SPn).
  	paranoidentry do_stack_segment */
  	errorentry do_stack_segment
  /*	jmp paranoid_exit1
---- 13.1.orig/arch/x86/kernel/fixup.c	2011-01-31 18:01:51.000000000 +0100
-+++ 13.1/arch/x86/kernel/fixup.c	2011-02-01 14:38:38.000000000 +0100
+--- a/arch/x86/kernel/fixup.c
++++ b/arch/x86/kernel/fixup.c
 @@ -33,6 +33,7 @@
  #include <linux/kernel.h>
  #include <linux/delay.h>
@@ -3345,8 +3345,8 @@ have been needed - see SLE11 SPn).
  
  #define DP(_f, _args...) pr_alert("  " _f "\n" , ## _args )
  
---- /dev/null	1970-01-01 00:00:00.000000000 +0000
-+++ 13.1/arch/x86/kernel/head-xen.c	2011-02-01 14:38:38.000000000 +0100
+--- /dev/null
++++ b/arch/x86/kernel/head-xen.c
 @@ -0,0 +1,57 @@
 +#include <linux/kernel.h>
 +#include <linux/init.h>
@@ -3405,8 +3405,8 @@ have been needed - see SLE11 SPn).
 +	reserve_early_overlap_ok(lowmem, 0x100000, "BIOS reserved");
 +#endif
 +}
---- /dev/null	1970-01-01 00:00:00.000000000 +0000
-+++ 13.1/arch/x86/kernel/head32-xen.c	2011-02-01 14:38:38.000000000 +0100
+--- /dev/null
++++ b/arch/x86/kernel/head32-xen.c
 @@ -0,0 +1,56 @@
 +/*
 + *  linux/arch/i386/kernel/head32.c -- prepare to run common code
@@ -3464,8 +3464,8 @@ have been needed - see SLE11 SPn).
 +
 +	start_kernel();
 +}
---- 13.1.orig/arch/x86/kernel/head64-xen.c	2011-08-09 10:53:20.000000000 +0200
-+++ 13.1/arch/x86/kernel/head64-xen.c	2011-08-09 10:54:49.000000000 +0200
+--- a/arch/x86/kernel/head64-xen.c
++++ b/arch/x86/kernel/head64-xen.c
 @@ -32,7 +32,26 @@
  #include <asm/e820.h>
  #include <asm/bios_ebda.h>
@@ -3625,8 +3625,8 @@ have been needed - see SLE11 SPn).
  
  	/*
  	 * At this point everything still needed from the boot loader
---- 13.1.orig/arch/x86/kernel/head_32-xen.S	2011-08-09 10:53:18.000000000 +0200
-+++ 13.1/arch/x86/kernel/head_32-xen.S	2011-08-09 10:54:53.000000000 +0200
+--- a/arch/x86/kernel/head_32-xen.S
++++ b/arch/x86/kernel/head_32-xen.S
 @@ -62,8 +62,6 @@ ENTRY(startup_32)
  	movb %cl,X86_MASK
  	movl %edx,X86_CAPABILITY
@@ -3636,8 +3636,8 @@ have been needed - see SLE11 SPn).
  	xorl %eax,%eax		# Clear GS
  	movl %eax,%gs
  
---- 13.1.orig/arch/x86/kernel/head_64-xen.S	2013-03-05 12:31:06.000000000 +0100
-+++ 13.1/arch/x86/kernel/head_64-xen.S	2013-03-05 12:32:04.000000000 +0100
+--- a/arch/x86/kernel/head_64-xen.S
++++ b/arch/x86/kernel/head_64-xen.S
 @@ -108,53 +108,6 @@ NEXT_PAGE(hypercall_page)
  
  #undef NEXT_PAGE
@@ -3692,8 +3692,8 @@ have been needed - see SLE11 SPn).
  	.section .bss.page_aligned, "aw", @nobits
  	.align PAGE_SIZE
  ENTRY(empty_zero_page)
---- 13.1.orig/arch/x86/kernel/apic/io_apic-xen.c	2011-01-31 18:07:35.000000000 +0100
-+++ 13.1/arch/x86/kernel/apic/io_apic-xen.c	2011-02-01 14:38:38.000000000 +0100
+--- a/arch/x86/kernel/apic/io_apic-xen.c
++++ b/arch/x86/kernel/apic/io_apic-xen.c
 @@ -45,6 +45,7 @@
  #include <asm/proto.h>
  #include <asm/acpi.h>
@@ -4457,8 +4457,8 @@ have been needed - see SLE11 SPn).
  		} else {
  			ioapic_phys = (unsigned long)
  				alloc_bootmem_pages(PAGE_SIZE);
---- 13.1.orig/arch/x86/kernel/ldt-xen.c	2011-01-31 18:01:51.000000000 +0100
-+++ 13.1/arch/x86/kernel/ldt-xen.c	2011-02-01 14:38:38.000000000 +0100
+--- a/arch/x86/kernel/ldt-xen.c
++++ b/arch/x86/kernel/ldt-xen.c
 @@ -20,9 +20,9 @@
  #include <asm/mmu_context.h>
  
@@ -4493,8 +4493,8 @@ have been needed - see SLE11 SPn).
  		preempt_enable();
  #endif
  	}
---- 13.1.orig/arch/x86/kernel/machine_kexec_32.c	2012-04-10 15:46:03.000000000 +0200
-+++ 13.1/arch/x86/kernel/machine_kexec_32.c	2012-04-10 16:47:16.000000000 +0200
+--- a/arch/x86/kernel/machine_kexec_32.c
++++ b/arch/x86/kernel/machine_kexec_32.c
 @@ -130,22 +130,11 @@ void machine_kexec_setup_load_arg(xen_ke
  	xki->page_list[PA_PTE_0] = __ma(kexec_pte0);
  	xki->page_list[PA_PTE_1] = __ma(kexec_pte1);
@@ -4521,8 +4521,8 @@ have been needed - see SLE11 SPn).
  
  #endif /* CONFIG_XEN */
  
---- 13.1.orig/arch/x86/kernel/machine_kexec_64.c	2013-03-21 14:28:27.000000000 +0100
-+++ 13.1/arch/x86/kernel/machine_kexec_64.c	2013-03-21 14:31:41.000000000 +0100
+--- a/arch/x86/kernel/machine_kexec_64.c
++++ b/arch/x86/kernel/machine_kexec_64.c
 @@ -61,24 +61,7 @@ void machine_kexec_setup_load_arg(xen_ke
  	xki->page_list[PA_PTE_1] = __ma(kexec_pte1);
  }
@@ -4549,8 +4549,8 @@ have been needed - see SLE11 SPn).
  
  #endif /* CONFIG_XEN */
  
---- /dev/null	1970-01-01 00:00:00.000000000 +0000
-+++ 13.1/arch/x86/kernel/machine_kexec_xen.c	2011-12-02 17:22:49.000000000 +0100
+--- /dev/null
++++ b/arch/x86/kernel/machine_kexec_xen.c
 @@ -0,0 +1,22 @@
 +int __init machine_kexec_setup_resources(struct resource *hypervisor,
 +					 struct resource *phys_cpus,
@@ -4574,8 +4574,8 @@ have been needed - see SLE11 SPn).
 +					    BITS_PER_LONG);
 +
 +}
---- 13.1.orig/arch/x86/kernel/microcode_core-xen.c	2011-12-01 15:01:36.000000000 +0100
-+++ 13.1/arch/x86/kernel/microcode_core-xen.c	2011-12-01 15:01:45.000000000 +0100
+--- a/arch/x86/kernel/microcode_core-xen.c
++++ b/arch/x86/kernel/microcode_core-xen.c
 @@ -5,13 +5,14 @@
   *		      2006	Shaohua Li <shaohua.li@intel.com>
   *
@@ -4640,8 +4640,8 @@ have been needed - see SLE11 SPn).
  	return 0;
  }
  
---- 13.1.orig/arch/x86/kernel/mpparse-xen.c	2011-01-31 18:07:35.000000000 +0100
-+++ 13.1/arch/x86/kernel/mpparse-xen.c	2011-02-01 14:38:38.000000000 +0100
+--- a/arch/x86/kernel/mpparse-xen.c
++++ b/arch/x86/kernel/mpparse-xen.c
 @@ -25,6 +25,9 @@
  #include <asm/proto.h>
  #include <asm/acpi.h>
@@ -5851,8 +5851,8 @@ have been needed - see SLE11 SPn).
 -#endif /* CONFIG_X86_IO_APIC */
 -#endif /* CONFIG_ACPI */
 +late_initcall(update_mp_table);
---- 13.1.orig/arch/x86/kernel/pci-dma-xen.c	2014-11-27 15:54:12.000000000 +0100
-+++ 13.1/arch/x86/kernel/pci-dma-xen.c	2012-04-04 14:29:19.000000000 +0200
+--- a/arch/x86/kernel/pci-dma-xen.c
++++ b/arch/x86/kernel/pci-dma-xen.c
 @@ -6,11 +6,11 @@
  
  #include <asm/proto.h>
@@ -6204,8 +6204,8 @@ have been needed - see SLE11 SPn).
  
  	no_iommu_init();
  	return 0;
---- 13.1.orig/arch/x86/kernel/pci-nommu-xen.c	2012-11-14 12:52:43.000000000 +0100
-+++ 13.1/arch/x86/kernel/pci-nommu-xen.c	2012-04-04 14:06:29.000000000 +0200
+--- a/arch/x86/kernel/pci-nommu-xen.c
++++ b/arch/x86/kernel/pci-nommu-xen.c
 @@ -82,18 +82,12 @@ static int nommu_dma_supported(struct de
  	return 1;
  }
@@ -6226,8 +6226,8 @@ have been needed - see SLE11 SPn).
  };
  
  void __init no_iommu_init(void)
---- 13.1.orig/arch/x86/kernel/probe_roms.c	2015-03-05 14:08:45.000000000 +0100
-+++ 13.1/arch/x86/kernel/probe_roms.c	2012-04-10 16:47:21.000000000 +0200
+--- a/arch/x86/kernel/probe_roms.c
++++ b/arch/x86/kernel/probe_roms.c
 @@ -233,7 +233,7 @@ void __init probe_roms(void)
  	upper = system_rom_resource.start;
  
@@ -6237,8 +6237,8 @@ have been needed - see SLE11 SPn).
  	if (romsignature(rom)) {
  		length = resource_size(&extension_rom_resource);
  		if (romchecksum(rom, length)) {
---- 13.1.orig/arch/x86/kernel/process-xen.c	2011-01-31 18:07:35.000000000 +0100
-+++ 13.1/arch/x86/kernel/process-xen.c	2011-03-03 15:59:49.000000000 +0100
+--- a/arch/x86/kernel/process-xen.c
++++ b/arch/x86/kernel/process-xen.c
 @@ -6,6 +6,13 @@
  #include <linux/sched.h>
  #include <linux/module.h>
@@ -6500,8 +6500,8 @@ have been needed - see SLE11 SPn).
  		return -1;
  
  	boot_option_idle_override = 1;
---- 13.1.orig/arch/x86/kernel/process_32-xen.c	2012-08-10 10:31:14.000000000 +0200
-+++ 13.1/arch/x86/kernel/process_32-xen.c	2012-08-10 10:32:35.000000000 +0200
+--- a/arch/x86/kernel/process_32-xen.c
++++ b/arch/x86/kernel/process_32-xen.c
 @@ -59,15 +59,11 @@
  #include <asm/tlbflush.h>
  #include <asm/cpu.h>
@@ -6605,8 +6605,8 @@ have been needed - see SLE11 SPn).
  		}
  		tick_nohz_restart_sched_tick();
  		preempt_enable_no_resched();
---- 13.1.orig/arch/x86/kernel/process_64-xen.c	2012-08-10 10:31:15.000000000 +0200
-+++ 13.1/arch/x86/kernel/process_64-xen.c	2012-08-10 10:32:33.000000000 +0200
+--- a/arch/x86/kernel/process_64-xen.c
++++ b/arch/x86/kernel/process_64-xen.c
 @@ -64,15 +64,6 @@ asmlinkage extern void ret_from_fork(voi
  
  unsigned long kernel_thread_flags = CLONE_VM | CLONE_UNTRACED;
@@ -6789,8 +6789,8 @@ have been needed - see SLE11 SPn).
  			if (gsindex)
  				rdmsrl(MSR_KERNEL_GS_BASE, base);
  			else
---- 13.1.orig/arch/x86/kernel/setup-xen.c	2011-01-31 18:07:35.000000000 +0100
-+++ 13.1/arch/x86/kernel/setup-xen.c	2012-05-31 11:19:29.000000000 +0200
+--- a/arch/x86/kernel/setup-xen.c
++++ b/arch/x86/kernel/setup-xen.c
 @@ -1,143 +1,1122 @@
 -#include <linux/kernel.h>
 +/*
@@ -8004,8 +8004,8 @@ have been needed - see SLE11 SPn).
 +	return NOTIFY_DONE;
 +}
 +#endif /* !CONFIG_XEN */
---- 13.1.orig/arch/x86/kernel/smp-xen.c	2011-01-31 18:07:35.000000000 +0100
-+++ 13.1/arch/x86/kernel/smp-xen.c	2011-02-01 14:38:38.000000000 +0100
+--- a/arch/x86/kernel/smp-xen.c
++++ b/arch/x86/kernel/smp-xen.c
 @@ -121,132 +121,14 @@ void xen_smp_send_reschedule(int cpu)
  	send_IPI_mask(cpumask_of_cpu(cpu), RESCHEDULE_VECTOR);
  }
@@ -8203,8 +8203,8 @@ have been needed - see SLE11 SPn).
  
  	return IRQ_HANDLED;
  }
---- 13.1.orig/arch/x86/kernel/time-xen.c	2012-02-10 13:27:59.000000000 +0100
-+++ 13.1/arch/x86/kernel/time-xen.c	2012-02-10 13:28:05.000000000 +0100
+--- a/arch/x86/kernel/time-xen.c
++++ b/arch/x86/kernel/time-xen.c
 @@ -493,7 +493,7 @@ irqreturn_t timer_interrupt(int irq, voi
  
  	/* Keep nmi watchdog up to date */
@@ -8234,8 +8234,8 @@ have been needed - see SLE11 SPn).
  		cpu_clear(cpu, nohz_cpu_mask);
  		j = jiffies + 1;
  	}
---- 13.1.orig/arch/x86/kernel/traps_32-xen.c	2013-11-26 11:26:14.000000000 +0100
-+++ 13.1/arch/x86/kernel/traps_32-xen.c	2013-11-26 11:26:30.000000000 +0100
+--- a/arch/x86/kernel/traps_32-xen.c
++++ b/arch/x86/kernel/traps_32-xen.c
 @@ -1,5 +1,6 @@
  /*
   *  Copyright (C) 1991, 1992  Linus Torvalds
@@ -8812,8 +8812,8 @@ have been needed - see SLE11 SPn).
  	unsigned long base = (kesp - uesp) & -THREAD_SIZE;
  	unsigned long new_kesp = kesp - base;
  	unsigned long lim_pages = (new_kesp | (THREAD_SIZE - 1)) >> PAGE_SHIFT;
---- 13.1.orig/arch/x86/kernel/traps_64-xen.c	2013-11-26 11:26:14.000000000 +0100
-+++ 13.1/arch/x86/kernel/traps_64-xen.c	2013-11-26 11:26:25.000000000 +0100
+--- a/arch/x86/kernel/traps_64-xen.c
++++ b/arch/x86/kernel/traps_64-xen.c
 @@ -10,73 +10,56 @@
   * 'Traps.c' handles hardware traps and faults after we have saved some
   * state in 'entry.S'.
@@ -9774,8 +9774,8 @@ have been needed - see SLE11 SPn).
  static int __init code_bytes_setup(char *s)
  {
  	code_bytes = simple_strtoul(s, NULL, 0);
---- 13.1.orig/arch/x86/kernel/vsyscall_64-xen.c	2011-01-31 18:07:35.000000000 +0100
-+++ 13.1/arch/x86/kernel/vsyscall_64-xen.c	2011-02-01 14:38:38.000000000 +0100
+--- a/arch/x86/kernel/vsyscall_64-xen.c
++++ b/arch/x86/kernel/vsyscall_64-xen.c
 @@ -42,7 +42,8 @@
  #include <asm/topology.h>
  #include <asm/vgtod.h>
@@ -9816,8 +9816,8 @@ have been needed - see SLE11 SPn).
  	hotcpu_notifier(cpu_vsyscall_notifier, 0);
  	return 0;
  }
---- 13.1.orig/arch/x86/mach-xen/setup.c	2011-01-31 18:07:35.000000000 +0100
-+++ 13.1/arch/x86/mach-xen/setup.c	2011-09-07 15:45:25.000000000 +0200
+--- a/arch/x86/mach-xen/setup.c
++++ b/arch/x86/mach-xen/setup.c
 @@ -17,6 +17,8 @@
  #include <xen/interface/callback.h>
  #include <xen/interface/memory.h>
@@ -9981,8 +9981,8 @@ have been needed - see SLE11 SPn).
  	}
 +#endif
  }
---- 13.1.orig/arch/x86/mm/Makefile	2012-02-08 10:55:41.000000000 +0100
-+++ 13.1/arch/x86/mm/Makefile	2011-04-13 13:48:19.000000000 +0200
+--- a/arch/x86/mm/Makefile
++++ b/arch/x86/mm/Makefile
 @@ -28,5 +28,6 @@ obj-$(CONFIG_ACPI_NUMA)		+= srat.o
  obj-$(CONFIG_NUMA_EMU)		+= numa_emulation.o
  
@@ -9990,8 +9990,8 @@ have been needed - see SLE11 SPn).
 +disabled-obj-$(CONFIG_XEN)	:= gup.o
  
  obj-$(CONFIG_MEMTEST)		+= memtest.o
---- 13.1.orig/arch/x86/mm/dump_pagetables-xen.c	2011-01-31 18:07:35.000000000 +0100
-+++ 13.1/arch/x86/mm/dump_pagetables-xen.c	2011-02-01 14:38:38.000000000 +0100
+--- a/arch/x86/mm/dump_pagetables-xen.c
++++ b/arch/x86/mm/dump_pagetables-xen.c
 @@ -45,7 +45,7 @@ static struct addr_marker address_marker
  	{ 0, "User Space" },
  #ifdef CONFIG_X86_64
@@ -10039,8 +10039,8 @@ have been needed - see SLE11 SPn).
  
  			if (pgd_large(*start) || !pgd_present(*start))
  				note_page(m, &st, __pgprot(prot), 1);
---- 13.1.orig/arch/x86/mm/fault-xen.c	2011-07-26 09:29:47.000000000 +0200
-+++ 13.1/arch/x86/mm/fault-xen.c	2011-07-26 09:29:55.000000000 +0200
+--- a/arch/x86/mm/fault-xen.c
++++ b/arch/x86/mm/fault-xen.c
 @@ -10,6 +10,7 @@
  #include <linux/string.h>
  #include <linux/types.h>
@@ -10241,8 +10241,8 @@ have been needed - see SLE11 SPn).
  	}
  #endif
  }
---- 13.1.orig/arch/x86/mm/hypervisor.c	2012-05-31 14:43:59.000000000 +0200
-+++ 13.1/arch/x86/mm/hypervisor.c	2012-06-01 15:09:20.000000000 +0200
+--- a/arch/x86/mm/hypervisor.c
++++ b/arch/x86/mm/hypervisor.c
 @@ -497,7 +497,7 @@ static int __init init_contig_order(void
  
  	return 0;
@@ -10372,8 +10372,8 @@ have been needed - see SLE11 SPn).
 +	maddr_t mach_gp = virt_to_machine(gdt + entry);
 +	return HYPERVISOR_update_descriptor(mach_gp, *(const u64*)desc);
  }
---- 13.1.orig/arch/x86/mm/init_32-xen.c	2011-01-31 18:07:35.000000000 +0100
-+++ 13.1/arch/x86/mm/init_32-xen.c	2011-11-03 12:18:58.000000000 +0100
+--- a/arch/x86/mm/init_32-xen.c
++++ b/arch/x86/mm/init_32-xen.c
 @@ -54,6 +54,7 @@
  
  unsigned int __VMALLOC_RESERVE = 128 << 20;
@@ -11203,8 +11203,8 @@ have been needed - see SLE11 SPn).
 +{
 +	return reserve_bootmem(phys, len, flags);
 +}
---- 13.1.orig/arch/x86/mm/init_64-xen.c	2013-08-15 12:59:43.000000000 +0200
-+++ 13.1/arch/x86/mm/init_64-xen.c	2013-08-15 12:59:51.000000000 +0200
+--- a/arch/x86/mm/init_64-xen.c
++++ b/arch/x86/mm/init_64-xen.c
 @@ -21,6 +21,7 @@
  #include <linux/swap.h>
  #include <linux/smp.h>
@@ -12582,8 +12582,8 @@ have been needed - see SLE11 SPn).
  	}
  	return 0;
  }
---- 13.1.orig/arch/x86/mm/ioremap-xen.c	2013-01-25 10:43:00.000000000 +0100
-+++ 13.1/arch/x86/mm/ioremap-xen.c	2011-02-07 15:40:39.000000000 +0100
+--- a/arch/x86/mm/ioremap-xen.c
++++ b/arch/x86/mm/ioremap-xen.c
 @@ -13,6 +13,7 @@
  #include <linux/pfn.h>
  #include <linux/slab.h>
@@ -12756,8 +12756,8 @@ have been needed - see SLE11 SPn).
  
  	return 1;
  }
---- 13.1.orig/arch/x86/mm/pageattr-xen.c	2011-03-23 09:53:18.000000000 +0100
-+++ 13.1/arch/x86/mm/pageattr-xen.c	2011-03-23 09:54:23.000000000 +0100
+--- a/arch/x86/mm/pageattr-xen.c
++++ b/arch/x86/mm/pageattr-xen.c
 @@ -34,6 +34,47 @@ struct cpa_data {
  	unsigned	force_split : 1;
  };
@@ -12972,8 +12972,8 @@ have been needed - see SLE11 SPn).
  
  	return _set_memory_wb(addr, numpages);
  }
---- 13.1.orig/arch/x86/mm/pat-xen.c	2011-01-31 18:07:35.000000000 +0100
-+++ 13.1/arch/x86/mm/pat-xen.c	2011-02-01 14:38:38.000000000 +0100
+--- a/arch/x86/mm/pat-xen.c
++++ b/arch/x86/mm/pat-xen.c
 @@ -12,6 +12,8 @@
  #include <linux/gfp.h>
  #include <linux/fs.h>
@@ -13683,8 +13683,8 @@ have been needed - see SLE11 SPn).
 +late_initcall(pat_memtype_list_init);
 +
 +#endif /* CONFIG_DEBUG_FS */
---- 13.1.orig/arch/x86/mm/pgtable-xen.c	2011-01-31 18:07:35.000000000 +0100
-+++ 13.1/arch/x86/mm/pgtable-xen.c	2011-02-01 14:38:38.000000000 +0100
+--- a/arch/x86/mm/pgtable-xen.c
++++ b/arch/x86/mm/pgtable-xen.c
 @@ -4,6 +4,7 @@
  #include <asm/pgalloc.h>
  #include <asm/pgtable.h>
@@ -14053,8 +14053,8 @@ have been needed - see SLE11 SPn).
 +	set_pte_vaddr(address, pte);
 +	fixmaps_set++;
 +}
---- 13.1.orig/arch/x86/mm/pgtable_32-xen.c	2011-01-31 18:07:35.000000000 +0100
-+++ 13.1/arch/x86/mm/pgtable_32-xen.c	2011-02-01 14:38:38.000000000 +0100
+--- a/arch/x86/mm/pgtable_32-xen.c
++++ b/arch/x86/mm/pgtable_32-xen.c
 @@ -25,51 +25,49 @@
  #include <xen/features.h>
  #include <asm/hypervisor.h>
@@ -14235,8 +14235,8 @@ have been needed - see SLE11 SPn).
  void make_lowmem_page_readonly(void *va, unsigned int feature)
  {
  	pte_t *pte;
---- 13.1.orig/arch/x86/pci/amd_bus.c	2015-03-05 14:08:46.000000000 +0100
-+++ 13.1/arch/x86/pci/amd_bus.c	2013-08-09 12:52:55.000000000 +0200
+--- a/arch/x86/pci/amd_bus.c
++++ b/arch/x86/pci/amd_bus.c
 @@ -312,6 +312,7 @@ static int __init early_fill_mp_bus_info
  
  #define ENABLE_CF8_EXT_CFG      (1ULL << 46)
@@ -14284,8 +14284,8 @@ have been needed - see SLE11 SPn).
  	if (boot_cpu_data.x86_vendor != X86_VENDOR_AMD)
  		return 0;
  
---- 13.1.orig/arch/x86/pci/mmconfig-shared.c	2015-03-05 14:08:46.000000000 +0100
-+++ 13.1/arch/x86/pci/mmconfig-shared.c	2013-01-14 13:50:37.000000000 +0100
+--- a/arch/x86/pci/mmconfig-shared.c
++++ b/arch/x86/pci/mmconfig-shared.c
 @@ -23,6 +23,10 @@
  #include <asm/pci_x86.h>
  #include <asm/acpi.h>
@@ -14352,8 +14352,8 @@ have been needed - see SLE11 SPn).
  }
  
  static int __ref pci_mmcfg_check_reserved(struct device *dev,
---- 13.1.orig/arch/x86/vdso/Makefile	2012-04-10 16:43:22.000000000 +0200
-+++ 13.1/arch/x86/vdso/Makefile	2011-09-07 15:45:31.000000000 +0200
+--- a/arch/x86/vdso/Makefile
++++ b/arch/x86/vdso/Makefile
 @@ -123,9 +123,7 @@ obj-$(VDSO32-y)			+= vdso32-syms.lds
  vdso32.so-$(VDSO32-y)		+= int80
  vdso32.so-$(CONFIG_COMPAT)	+= syscall
@@ -14365,8 +14365,8 @@ have been needed - see SLE11 SPn).
  
  vdso32-images			= $(vdso32.so-y:%=vdso32-%.so)
  
---- 13.1.orig/arch/x86/vdso/vdso32.S	2011-01-31 18:01:51.000000000 +0100
-+++ 13.1/arch/x86/vdso/vdso32.S	2011-02-01 14:38:38.000000000 +0100
+--- a/arch/x86/vdso/vdso32.S
++++ b/arch/x86/vdso/vdso32.S
 @@ -9,7 +9,7 @@ vdso32_int80_end:
  
  	.globl vdso32_syscall_start, vdso32_syscall_end
@@ -14393,8 +14393,8 @@ have been needed - see SLE11 SPn).
 -#endif
 -
  __FINIT
---- 13.1.orig/arch/x86/vdso/vdso32-setup-xen.c	2011-01-31 18:07:35.000000000 +0100
-+++ 13.1/arch/x86/vdso/vdso32-setup-xen.c	2011-02-01 14:38:38.000000000 +0100
+--- a/arch/x86/vdso/vdso32-setup-xen.c
++++ b/arch/x86/vdso/vdso32-setup-xen.c
 @@ -195,50 +195,28 @@ static __init void relocate_vdso(Elf32_E
  	}
  }
@@ -14528,8 +14528,8 @@ have been needed - see SLE11 SPn).
  	}
  
  	memcpy(syscall_page, vsyscall, vsyscall_len);
---- 13.1.orig/arch/x86/xen/Kconfig	2013-05-23 17:06:53.000000000 +0200
-+++ 13.1/arch/x86/xen/Kconfig	2013-01-08 11:51:10.000000000 +0100
+--- a/arch/x86/xen/Kconfig
++++ b/arch/x86/xen/Kconfig
 @@ -32,14 +32,14 @@ config XEN_MAX_DOMAIN_MEMORY
         int
         default 500 if X86_64
@@ -14547,8 +14547,8 @@ have been needed - see SLE11 SPn).
         select HIBERNATE_CALLBACKS
         default y
  
---- 13.1.orig/drivers/acpi/processor_core.c	2013-03-21 14:20:28.000000000 +0100
-+++ 13.1/drivers/acpi/processor_core.c	2013-03-21 14:30:44.000000000 +0100
+--- a/drivers/acpi/processor_core.c
++++ b/drivers/acpi/processor_core.c
 @@ -323,19 +323,31 @@ acpi_processor_eval_pdc(acpi_handle hand
  {
  	acpi_status status = AE_OK;
@@ -14582,8 +14582,8 @@ have been needed - see SLE11 SPn).
  	}
  	status = acpi_evaluate_object(handle, "_PDC", pdc_in, NULL);
  
---- 13.1.orig/drivers/acpi/acpi_processor.c	2013-08-09 12:35:53.000000000 +0200
-+++ 13.1/drivers/acpi/acpi_processor.c	2013-08-09 12:52:46.000000000 +0200
+--- a/drivers/acpi/acpi_processor.c
++++ b/drivers/acpi/acpi_processor.c
 @@ -424,7 +424,7 @@ static int acpi_processor_add(struct acp
  #ifndef CONFIG_XEN
  	per_cpu(processor_device_array, pr->id) = device;
@@ -14616,8 +14616,8 @@ have been needed - see SLE11 SPn).
  
  	if (processor_cntl_external())
  		processor_notify_external(pr, PROCESSOR_HOTPLUG,
---- 13.1.orig/drivers/acpi/processor_perflib.c	2013-08-09 12:15:42.000000000 +0200
-+++ 13.1/drivers/acpi/processor_perflib.c	2011-06-30 16:41:01.000000000 +0200
+--- a/drivers/acpi/processor_perflib.c
++++ b/drivers/acpi/processor_perflib.c
 @@ -183,6 +183,12 @@ int acpi_processor_ppc_has_changed(struc
  {
  	int ret;
@@ -14631,8 +14631,8 @@ have been needed - see SLE11 SPn).
  	if (ignore_ppc) {
  		/*
  		 * Only when it is notification event, the _OST object
---- 13.1.orig/drivers/char/tpm/tpm_vtpm.c	2011-01-31 14:53:38.000000000 +0100
-+++ 13.1/drivers/char/tpm/tpm_vtpm.c	2011-02-01 14:38:38.000000000 +0100
+--- a/drivers/char/tpm/tpm_vtpm.c
++++ b/drivers/char/tpm/tpm_vtpm.c
 @@ -347,7 +347,7 @@ static int _vtpm_send_queued(struct tpm_
  {
  	int rc;
@@ -14642,8 +14642,8 @@ have been needed - see SLE11 SPn).
  	unsigned char buffer[1];
  	struct vtpm_state *vtpms;
  	vtpms = (struct vtpm_state *)chip_get_private(chip);
---- 13.1.orig/drivers/dma/ioat/dma.h	2013-05-23 17:09:55.000000000 +0200
-+++ 13.1/drivers/dma/ioat/dma.h	2013-05-23 17:17:49.000000000 +0200
+--- a/drivers/dma/ioat/dma.h
++++ b/drivers/dma/ioat/dma.h
 @@ -389,6 +389,7 @@ __ioat_dca_init(struct pci_dev *pdev, vo
  }
  #define ioat_dca_init __ioat_dca_init
@@ -14652,8 +14652,8 @@ have been needed - see SLE11 SPn).
  #endif
  
  #endif /* IOATDMA_H */
---- 13.1.orig/drivers/hwmon/coretemp-xen.c	2011-01-31 18:01:51.000000000 +0100
-+++ 13.1/drivers/hwmon/coretemp-xen.c	2011-02-01 14:38:38.000000000 +0100
+--- a/drivers/hwmon/coretemp-xen.c
++++ b/drivers/hwmon/coretemp-xen.c
 @@ -360,10 +360,11 @@ static int coretemp_device_add(unsigned 
  	if (err)
  		goto exit_entry_free;
@@ -14668,8 +14668,8 @@ have been needed - see SLE11 SPn).
  
  		/* supported CPU not found, but report the unknown
  		   family 6 CPU */
---- 13.1.orig/drivers/pci/msi-xen.c	2013-04-26 10:44:53.000000000 +0200
-+++ 13.1/drivers/pci/msi-xen.c	2013-04-26 10:45:13.000000000 +0200
+--- a/drivers/pci/msi-xen.c
++++ b/drivers/pci/msi-xen.c
 @@ -59,12 +59,10 @@ arch_msi_check_device(struct pci_dev *de
  	return 0;
  }
@@ -14781,8 +14781,8 @@ have been needed - see SLE11 SPn).
  		return -EINVAL;
  	}
  
---- 13.1.orig/drivers/xen/Kconfig	2011-01-31 18:07:35.000000000 +0100
-+++ 13.1/drivers/xen/Kconfig	2012-10-04 12:15:21.000000000 +0200
+--- a/drivers/xen/Kconfig
++++ b/drivers/xen/Kconfig
 @@ -383,6 +383,10 @@ config XEN_SMPBOOT
  config XEN_SPINLOCK_ACQUIRE_NESTING
  	int "maximum nesting level for acquiring spin locks"
@@ -14794,16 +14794,16 @@ have been needed - see SLE11 SPn).
  	range 0 3
  	default 0
  	help
---- 13.1.orig/drivers/xen/Makefile	2011-11-03 12:14:33.000000000 +0100
-+++ 13.1/drivers/xen/Makefile	2011-02-01 14:38:38.000000000 +0100
+--- a/drivers/xen/Makefile
++++ b/drivers/xen/Makefile
 @@ -1,4 +1,4 @@
 -obj-$(CONFIG_PARAVIRT_XEN)	+= grant-table.o features.o events.o
 +obj-$(CONFIG_PARAVIRT_XEN)	+= grant-table.o features.o events.o manage.o
  xen-balloon-$(CONFIG_PARAVIRT_XEN) := balloon.o
  
  xen-balloon-$(CONFIG_XEN)	:= balloon/
---- 13.1.orig/drivers/xen/balloon/balloon.c	2012-06-06 13:55:27.000000000 +0200
-+++ 13.1/drivers/xen/balloon/balloon.c	2012-01-20 14:53:22.000000000 +0100
+--- a/drivers/xen/balloon/balloon.c
++++ b/drivers/xen/balloon/balloon.c
 @@ -77,7 +77,7 @@ struct balloon_stats balloon_stats;
  /* We increase/decrease in batches which fit in a page */
  static unsigned long frame_list[PAGE_SIZE / sizeof(unsigned long)];
@@ -14813,8 +14813,8 @@ have been needed - see SLE11 SPn).
  #define inc_totalhigh_pages() (totalhigh_pages++)
  #define dec_totalhigh_pages() (totalhigh_pages--)
  #else
---- 13.1.orig/drivers/xen/balloon/sysfs.c	2011-01-31 18:01:51.000000000 +0100
-+++ 13.1/drivers/xen/balloon/sysfs.c	2011-02-01 14:38:38.000000000 +0100
+--- a/drivers/xen/balloon/sysfs.c
++++ b/drivers/xen/balloon/sysfs.c
 @@ -45,6 +45,7 @@
  
  #define BALLOON_SHOW(name, format, args...)			\
@@ -14842,8 +14842,8 @@ have been needed - see SLE11 SPn).
  {
  	char memstring[64], *endchar;
  	unsigned long long target_bytes;
---- 13.1.orig/drivers/xen/blktap/blktap.c	2013-06-20 15:22:47.000000000 +0200
-+++ 13.1/drivers/xen/blktap/blktap.c	2013-09-04 12:57:24.000000000 +0200
+--- a/drivers/xen/blktap/blktap.c
++++ b/drivers/xen/blktap/blktap.c
 @@ -56,6 +56,7 @@
  #include <linux/gfp.h>
  #include <linux/poll.h>
@@ -14880,8 +14880,8 @@ have been needed - see SLE11 SPn).
  	} else {
  		/* this is bad, but not fatal */
  		WPRINTK("sysfs xen_class not created\n");
---- 13.1.orig/drivers/xen/blktap2/sysfs.c	2011-03-11 10:58:58.000000000 +0100
-+++ 13.1/drivers/xen/blktap2/sysfs.c	2011-02-01 14:38:38.000000000 +0100
+--- a/drivers/xen/blktap2/sysfs.c
++++ b/drivers/xen/blktap2/sysfs.c
 @@ -307,8 +307,8 @@ blktap_sysfs_create(struct blktap *tap)
  
  	ring = &tap->ring;
@@ -14893,8 +14893,8 @@ have been needed - see SLE11 SPn).
  	if (IS_ERR(dev))
  		return PTR_ERR(dev);
  
---- 13.1.orig/drivers/xen/char/mem.c	2012-01-20 14:52:38.000000000 +0100
-+++ 13.1/drivers/xen/char/mem.c	2012-01-20 14:53:19.000000000 +0100
+--- a/drivers/xen/char/mem.c
++++ b/drivers/xen/char/mem.c
 @@ -27,7 +27,7 @@ static inline int uncached_access(struct
  
  static inline int range_is_allowed(unsigned long pfn, unsigned long size)
@@ -14916,8 +14916,8 @@ have been needed - see SLE11 SPn).
  };
  
  static int xen_mmap_mem(struct file * file, struct vm_area_struct * vma)
---- 13.1.orig/drivers/xen/console/console.c	2013-01-29 14:48:33.000000000 +0100
-+++ 13.1/drivers/xen/console/console.c	2013-01-29 14:48:40.000000000 +0100
+--- a/drivers/xen/console/console.c
++++ b/drivers/xen/console/console.c
 @@ -422,9 +422,7 @@ static void __xencons_tx_flush(void)
  
  	if (work_done && (xencons_tty != NULL)) {
@@ -14940,8 +14940,8 @@ have been needed - see SLE11 SPn).
  	tty->closing = 0;
  	spin_lock_irqsave(&xencons_lock, flags);
  	xencons_tty = NULL;
---- 13.1.orig/drivers/xen/console/xencons_ring.c	2012-03-22 13:44:19.000000000 +0100
-+++ 13.1/drivers/xen/console/xencons_ring.c	2012-03-22 14:04:29.000000000 +0100
+--- a/drivers/xen/console/xencons_ring.c
++++ b/drivers/xen/console/xencons_ring.c
 @@ -109,6 +109,7 @@ int xencons_ring_init(void)
  	return 0;
  }
@@ -14955,8 +14955,8 @@ have been needed - see SLE11 SPn).
  	notify_daemon();
  }
 +#endif
---- 13.1.orig/drivers/xen/core/evtchn.c	2012-10-04 11:55:04.000000000 +0200
-+++ 13.1/drivers/xen/core/evtchn.c	2012-10-04 13:44:35.000000000 +0200
+--- a/drivers/xen/core/evtchn.c
++++ b/drivers/xen/core/evtchn.c
 @@ -125,7 +125,11 @@ static int irq_bindcount[NR_IRQS];
  
  #ifdef CONFIG_SMP
@@ -15062,8 +15062,8 @@ have been needed - see SLE11 SPn).
  
  	/* No event channels are 'live' right now. */
  	for (i = 0; i < NR_EVENT_CHANNELS; i++)
---- 13.1.orig/drivers/xen/core/gnttab.c	2012-11-14 12:41:51.000000000 +0100
-+++ 13.1/drivers/xen/core/gnttab.c	2012-11-14 12:57:19.000000000 +0100
+--- a/drivers/xen/core/gnttab.c
++++ b/drivers/xen/core/gnttab.c
 @@ -40,7 +40,7 @@
  #include <xen/gnttab.h>
  #include <asm/pgtable.h>
@@ -15200,8 +15200,8 @@ have been needed - see SLE11 SPn).
  	return 0;
  
   ini_nomem:
---- 13.1.orig/drivers/xen/core/machine_kexec.c	2011-12-21 11:03:09.000000000 +0100
-+++ 13.1/drivers/xen/core/machine_kexec.c	2011-12-21 11:09:57.000000000 +0100
+--- a/drivers/xen/core/machine_kexec.c
++++ b/drivers/xen/core/machine_kexec.c
 @@ -75,8 +75,7 @@ void __init xen_machine_kexec_setup_reso
  
  	/* allocate xen_phys_cpus */
@@ -15235,8 +15235,8 @@ have been needed - see SLE11 SPn).
  void __init xen_machine_kexec_register_resources(struct resource *res)
  {
  	int k;
---- 13.1.orig/drivers/xen/core/machine_reboot.c	2011-01-31 18:01:51.000000000 +0100
-+++ 13.1/drivers/xen/core/machine_reboot.c	2011-02-01 14:38:38.000000000 +0100
+--- a/drivers/xen/core/machine_reboot.c
++++ b/drivers/xen/core/machine_reboot.c
 @@ -52,6 +52,7 @@ void machine_power_off(void)
  	HYPERVISOR_shutdown(SHUTDOWN_poweroff);
  }
@@ -15276,8 +15276,8 @@ have been needed - see SLE11 SPn).
  	return 0;
  }
 +#endif
---- 13.1.orig/drivers/xen/core/reboot.c	2011-01-31 17:56:27.000000000 +0100
-+++ 13.1/drivers/xen/core/reboot.c	2011-02-01 14:38:38.000000000 +0100
+--- a/drivers/xen/core/reboot.c
++++ b/drivers/xen/core/reboot.c
 @@ -28,17 +28,12 @@ MODULE_LICENSE("Dual BSD/GPL");
  /* Ignore multiple shutdown requests. */
  static int shutting_down = SHUTDOWN_INVALID;
@@ -15350,8 +15350,8 @@ have been needed - see SLE11 SPn).
  
  static int setup_shutdown_watcher(void)
  {
---- 13.1.orig/drivers/xen/core/smpboot.c	2012-03-22 16:09:53.000000000 +0100
-+++ 13.1/drivers/xen/core/smpboot.c	2012-03-22 16:10:43.000000000 +0100
+--- a/drivers/xen/core/smpboot.c
++++ b/drivers/xen/core/smpboot.c
 @@ -25,6 +25,7 @@
  
  extern irqreturn_t smp_reschedule_interrupt(int, void *);
@@ -15493,8 +15493,8 @@ have been needed - see SLE11 SPn).
  	prefill_possible_map();
  }
  
---- 13.1.orig/drivers/xen/core/spinlock.c	2015-01-12 15:17:55.000000000 +0100
-+++ 13.1/drivers/xen/core/spinlock.c	2015-03-05 14:13:00.000000000 +0100
+--- a/drivers/xen/core/spinlock.c
++++ b/drivers/xen/core/spinlock.c
 @@ -5,6 +5,10 @@
   *	portions of this file.
   */
@@ -15676,8 +15676,8 @@ have been needed - see SLE11 SPn).
  EXPORT_SYMBOL(xen_spin_kick);
 +
 +#endif /* TICKET_SHIFT */
---- 13.1.orig/drivers/xen/fbfront/xenfb.c	2011-01-31 18:07:35.000000000 +0100
-+++ 13.1/drivers/xen/fbfront/xenfb.c	2012-10-04 12:15:33.000000000 +0200
+--- a/drivers/xen/fbfront/xenfb.c
++++ b/drivers/xen/fbfront/xenfb.c
 @@ -18,6 +18,7 @@
   * frame buffer.
   */
@@ -15729,16 +15729,16 @@ have been needed - see SLE11 SPn).
  
 +MODULE_DESCRIPTION("Xen virtual framebuffer device frontend");
  MODULE_LICENSE("GPL");
---- 13.1.orig/drivers/xen/fbfront/xenkbd.c	2011-01-31 17:56:27.000000000 +0100
-+++ 13.1/drivers/xen/fbfront/xenkbd.c	2012-10-04 12:15:35.000000000 +0200
+--- a/drivers/xen/fbfront/xenkbd.c
++++ b/drivers/xen/fbfront/xenkbd.c
 @@ -364,4 +364,5 @@ static void __exit xenkbd_cleanup(void)
  module_init(xenkbd_init);
  module_exit(xenkbd_cleanup);
  
 +MODULE_DESCRIPTION("Xen virtual keyboard/pointer device frontend");
  MODULE_LICENSE("GPL");
---- 13.1.orig/drivers/xen/netback/netback.c	2013-06-13 08:52:21.000000000 +0200
-+++ 13.1/drivers/xen/netback/netback.c	2011-04-11 15:03:06.000000000 +0200
+--- a/drivers/xen/netback/netback.c
++++ b/drivers/xen/netback/netback.c
 @@ -36,7 +36,7 @@
  
  #include "common.h"
@@ -15757,8 +15757,8 @@ have been needed - see SLE11 SPn).
  
  static struct pending_tx_info {
  	netif_tx_request_t req;
---- 13.1.orig/drivers/xen/netfront/accel.c	2013-01-30 11:13:29.000000000 +0100
-+++ 13.1/drivers/xen/netfront/accel.c	2011-02-01 14:38:38.000000000 +0100
+--- a/drivers/xen/netfront/accel.c
++++ b/drivers/xen/netfront/accel.c
 @@ -28,6 +28,7 @@
   * IN THE SOFTWARE.
   */
@@ -15767,8 +15767,8 @@ have been needed - see SLE11 SPn).
  #include <linux/netdevice.h>
  #include <linux/skbuff.h>
  #include <linux/list.h>
---- 13.1.orig/drivers/xen/netfront/netfront.c	2013-07-15 12:28:28.000000000 +0200
-+++ 13.1/drivers/xen/netfront/netfront.c	2013-05-10 14:28:10.000000000 +0200
+--- a/drivers/xen/netfront/netfront.c
++++ b/drivers/xen/netfront/netfront.c
 @@ -643,7 +643,7 @@ static int network_open(struct net_devic
  	}
  	spin_unlock_bh(&np->rx_lock);
@@ -15778,8 +15778,8 @@ have been needed - see SLE11 SPn).
  
  	return 0;
  }
---- 13.1.orig/drivers/xen/sfc_netback/accel.h	2015-03-05 14:08:46.000000000 +0100
-+++ 13.1/drivers/xen/sfc_netback/accel.h	2011-02-01 14:38:38.000000000 +0100
+--- a/drivers/xen/sfc_netback/accel.h
++++ b/drivers/xen/sfc_netback/accel.h
 @@ -25,6 +25,7 @@
  #ifndef NETBACK_ACCEL_H
  #define NETBACK_ACCEL_H
@@ -15788,8 +15788,8 @@ have been needed - see SLE11 SPn).
  #include <linux/slab.h>
  #include <linux/ip.h>
  #include <linux/tcp.h>
---- 13.1.orig/drivers/xen/sfc_netfront/accel.h	2011-01-31 17:29:16.000000000 +0100
-+++ 13.1/drivers/xen/sfc_netfront/accel.h	2011-02-01 14:38:38.000000000 +0100
+--- a/drivers/xen/sfc_netfront/accel.h
++++ b/drivers/xen/sfc_netfront/accel.h
 @@ -35,6 +35,7 @@
  #include <xen/evtchn.h>
  
@@ -15798,8 +15798,8 @@ have been needed - see SLE11 SPn).
  #include <linux/list.h>
  
  enum netfront_accel_post_status {
---- 13.1.orig/drivers/xen/xenbus/xenbus_client.c	2011-01-31 18:07:35.000000000 +0100
-+++ 13.1/drivers/xen/xenbus/xenbus_client.c	2011-02-01 14:38:38.000000000 +0100
+--- a/drivers/xen/xenbus/xenbus_client.c
++++ b/drivers/xen/xenbus/xenbus_client.c
 @@ -149,7 +149,7 @@ int xenbus_watch_pathfmt(struct xenbus_d
  	char *path;
  
@@ -15809,8 +15809,8 @@ have been needed - see SLE11 SPn).
  	va_end(ap);
  
  	if (!path) {
---- 13.1.orig/drivers/xen/xenbus/xenbus_comms.c	2011-04-11 15:00:27.000000000 +0200
-+++ 13.1/drivers/xen/xenbus/xenbus_comms.c	2011-04-11 15:03:17.000000000 +0200
+--- a/drivers/xen/xenbus/xenbus_comms.c
++++ b/drivers/xen/xenbus/xenbus_comms.c
 @@ -250,14 +250,11 @@ int xb_init_comms(void)
  			intf->rsp_cons = intf->rsp_prod;
  	}
@@ -15848,8 +15848,8 @@ have been needed - see SLE11 SPn).
  
  	return 0;
  }
---- 13.1.orig/drivers/xen/xenbus/xenbus_dev.c	2012-02-16 12:30:22.000000000 +0100
-+++ 13.1/drivers/xen/xenbus/xenbus_dev.c	2011-06-30 16:41:18.000000000 +0200
+--- a/drivers/xen/xenbus/xenbus_dev.c
++++ b/drivers/xen/xenbus/xenbus_dev.c
 @@ -158,8 +158,7 @@ static void queue_flush(struct xenbus_de
  			int err)
  {
@@ -15860,8 +15860,8 @@ have been needed - see SLE11 SPn).
  		wake_up(&u->read_waitq);
  	} else
  		while (!list_empty(queue)) {
---- 13.1.orig/drivers/xen/xenbus/xenbus_probe.c	2012-03-12 13:47:02.000000000 +0100
-+++ 13.1/drivers/xen/xenbus/xenbus_probe.c	2012-03-22 14:03:53.000000000 +0100
+--- a/drivers/xen/xenbus/xenbus_probe.c
++++ b/drivers/xen/xenbus/xenbus_probe.c
 @@ -36,6 +36,7 @@
  		 __FUNCTION__, __LINE__, ##args)
  
@@ -15886,8 +15886,8 @@ have been needed - see SLE11 SPn).
  
  /* A flag to determine if xenstored is 'ready' (i.e. has started) */
  atomic_t xenbus_xsd_state = ATOMIC_INIT(XENBUS_XSD_UNCOMMITTED);
---- 13.1.orig/drivers/xen/xenbus/xenbus_probe_backend.c	2011-12-21 10:56:21.000000000 +0100
-+++ 13.1/drivers/xen/xenbus/xenbus_probe_backend.c	2012-03-22 14:04:14.000000000 +0100
+--- a/drivers/xen/xenbus/xenbus_probe_backend.c
++++ b/drivers/xen/xenbus/xenbus_probe_backend.c
 @@ -227,6 +227,7 @@ static struct xenbus_watch be_watch = {
  	.callback = backend_changed,
  };
@@ -15904,8 +15904,8 @@ have been needed - see SLE11 SPn).
  
  void xenbus_backend_probe_and_watch(void)
  {
---- 13.1.orig/drivers/xen/xenbus/xenbus_xs.c	2012-03-12 15:30:16.000000000 +0100
-+++ 13.1/drivers/xen/xenbus/xenbus_xs.c	2012-03-22 14:04:09.000000000 +0100
+--- a/drivers/xen/xenbus/xenbus_xs.c
++++ b/drivers/xen/xenbus/xenbus_xs.c
 @@ -187,6 +187,7 @@ static void transaction_end(void)
  		wake_up(&xs_state.transaction_wq);
  }
@@ -15938,8 +15938,8 @@ have been needed - see SLE11 SPn).
  
  #if defined(CONFIG_XEN) || defined(MODULE)
  static int xenwatch_handle_callback(void *data)
---- 13.1.orig/fs/aio.c	2013-08-09 12:35:41.000000000 +0200
-+++ 13.1/fs/aio.c	2013-08-09 12:53:00.000000000 +0200
+--- a/fs/aio.c
++++ b/fs/aio.c
 @@ -901,7 +901,7 @@ static int make_aio_fd(struct kioctx *io
  	int fd;
  	struct file *file;
@@ -15949,8 +15949,8 @@ have been needed - see SLE11 SPn).
  	if (fd < 0)
  		return fd;
  
---- 13.1.orig/include/uapi/Kbuild	2015-03-05 14:08:46.000000000 +0100
-+++ 13.1/include/uapi/Kbuild	2012-10-23 15:01:10.000000000 +0200
+--- a/include/uapi/Kbuild
++++ b/include/uapi/Kbuild
 @@ -10,5 +10,6 @@ header-y += mtd/
  header-y += rdma/
  header-y += video/
@@ -15958,8 +15958,8 @@ have been needed - see SLE11 SPn).
 +header-y += xen/public/
  header-y += xen/
  header-y += scsi/
---- 13.1.orig/arch/x86/include/asm/kexec.h	2013-01-08 09:26:20.000000000 +0100
-+++ 13.1/arch/x86/include/asm/kexec.h	2011-02-01 14:38:38.000000000 +0100
+--- a/arch/x86/include/asm/kexec.h
++++ b/arch/x86/include/asm/kexec.h
 @@ -5,8 +5,21 @@
  # define PA_CONTROL_PAGE	0
  # define VA_CONTROL_PAGE	1
@@ -15982,8 +15982,8 @@ have been needed - see SLE11 SPn).
  #else
  # define PA_CONTROL_PAGE	0
  # define VA_CONTROL_PAGE	1
---- 13.1.orig/arch/x86/include/mach-xen/asm/desc.h	2011-01-31 18:07:35.000000000 +0100
-+++ 13.1/arch/x86/include/mach-xen/asm/desc.h	2011-02-01 14:38:38.000000000 +0100
+--- a/arch/x86/include/mach-xen/asm/desc.h
++++ b/arch/x86/include/mach-xen/asm/desc.h
 @@ -31,11 +31,17 @@ extern struct desc_ptr idt_descr;
  extern gate_desc idt_table[];
  #endif
@@ -16052,8 +16052,8 @@ have been needed - see SLE11 SPn).
  /*
   * This routine sets up an interrupt gate at directory privilege level 3.
   */
---- 13.1.orig/arch/x86/include/mach-xen/asm/fixmap.h	2011-01-31 18:07:35.000000000 +0100
-+++ 13.1/arch/x86/include/mach-xen/asm/fixmap.h	2011-02-01 14:38:38.000000000 +0100
+--- a/arch/x86/include/mach-xen/asm/fixmap.h
++++ b/arch/x86/include/mach-xen/asm/fixmap.h
 @@ -7,7 +7,58 @@
  # include "fixmap_64.h"
  #endif
@@ -16113,8 +16113,8 @@ have been needed - see SLE11 SPn).
 +	return __virt_to_fix(vaddr);
 +}
  #endif
---- 13.1.orig/arch/x86/include/mach-xen/asm/fixmap_32.h	2011-01-31 18:07:35.000000000 +0100
-+++ 13.1/arch/x86/include/mach-xen/asm/fixmap_32.h	2011-02-01 14:38:38.000000000 +0100
+--- a/arch/x86/include/mach-xen/asm/fixmap_32.h
++++ b/arch/x86/include/mach-xen/asm/fixmap_32.h
 @@ -58,10 +58,17 @@ enum fixed_addresses {
  #ifdef CONFIG_X86_LOCAL_APIC
  	FIX_APIC_BASE,	/* local (CPU) APIC) -- required for SMP or not */
@@ -16232,8 +16232,8 @@ have been needed - see SLE11 SPn).
 -
  #endif /* !__ASSEMBLY__ */
  #endif
---- 13.1.orig/arch/x86/include/mach-xen/asm/fixmap_64.h	2011-01-31 18:07:35.000000000 +0100
-+++ 13.1/arch/x86/include/mach-xen/asm/fixmap_64.h	2011-02-01 14:38:38.000000000 +0100
+--- a/arch/x86/include/mach-xen/asm/fixmap_64.h
++++ b/arch/x86/include/mach-xen/asm/fixmap_64.h
 @@ -12,6 +12,7 @@
  #define _ASM_FIXMAP_64_H
  
@@ -16333,8 +16333,8 @@ have been needed - see SLE11 SPn).
 -}
 -
  #endif
---- 13.1.orig/arch/x86/include/mach-xen/asm/highmem.h	2011-01-31 18:07:35.000000000 +0100
-+++ 13.1/arch/x86/include/mach-xen/asm/highmem.h	2011-02-01 14:38:38.000000000 +0100
+--- a/arch/x86/include/mach-xen/asm/highmem.h
++++ b/arch/x86/include/mach-xen/asm/highmem.h
 @@ -73,6 +73,9 @@ struct page *kmap_atomic_to_page(void *p
  
  #define flush_cache_kmaps()	do { } while (0)
@@ -16345,8 +16345,8 @@ have been needed - see SLE11 SPn).
  void clear_highpage(struct page *);
  static inline void clear_user_highpage(struct page *page, unsigned long vaddr)
  {
---- 13.1.orig/arch/x86/include/mach-xen/asm/hypercall.h	2012-10-31 11:11:46.000000000 +0100
-+++ 13.1/arch/x86/include/mach-xen/asm/hypercall.h	2012-10-31 11:13:48.000000000 +0100
+--- a/arch/x86/include/mach-xen/asm/hypercall.h
++++ b/arch/x86/include/mach-xen/asm/hypercall.h
 @@ -334,9 +334,19 @@ static inline int __must_check
  HYPERVISOR_grant_table_op(
  	unsigned int cmd, void *uop, unsigned int count)
@@ -16368,8 +16368,8 @@ have been needed - see SLE11 SPn).
  }
  
  static inline int __must_check
---- 13.1.orig/arch/x86/include/mach-xen/asm/hypervisor.h	2012-06-06 13:56:31.000000000 +0200
-+++ 13.1/arch/x86/include/mach-xen/asm/hypervisor.h	2012-02-07 11:55:13.000000000 +0100
+--- a/arch/x86/include/mach-xen/asm/hypervisor.h
++++ b/arch/x86/include/mach-xen/asm/hypervisor.h
 @@ -35,7 +35,6 @@
  
  #include <linux/types.h>
@@ -16417,8 +16417,8 @@ have been needed - see SLE11 SPn).
  #if defined(CONFIG_X86_64)
  #define MULTI_UVMFLAGS_INDEX 2
  #define MULTI_UVMDOMID_INDEX 3
---- 13.1.orig/arch/x86/include/mach-xen/asm/io.h	2011-01-31 18:07:35.000000000 +0100
-+++ 13.1/arch/x86/include/mach-xen/asm/io.h	2011-02-01 14:38:38.000000000 +0100
+--- a/arch/x86/include/mach-xen/asm/io.h
++++ b/arch/x86/include/mach-xen/asm/io.h
 @@ -3,20 +3,140 @@
  
  #define ARCH_HAS_IOREMAP_WC
@@ -16565,8 +16565,8 @@ have been needed - see SLE11 SPn).
 +
 +
  #endif /* _ASM_X86_IO_H */
---- 13.1.orig/arch/x86/include/mach-xen/asm/irqflags.h	2012-05-24 09:11:30.000000000 +0200
-+++ 13.1/arch/x86/include/mach-xen/asm/irqflags.h	2012-05-24 09:11:35.000000000 +0200
+--- a/arch/x86/include/mach-xen/asm/irqflags.h
++++ b/arch/x86/include/mach-xen/asm/irqflags.h
 @@ -107,7 +107,7 @@ static inline void halt(void)
  
  #ifndef CONFIG_X86_64
@@ -16631,8 +16631,8 @@ have been needed - see SLE11 SPn).
  #else
  #  define TRACE_IRQS_ON
  #  define TRACE_IRQS_OFF
---- 13.1.orig/arch/x86/include/mach-xen/asm/mmu_context.h	2011-01-31 17:56:27.000000000 +0100
-+++ 13.1/arch/x86/include/mach-xen/asm/mmu_context.h	2011-02-01 14:38:38.000000000 +0100
+--- a/arch/x86/include/mach-xen/asm/mmu_context.h
++++ b/arch/x86/include/mach-xen/asm/mmu_context.h
 @@ -1,5 +1,42 @@
 +#ifndef __ASM_X86_MMU_CONTEXT_H
 +#define __ASM_X86_MMU_CONTEXT_H
@@ -16676,8 +16676,8 @@ have been needed - see SLE11 SPn).
 +
 +
 +#endif /* __ASM_X86_MMU_CONTEXT_H */
---- 13.1.orig/arch/x86/include/mach-xen/asm/mmu_context_32.h	2011-01-31 18:07:35.000000000 +0100
-+++ 13.1/arch/x86/include/mach-xen/asm/mmu_context_32.h	2011-02-01 14:38:38.000000000 +0100
+--- a/arch/x86/include/mach-xen/asm/mmu_context_32.h
++++ b/arch/x86/include/mach-xen/asm/mmu_context_32.h
 @@ -1,32 +1,6 @@
  #ifndef __I386_SCHED_H
  #define __I386_SCHED_H
@@ -16722,8 +16722,8 @@ have been needed - see SLE11 SPn).
 -} while (0)
 -
  #endif
---- 13.1.orig/arch/x86/include/mach-xen/asm/mmu_context_64.h	2011-01-31 18:07:35.000000000 +0100
-+++ 13.1/arch/x86/include/mach-xen/asm/mmu_context_64.h	2011-02-01 14:38:38.000000000 +0100
+--- a/arch/x86/include/mach-xen/asm/mmu_context_64.h
++++ b/arch/x86/include/mach-xen/asm/mmu_context_64.h
 @@ -1,23 +1,6 @@
  #ifndef __X86_64_MMU_CONTEXT_H
  #define __X86_64_MMU_CONTEXT_H
@@ -16771,8 +16771,8 @@ have been needed - see SLE11 SPn).
 -}
 -
  #endif
---- 13.1.orig/arch/x86/include/mach-xen/asm/pci.h	2011-01-31 18:07:35.000000000 +0100
-+++ 13.1/arch/x86/include/mach-xen/asm/pci.h	2011-02-01 14:38:38.000000000 +0100
+--- a/arch/x86/include/mach-xen/asm/pci.h
++++ b/arch/x86/include/mach-xen/asm/pci.h
 @@ -21,6 +21,8 @@ struct pci_sysdata {
  #endif
  };
@@ -16782,8 +16782,8 @@ have been needed - see SLE11 SPn).
  /* scan a bus after allocating a pci_sysdata for it */
  extern struct pci_bus *pci_scan_bus_on_node(int busno, struct pci_ops *ops,
  					    int node);
---- 13.1.orig/arch/x86/include/mach-xen/asm/pgalloc.h	2011-01-31 18:07:35.000000000 +0100
-+++ 13.1/arch/x86/include/mach-xen/asm/pgalloc.h	2011-02-01 14:38:38.000000000 +0100
+--- a/arch/x86/include/mach-xen/asm/pgalloc.h
++++ b/arch/x86/include/mach-xen/asm/pgalloc.h
 @@ -7,6 +7,9 @@
  
  #include <asm/io.h>		/* for phys_to_virt and page_to_pseudophys */
@@ -16794,8 +16794,8 @@ have been needed - see SLE11 SPn).
  static inline void paravirt_alloc_pte(struct mm_struct *mm, unsigned long pfn)	{}
  static inline void paravirt_alloc_pmd(struct mm_struct *mm, unsigned long pfn)	{}
  static inline void paravirt_alloc_pmd_clone(unsigned long pfn, unsigned long clonepfn,
---- 13.1.orig/arch/x86/include/mach-xen/asm/pgtable.h	2011-03-23 09:52:33.000000000 +0100
-+++ 13.1/arch/x86/include/mach-xen/asm/pgtable.h	2011-03-23 09:54:13.000000000 +0100
+--- a/arch/x86/include/mach-xen/asm/pgtable.h
++++ b/arch/x86/include/mach-xen/asm/pgtable.h
 @@ -13,11 +13,12 @@
  #define _PAGE_BIT_PSE		7	/* 4 MB (or 2MB) page */
  #define _PAGE_BIT_PAT		7	/* on 4KB pages */
@@ -17219,8 +17219,8 @@ have been needed - see SLE11 SPn).
  #endif	/* __ASSEMBLY__ */
  
  #endif	/* _ASM_X86_PGTABLE_H */
---- 13.1.orig/arch/x86/include/mach-xen/asm/pgtable-3level.h	2011-03-23 09:52:36.000000000 +0100
-+++ 13.1/arch/x86/include/mach-xen/asm/pgtable-3level.h	2011-03-23 09:54:10.000000000 +0100
+--- a/arch/x86/include/mach-xen/asm/pgtable-3level.h
++++ b/arch/x86/include/mach-xen/asm/pgtable-3level.h
 @@ -14,11 +14,11 @@
  #define pmd_ERROR(e)							\
  	printk("%s:%d: bad pmd %p(%016Lx pfn %08Lx).\n",		\
@@ -17256,8 +17256,8 @@ have been needed - see SLE11 SPn).
  
  
  /* Find an entry in the second-level page table.. */
---- 13.1.orig/arch/x86/include/mach-xen/asm/pgtable_32.h	2011-01-31 18:07:35.000000000 +0100
-+++ 13.1/arch/x86/include/mach-xen/asm/pgtable_32.h	2011-02-01 14:38:38.000000000 +0100
+--- a/arch/x86/include/mach-xen/asm/pgtable_32.h
++++ b/arch/x86/include/mach-xen/asm/pgtable_32.h
 @@ -89,10 +89,10 @@ extern unsigned long pg0[];
  /* pmd_present doesn't just test the _PAGE_PRESENT bit since wr.p.t.
     can temporarily clear it. */
@@ -17307,8 +17307,8 @@ have been needed - see SLE11 SPn).
  
  #if defined(CONFIG_HIGHPTE)
  #define pte_offset_map(dir, address)					\
---- 13.1.orig/arch/x86/include/mach-xen/asm/pgtable_64.h	2011-03-23 09:52:37.000000000 +0100
-+++ 13.1/arch/x86/include/mach-xen/asm/pgtable_64.h	2011-03-23 09:54:07.000000000 +0100
+--- a/arch/x86/include/mach-xen/asm/pgtable_64.h
++++ b/arch/x86/include/mach-xen/asm/pgtable_64.h
 @@ -23,6 +23,8 @@ extern void xen_init_pt(void);
  extern pud_t level3_kernel_pgt[512];
  extern pud_t level3_ident_pgt[512];
@@ -17389,8 +17389,8 @@ have been needed - see SLE11 SPn).
  #define pmd_page(pmd)		(pfn_to_page(pmd_val((pmd)) >> PAGE_SHIFT))
  
  #define pmd_index(address) (((address) >> PMD_SHIFT) & (PTRS_PER_PMD - 1))
---- 13.1.orig/arch/x86/include/mach-xen/asm/processor.h	2011-03-03 16:42:13.000000000 +0100
-+++ 13.1/arch/x86/include/mach-xen/asm/processor.h	2011-03-03 16:44:23.000000000 +0100
+--- a/arch/x86/include/mach-xen/asm/processor.h
++++ b/arch/x86/include/mach-xen/asm/processor.h
 @@ -144,7 +144,7 @@ extern __u32			cleared_cpu_caps[NCAPINTS
  #ifdef CONFIG_SMP
  DECLARE_PER_CPU(struct cpuinfo_x86, cpu_info);
@@ -17465,8 +17465,8 @@ have been needed - see SLE11 SPn).
  
  extern void enable_sep_cpu(void);
  extern int sysenter_setup(void);
---- 13.1.orig/arch/x86/include/mach-xen/asm/smp.h	2011-01-31 18:07:35.000000000 +0100
-+++ 13.1/arch/x86/include/mach-xen/asm/smp.h	2011-02-01 14:38:38.000000000 +0100
+--- a/arch/x86/include/mach-xen/asm/smp.h
++++ b/arch/x86/include/mach-xen/asm/smp.h
 @@ -25,25 +25,18 @@ extern cpumask_t cpu_initialized;
  extern void (*mtrr_hook)(void);
  extern void zap_low_mappings(void);
@@ -17586,8 +17586,8 @@ have been needed - see SLE11 SPn).
 -extern void unlock_ipi_call_lock(void);
  #endif /* __ASSEMBLY__ */
  #endif
---- 13.1.orig/arch/x86/include/mach-xen/asm/spinlock.h	2012-01-31 16:50:18.000000000 +0100
-+++ 13.1/arch/x86/include/mach-xen/asm/spinlock.h	2012-04-03 08:27:21.000000000 +0200
+--- a/arch/x86/include/mach-xen/asm/spinlock.h
++++ b/arch/x86/include/mach-xen/asm/spinlock.h
 @@ -42,6 +42,8 @@
  # define UNLOCK_LOCK_PREFIX
  #endif
@@ -17871,8 +17871,8 @@ have been needed - see SLE11 SPn).
  static inline void __raw_spin_unlock_wait(raw_spinlock_t *lock)
  {
  	while (__raw_spin_is_locked(lock))
---- 13.1.orig/arch/x86/include/mach-xen/asm/spinlock_types.h	2012-01-10 11:47:24.000000000 +0100
-+++ 13.1/arch/x86/include/mach-xen/asm/spinlock_types.h	2012-01-31 17:03:19.000000000 +0100
+--- a/arch/x86/include/mach-xen/asm/spinlock_types.h
++++ b/arch/x86/include/mach-xen/asm/spinlock_types.h
 @@ -10,6 +10,7 @@
  typedef union {
  	unsigned int slock;
@@ -17889,8 +17889,8 @@ have been needed - see SLE11 SPn).
  	};
  } raw_spinlock_t;
  
---- 13.1.orig/arch/x86/include/mach-xen/asm/xor.h	2012-07-05 10:56:25.000000000 +0200
-+++ 13.1/arch/x86/include/mach-xen/asm/xor.h	2011-01-31 17:56:27.000000000 +0100
+--- a/arch/x86/include/mach-xen/asm/xor.h
++++ b/arch/x86/include/mach-xen/asm/xor.h
 @@ -1,3 +1,6 @@
 +#ifndef ASM_X86_XEN__XOR_H
 +#define ASM_X86_XEN__XOR_H
@@ -17904,8 +17904,8 @@ have been needed - see SLE11 SPn).
  #endif
 +
 +#endif /* ASM_X86_XEN__XOR_H */
---- 13.1.orig/arch/x86/include/mach-xen/asm/irq_vectors.h	2015-03-05 14:08:46.000000000 +0100
-+++ 13.1/arch/x86/include/mach-xen/asm/irq_vectors.h	2011-02-15 17:27:18.000000000 +0100
+--- a/arch/x86/include/mach-xen/asm/irq_vectors.h
++++ b/arch/x86/include/mach-xen/asm/irq_vectors.h
 @@ -1,97 +1,24 @@
 -/*
 - * This file should contain #defines for all of the interrupt vector
@@ -18040,8 +18040,8 @@ have been needed - see SLE11 SPn).
  #endif
  
  #define DYNIRQ_BASE		(PIRQ_BASE + NR_PIRQS)
---- 13.1.orig/arch/x86/include/asm/traps.h	2015-03-05 14:08:46.000000000 +0100
-+++ 13.1/arch/x86/include/asm/traps.h	2011-09-07 15:45:44.000000000 +0200
+--- a/arch/x86/include/asm/traps.h
++++ b/arch/x86/include/asm/traps.h
 @@ -40,6 +40,9 @@ asmlinkage void alignment_check(void);
  asmlinkage void machine_check(void);
  #endif /* CONFIG_X86_MCE */
@@ -18062,8 +18062,8 @@ have been needed - see SLE11 SPn).
  #endif
  
  static inline int get_si_code(unsigned long condition)
---- 13.1.orig/include/linux/page-flags.h	2013-03-21 14:29:20.000000000 +0100
-+++ 13.1/include/linux/page-flags.h	2012-08-20 10:54:08.000000000 +0200
+--- a/include/linux/page-flags.h
++++ b/include/linux/page-flags.h
 @@ -126,12 +126,12 @@ enum pageflags {
  	PG_fscache = PG_private_2,	/* page backed by cache */
  
@@ -18092,8 +18092,8 @@ have been needed - see SLE11 SPn).
  PAGEFLAG(Reserved, reserved) __CLEARPAGEFLAG(Reserved, reserved)
  PAGEFLAG(SwapBacked, swapbacked) __CLEARPAGEFLAG(SwapBacked, swapbacked)
  
---- 13.1.orig/include/xen/interface/memory.h	2013-04-26 10:45:01.000000000 +0200
-+++ 13.1/include/xen/interface/memory.h	2013-04-26 10:45:08.000000000 +0200
+--- a/include/xen/interface/memory.h
++++ b/include/xen/interface/memory.h
 @@ -96,6 +96,7 @@ struct xen_memory_reservation {
       */
      domid_t        domid;
@@ -18130,16 +18130,16 @@ have been needed - see SLE11 SPn).
  typedef struct xen_add_to_physmap xen_add_to_physmap_t;
  DEFINE_XEN_GUEST_HANDLE(xen_add_to_physmap_t);
  
---- 13.1.orig/include/uapi/xen/public/Kbuild	2015-03-05 14:08:46.000000000 +0100
-+++ 13.1/include/uapi/xen/public/Kbuild	2011-02-01 14:38:38.000000000 +0100
+--- a/include/uapi/xen/public/Kbuild
++++ b/include/uapi/xen/public/Kbuild
 @@ -1 +1,5 @@
 +header-y += evtchn.h
 +header-y += gntdev.h
  header-y += iomulti.h
 +header-y += privcmd.h
 +header-y += xenbus.h
---- 13.1.orig/include/uapi/xen/public/privcmd.h	2015-03-05 14:08:46.000000000 +0100
-+++ 13.1/include/uapi/xen/public/privcmd.h	2011-02-01 14:38:38.000000000 +0100
+--- a/include/uapi/xen/public/privcmd.h
++++ b/include/uapi/xen/public/privcmd.h
 @@ -35,10 +35,6 @@
  
  #include <linux/types.h>
@@ -18151,8 +18151,8 @@ have been needed - see SLE11 SPn).
  typedef struct privcmd_hypercall
  {
  	__u64 op;
---- 13.1.orig/include/uapi/xen/public/xenbus.h	2015-03-05 14:08:46.000000000 +0100
-+++ 13.1/include/uapi/xen/public/xenbus.h	2011-02-01 14:38:38.000000000 +0100
+--- a/include/uapi/xen/public/xenbus.h
++++ b/include/uapi/xen/public/xenbus.h
 @@ -35,10 +35,6 @@
  
  #include <linux/types.h>
@@ -18164,8 +18164,8 @@ have been needed - see SLE11 SPn).
  typedef struct xenbus_alloc {
  	domid_t dom;
  	__u32 port;
---- 13.1.orig/kernel/kexec.c	2013-05-23 17:09:31.000000000 +0200
-+++ 13.1/kernel/kexec.c	2012-10-23 15:02:01.000000000 +0200
+--- a/kernel/kexec.c
++++ b/kernel/kexec.c
 @@ -47,7 +47,7 @@ note_buf_t __percpu *crash_notes;
  static unsigned char vmcoreinfo_data[VMCOREINFO_BYTES];
  u32
@@ -18175,8 +18175,8 @@ have been needed - see SLE11 SPn).
  #endif
  vmcoreinfo_note[VMCOREINFO_NOTE_SIZE/4];
  size_t vmcoreinfo_size;
---- 13.1.orig/lib/swiotlb-xen.c	2012-11-14 12:52:06.000000000 +0100
-+++ 13.1/lib/swiotlb-xen.c	2012-11-14 12:57:13.000000000 +0100
+--- a/lib/swiotlb-xen.c
++++ b/lib/swiotlb-xen.c
 @@ -787,7 +787,7 @@ swiotlb_sync_sg_for_device(struct device
  }
  
