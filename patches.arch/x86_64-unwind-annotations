@@ -4,14 +4,12 @@ Patch-mainline: tbd
 References: bnc#472783, bnc#588458
 
 ---
- arch/x86/kernel/entry_64.S |   99 +++++++++++++++++++++++----------------------
- arch/x86/kernel/head_64.S  |   20 +++++++++
- 2 files changed, 72 insertions(+), 47 deletions(-)
+ arch/x86/kernel/entry_64.S |   79 +++++++++++++++++++++++----------------------
+ arch/x86/kernel/head_64.S  |   20 +++++++++++
+ 2 files changed, 61 insertions(+), 38 deletions(-)
 
-Index: current/arch/x86/kernel/entry_64.S
-===================================================================
---- current.orig/arch/x86/kernel/entry_64.S
-+++ current/arch/x86/kernel/entry_64.S
+--- a/arch/x86/kernel/entry_64.S
++++ b/arch/x86/kernel/entry_64.S
 @@ -179,21 +179,21 @@ ENDPROC(native_usergs_sysret64)
  /*
   * initial frame state for interrupts (and exceptions without error code)
@@ -104,7 +102,7 @@ Index: current/arch/x86/kernel/entry_64.S
  	movl $1,%ebx
  	movl $MSR_GS_BASE,%ecx
  	rdmsr
-@@ -1039,7 +1042,7 @@ ENTRY(\sym)
+@@ -1040,7 +1043,7 @@ ENTRY(\sym)
  	call error_entry
  	.endif
  
@@ -113,7 +111,7 @@ Index: current/arch/x86/kernel/entry_64.S
  
  	.if \paranoid
  	.if \shift_ist != -1
-@@ -1373,25 +1376,24 @@ END(paranoid_exit)
+@@ -1374,25 +1377,24 @@ END(paranoid_exit)
   * returns in "no swapgs flag" in %ebx.
   */
  ENTRY(error_entry)
@@ -154,7 +152,7 @@ Index: current/arch/x86/kernel/entry_64.S
  	xorl %ebx,%ebx
  	testl $3,CS+8(%rsp)
  	je error_kernelspace
-@@ -1408,6 +1410,7 @@ error_sti:
+@@ -1409,6 +1411,7 @@ error_sti:
   * for these here too.
   */
  error_kernelspace:
@@ -162,19 +160,17 @@ Index: current/arch/x86/kernel/entry_64.S
  	incl %ebx
  	leaq native_irq_return_iret(%rip),%rcx
  	cmpq %rcx,RIP+8(%rsp)
-@@ -1668,7 +1671,7 @@ end_repeat_nmi:
+@@ -1769,7 +1772,7 @@ end_repeat_nmi:
  	 * exceptions might do.
  	 */
  	call save_paranoid
 -	DEFAULT_FRAME 0
 +	DEFAULT_FRAME -1
  
- 	/*
- 	 * Save off the CR2 register. If we take a page fault in the NMI then
-Index: current/arch/x86/kernel/head_64.S
-===================================================================
---- current.orig/arch/x86/kernel/head_64.S
-+++ current/arch/x86/kernel/head_64.S
+ 	/* paranoidentry do_nmi, 0; without TRACE_IRQS_OFF */
+ 	movq %rsp,%rdi
+--- a/arch/x86/kernel/head_64.S
++++ b/arch/x86/kernel/head_64.S
 @@ -378,6 +378,25 @@ ENTRY(early_idt_handler)
  
  11:
