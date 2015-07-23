@@ -2,6 +2,8 @@
 SRCVERSION=4.1
 # variant of the kernel-source package, either empty or "-rt"
 VARIANT=
+# Hack
+BS_SUFFIX=-arm64
 # buildservice projects to build the kernel against
 OBS_PROJECT=openSUSE:Factory
 OBS_PROJECT_ARM=openSUSE:Factory:ARM

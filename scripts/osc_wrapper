@@ -33,7 +33,7 @@ try_spec()
 	if test -e "$spec"; then
 		echo "$spec"
 		return 0
-	elif test -e "kernel-source$VARIANT/$spec"; then
+	elif test -e "kernel-source$VARIANT$BS_SUFFIX/$spec"; then
 		echo "$_"
 		return 0
 	else
@@ -294,9 +294,9 @@ do_upload()
 	case $# in
 	1)
 		home_project=$1
-		spec=$(try_spec kernel-source$VARIANT.spec)
+		spec=$(try_spec kernel-source$VARIANT$BS_SUFFIX.spec)
 		if test -z "$spec"; then
-			die "Can't find kernel-source$VARIANT directory"
+			die "Can't find kernel-source$VARIANT$BS_SUFFIX directory"
 		fi
 		dir=$(dirname "$spec")
 		;;
@@ -317,7 +317,7 @@ do_upload()
 	esac
 	check_dir_commit "$dir"
 
-	cmd=("$topdir/scripts/bs-upload-kernel" -A "$api" $flavor "$dir" "$home_project" "kernel-source$VARIANT")
+	cmd=("$topdir/scripts/bs-upload-kernel" -A "$api" $flavor "$dir" "$home_project" "kernel-source$VARIANT$BS_SUFFIX")
 	echo "${cmd[@]}"
 	"${cmd[@]}" || exit
 
