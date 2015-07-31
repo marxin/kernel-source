@@ -1,0 +1,54 @@
+From b2a5ef067e0f6352031d683218acb4908ca8bedf Mon Sep 17 00:00:00 2001
+From: Andrew Pinski <apinski@cavium.com>
+Date: Wed, 21 May 2014 14:33:43 -0700
+Subject: [PATCH 058/131] ARM64:ILP32: Use the non compat HWCAP for ILP32
+Git-commit: 9548c80f904e8f75e5d1d8b4f36482c5d0b716b6
+Patch-mainline: Queued in subsystem maintainer repository
+Git-repo: git://git.kernel.org/pub/scm/linux/kernel/git/rric/linux.git thunder/master-v4.1
+
+Signed-off-by: Andrew Pinski <apinski@cavium.com>
+
+Signed-off-by: Matthias Brugger <mbrugger@suse.com>
+
+---
+ arch/arm64/include/asm/compat.h | 10 ++++++++++
+ arch/arm64/include/asm/hwcap.h  |  2 --
+ 2 files changed, 10 insertions(+), 2 deletions(-)
+
+diff --git a/arch/arm64/include/asm/compat.h b/arch/arm64/include/asm/compat.h
+index 709b76f..af59171 100644
+--- a/arch/arm64/include/asm/compat.h
++++ b/arch/arm64/include/asm/compat.h
+@@ -302,6 +302,16 @@ struct compat_shmid64_ds {
+ 	compat_ulong_t __unused5;
+ };
+ 
++#define COMPAT_ELF_HWCAP	\
++	(is_a32_compat_task()	\
++	  ? compat_elf_hwcap	\
++	  : elf_hwcap)
++
++#define COMPAT_ELF_HWCAP2	\
++	(is_a32_compat_task()	\
++	  ? compat_elf_hwcap2	\
++	  : 0)
++
+ static inline int is_compat_task(void)
+ {
+ 	return test_thread_flag(TIF_32BIT);
+diff --git a/arch/arm64/include/asm/hwcap.h b/arch/arm64/include/asm/hwcap.h
+index 0ad7351..8b09fd1 100644
+--- a/arch/arm64/include/asm/hwcap.h
++++ b/arch/arm64/include/asm/hwcap.h
+@@ -47,8 +47,6 @@
+ #define ELF_HWCAP		(elf_hwcap)
+ 
+ #ifdef CONFIG_COMPAT
+-#define COMPAT_ELF_HWCAP	(compat_elf_hwcap)
+-#define COMPAT_ELF_HWCAP2	(compat_elf_hwcap2)
+ extern unsigned int compat_elf_hwcap, compat_elf_hwcap2;
+ #endif
+ 
+-- 
+1.7.12.4
+
