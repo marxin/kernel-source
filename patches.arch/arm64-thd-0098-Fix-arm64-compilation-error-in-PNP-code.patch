@@ -1,0 +1,39 @@
+From c7876971b5ae6b6ec253ee54eae7b25f8a53a6a1 Mon Sep 17 00:00:00 2001
+From: Al Stone <ahs3@redhat.com>
+Date: Thu, 28 Aug 2014 13:14:16 -0400
+Subject: [PATCH 098/131] Fix arm64 compilation error in PNP code
+Git-commit: 351fae429397d5c1d4a45e2cf2b5760b8cfc26ab
+Patch-mainline: Queued in subsystem maintainer repository
+Git-repo: git://git.kernel.org/pub/scm/linux/kernel/git/rric/linux.git thunder/master-v4.1
+
+Signed-off-by: Mark Salter <msalter@redhat.com>
+
+Signed-off-by: Matthias Brugger <mbrugger@suse.com>
+
+---
+ drivers/pnp/resource.c | 2 ++
+ 1 file changed, 2 insertions(+)
+
+diff --git a/drivers/pnp/resource.c b/drivers/pnp/resource.c
+index f980ff7..01f55a4 100644
+--- a/drivers/pnp/resource.c
++++ b/drivers/pnp/resource.c
+@@ -315,6 +315,7 @@ static int pci_dev_uses_irq(struct pnp_dev *pnp, struct pci_dev *pci,
+ 	progif = class & 0xff;
+ 	class >>= 8;
+ 
++#ifdef HAVE_ARCH_PCI_GET_LEGACY_IDE_IRQ
+ 	if (class == PCI_CLASS_STORAGE_IDE) {
+ 		/*
+ 		 * Unless both channels are native-PCI mode only,
+@@ -328,6 +329,7 @@ static int pci_dev_uses_irq(struct pnp_dev *pnp, struct pci_dev *pci,
+ 				return 1;
+ 			}
+ 	}
++#endif /* HAVE_ARCH_PCI_GET_LEGACY_IDE_IRQ */
+ 
+ 	return 0;
+ }
+-- 
+1.7.12.4
+
