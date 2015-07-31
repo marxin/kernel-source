@@ -1,0 +1,45 @@
+From 00007502181df39a0235d6eefcbb349f8d35131b Mon Sep 17 00:00:00 2001
+From: Robert Richter <rrichter@cavium.com>
+Date: Wed, 27 Aug 2014 16:24:24 +0200
+Subject: [PATCH 040/131] irqchip, gicv3-its: Read typer register outside the
+ loop
+Git-commit: 8c9c33793794a82a1b333a799e4eb4e53fc12410
+Patch-mainline: Queued in subsystem maintainer repository
+Git-repo: git://git.kernel.org/pub/scm/linux/kernel/git/rric/linux.git thunder/master-v4.1
+
+No need to read the typer register in the loop. Values do not change.
+
+Signed-off-by: Robert Richter <rrichter@cavium.com>
+
+Signed-off-by: Matthias Brugger <mbrugger@suse.com>
+
+---
+ drivers/irqchip/irq-gic-v3-its.c | 5 ++---
+ 1 file changed, 2 insertions(+), 3 deletions(-)
+
+diff --git a/drivers/irqchip/irq-gic-v3-its.c b/drivers/irqchip/irq-gic-v3-its.c
+index 4580970..fb246ce 100644
+--- a/drivers/irqchip/irq-gic-v3-its.c
++++ b/drivers/irqchip/irq-gic-v3-its.c
+@@ -803,6 +803,8 @@ static int its_alloc_tables(struct its_node *its)
+ 	int psz = SZ_64K;
+ 	u64 shr = GITS_BASER_InnerShareable;
+ 	u64 cache = GITS_BASER_WaWb;
++	u64 typer = readq_relaxed(its->base + GITS_TYPER);
++	u32 ids = GITS_TYPER_DEVBITS(typer);
+ 
+ 	for (i = 0; i < GITS_BASER_NR_REGS; i++) {
+ 		u64 val = readq_relaxed(its->base + GITS_BASER + i * 8);
+@@ -825,9 +827,6 @@ static int its_alloc_tables(struct its_node *its)
+ 		 * For other tables, only allocate a single page.
+ 		 */
+ 		if (type == GITS_BASER_TYPE_DEVICE) {
+-			u64 typer = readq_relaxed(its->base + GITS_TYPER);
+-			u32 ids = GITS_TYPER_DEVBITS(typer);
+-
+ 			/*
+ 			 * 'order' was initialized earlier to the default page
+ 			 * granule of the the ITS.  We can't have an allocation
+-- 
+1.7.12.4
+
