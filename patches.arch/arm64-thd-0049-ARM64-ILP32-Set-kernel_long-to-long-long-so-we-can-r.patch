@@ -1,0 +1,40 @@
+From 0e634b8e54e8db8f5b1461547fb80f8b61056f4f Mon Sep 17 00:00:00 2001
+From: Andrew Pinski <apinski@cavium.com>
+Date: Mon, 19 May 2014 20:46:02 -0700
+Subject: [PATCH 049/131] ARM64:ILP32: Set kernel_long to long long so we can
+ reuse most of the same syscalls as LP64
+Git-commit: 4418ddcef62a74d1b36a04af7d74d15fcdb2ae3d
+Patch-mainline: Queued in subsystem maintainer repository
+Git-repo: git://git.kernel.org/pub/scm/linux/kernel/git/rric/linux.git thunder/master-v4.1
+
+Since we want time_t and some other userland types to be the same between ILP32 and LP64, we define __kernel_long_t to be long long.
+
+Signed-off-by: Andrew Pinski <apinski@cavium.com>
+
+Signed-off-by: Matthias Brugger <mbrugger@suse.com>
+
+---
+ arch/arm64/include/uapi/asm/posix_types.h | 8 +++++++-
+ 1 file changed, 7 insertions(+), 1 deletion(-)
+
+diff --git a/arch/arm64/include/uapi/asm/posix_types.h b/arch/arm64/include/uapi/asm/posix_types.h
+index 7985ff6..0961945 100644
+--- a/arch/arm64/include/uapi/asm/posix_types.h
++++ b/arch/arm64/include/uapi/asm/posix_types.h
+@@ -5,6 +5,12 @@ typedef unsigned short __kernel_old_uid_t;
+ typedef unsigned short __kernel_old_gid_t;
+ #define __kernel_old_uid_t __kernel_old_uid_t
+ 
++#ifdef __ILP32__
++typedef long long __kernel_long_t;
++typedef unsigned long long __kernel_ulong_t;
++#define __kernel_long_t __kernel_long_t
++#endif
++
+ #include <asm-generic/posix_types.h>
+ 
+-#endif /*  __ASM_POSIX_TYPES_H */
++#endif /* __ASM_POSIX_TYPES_H */
+-- 
+1.7.12.4
+
