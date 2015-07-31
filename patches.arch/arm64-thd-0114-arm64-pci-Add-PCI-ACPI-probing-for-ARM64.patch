@@ -1,0 +1,512 @@
+From ed2026239a001d055611221de33ca4a5c04d1d6d Mon Sep 17 00:00:00 2001
+From: Tomasz Nowicki <tomasz.nowicki@linaro.org>
+Date: Thu, 27 Nov 2014 18:20:51 +0100
+Subject: [PATCH 114/131] arm64, pci: Add PCI ACPI probing for ARM64
+Git-commit: 4d47aba13f946019203ca5c0f5ebf357414fb6d1
+Patch-mainline: Queued in subsystem maintainer repository
+Git-repo: git://git.kernel.org/pub/scm/linux/kernel/git/rric/linux.git thunder/master-v4.1
+
+Host driver is made in old fashion, it should be revisited once
+new way of root bus creation get upstream.
+
+Signed-off-by: Tomasz Nowicki <tomasz.nowicki@linaro.org>
+Signed-off-by: Robert Richter <rrichter@cavium.com>
+Signed-off-by: Matthias Brugger <mbrugger@suse.com>
+
+---
+ arch/arm64/include/asm/pci.h |   8 +
+ arch/arm64/kernel/Makefile   |   1 +
+ arch/arm64/kernel/pci-acpi.c | 348 +++++++++++++++++++++++++++++++++++++++++++
+ drivers/pci/pci.c            |  90 ++++++-----
+ 4 files changed, 406 insertions(+), 41 deletions(-)
+ create mode 100644 arch/arm64/kernel/pci-acpi.c
+
+diff --git a/arch/arm64/include/asm/pci.h b/arch/arm64/include/asm/pci.h
+index 4e47457..76275e1 100644
+--- a/arch/arm64/include/asm/pci.h
++++ b/arch/arm64/include/asm/pci.h
+@@ -29,6 +29,14 @@ extern int isa_dma_bridge_buggy;
+ #ifdef CONFIG_PCI
+ 
+ #ifdef CONFIG_ACPI
++struct pci_controller {
++	struct acpi_device *companion;
++	int segment;
++	int node;		/* nearest node with memory or NUMA_NO_NODE for global allocation */
++};
++
++#define PCI_CONTROLLER(busdev) ((struct pci_controller *) busdev->sysdata)
++
+ /*
+  * ARM64 PCI config space access primitives.
+  */
+diff --git a/arch/arm64/kernel/Makefile b/arch/arm64/kernel/Makefile
+index f143d30..a933cb5 100644
+--- a/arch/arm64/kernel/Makefile
++++ b/arch/arm64/kernel/Makefile
+@@ -36,6 +36,7 @@ arm64-obj-$(CONFIG_KGDB)		+= kgdb.o
+ arm64-obj-$(CONFIG_EFI)			+= efi.o efi-stub.o efi-entry.o
+ arm64-obj-$(CONFIG_PCI)			+= pci.o
+ arm64-obj-$(CONFIG_ARMV8_DEPRECATED)	+= armv8_deprecated.o
++arm64-obj-$(CONFIG_ACPI)		+= pci-acpi.o
+ arm64-obj-$(CONFIG_ACPI)		+= acpi.o
+ 
+ obj-y					+= $(arm64-obj-y) vdso/
+diff --git a/arch/arm64/kernel/pci-acpi.c b/arch/arm64/kernel/pci-acpi.c
+new file mode 100644
+index 0000000..1826b10
+--- /dev/null
++++ b/arch/arm64/kernel/pci-acpi.c
+@@ -0,0 +1,348 @@
++/*
++ * Code borrowed from powerpc/kernel/pci-common.c and arch/ia64/pci/pci.c
++ *
++ * Copyright (c) 2002, 2005 Hewlett-Packard Development Company, L.P.
++ *	David Mosberger-Tang <davidm@hpl.hp.com>
++ *	Bjorn Helgaas <bjorn.helgaas@hp.com>
++ * Copyright (C) 2004 Silicon Graphics, Inc.
++ * Copyright (C) 2003 Anton Blanchard <anton@au.ibm.com>, IBM
++ * Copyright (C) 2014 ARM Ltd.
++ *
++ * This program is free software; you can redistribute it and/or
++ * modify it under the terms of the GNU General Public License
++ * version 2 as published by the Free Software Foundation.
++ *
++ */
++
++#include <linux/acpi.h>
++#include <linux/init.h>
++#include <linux/io.h>
++#include <linux/kernel.h>
++#include <linux/mm.h>
++#include <linux/mmconfig.h>
++#include <linux/of_address.h>
++#include <linux/of_pci.h>
++#include <linux/of_platform.h>
++#include <linux/pci.h>
++#include <linux/pci-acpi.h>
++#include <linux/slab.h>
++
++#include <asm/pci-bridge.h>
++
++int pcibios_root_bridge_prepare(struct pci_host_bridge *bridge)
++{
++	ACPI_COMPANION_SET(&bridge->dev,
++			   PCI_CONTROLLER(bridge->bus)->companion);
++
++	return 0;
++}
++
++void pcibios_add_bus(struct pci_bus *bus)
++{
++	acpi_pci_add_bus(bus);
++}
++
++void pcibios_remove_bus(struct pci_bus *bus)
++{
++	acpi_pci_remove_bus(bus);
++}
++
++int
++pcibios_enable_device (struct pci_dev *dev, int mask)
++{
++	int ret;
++
++	ret = pci_enable_resources(dev, mask);
++	if (ret < 0)
++		return ret;
++
++	if (!dev->msi_enabled)
++		return acpi_pci_irq_enable(dev);
++	return 0;
++}
++
++void
++pcibios_disable_device (struct pci_dev *dev)
++{
++	BUG_ON(atomic_read(&dev->enable_cnt));
++	if (!dev->msi_enabled)
++		acpi_pci_irq_disable(dev);
++}
++
++static int pci_read(struct pci_bus *bus, unsigned int devfn, int where,
++		    int size, u32 *value)
++{
++	return raw_pci_read(pci_domain_nr(bus), bus->number,
++			    devfn, where, size, value);
++}
++
++static int pci_write(struct pci_bus *bus, unsigned int devfn, int where,
++		     int size, u32 value)
++{
++	return raw_pci_write(pci_domain_nr(bus), bus->number,
++			     devfn, where, size, value);
++}
++
++struct pci_ops pci_root_ops = {
++	.read = pci_read,
++	.write = pci_write,
++};
++
++static struct pci_controller *alloc_pci_controller(int seg)
++{
++	struct pci_controller *controller;
++
++	controller = kzalloc(sizeof(*controller), GFP_KERNEL);
++	if (!controller)
++		return NULL;
++
++	controller->segment = seg;
++	return controller;
++}
++
++struct pci_root_info {
++	struct acpi_device *bridge;
++	struct pci_controller *controller;
++	struct list_head resources;
++	struct resource *res;
++	unsigned int res_num;
++	char *name;
++};
++
++static acpi_status resource_to_window(struct acpi_resource *resource,
++				      struct acpi_resource_address64 *addr)
++{
++	acpi_status status;
++
++	/*
++	 * We're only interested in _CRS descriptors that are
++	 *	- address space descriptors for memory
++	 *	- non-zero size
++	 *	- producers, i.e., the address space is routed downstream,
++	 *	  not consumed by the bridge itself
++	 */
++	status = acpi_resource_to_address64(resource, addr);
++	if (ACPI_SUCCESS(status) &&
++	    (addr->resource_type == ACPI_MEMORY_RANGE ||
++	     addr->resource_type == ACPI_IO_RANGE) &&
++	    addr->address.address_length &&
++	    addr->producer_consumer == ACPI_PRODUCER)
++		return AE_OK;
++
++	return AE_ERROR;
++}
++
++static acpi_status count_window(struct acpi_resource *resource, void *data)
++{
++	unsigned int *windows = (unsigned int *) data;
++	struct acpi_resource_address64 addr;
++	acpi_status status;
++
++	status = resource_to_window(resource, &addr);
++	if (ACPI_SUCCESS(status))
++		(*windows)++;
++
++	return AE_OK;
++}
++
++static acpi_status add_window(struct acpi_resource *res, void *data)
++{
++	struct pci_root_info *info = data;
++	struct resource *resource;
++	struct acpi_resource_address64 addr;
++	resource_size_t offset;
++	acpi_status status;
++	unsigned long flags;
++	struct resource *root;
++	u64 start;
++
++	/* Return AE_OK for non-window resources to keep scanning for more */
++	status = resource_to_window(res, &addr);
++	if (!ACPI_SUCCESS(status))
++		return AE_OK;
++
++	if (addr.resource_type == ACPI_MEMORY_RANGE) {
++		flags = IORESOURCE_MEM;
++		root = &iomem_resource;
++	} else if (addr.resource_type == ACPI_IO_RANGE) {
++		flags = IORESOURCE_IO;
++		root = &ioport_resource;
++	} else
++		return AE_OK;
++
++	start = addr.address.minimum + addr.address.translation_offset;
++
++	resource = &info->res[info->res_num];
++	resource->name = info->name;
++	resource->flags = flags;
++	resource->start = start;
++	resource->end = resource->start + addr.address.address_length - 1;
++
++	if (flags & IORESOURCE_IO) {
++		unsigned long port;
++		int err;
++
++		err = pci_register_io_range(start, addr.address.address_length);
++		if (err)
++			return AE_OK;
++
++		port = pci_address_to_pio(start);
++		if (port == (unsigned long)-1)
++			return AE_OK;
++
++		resource->start = port;
++		resource->end = port + addr.address.address_length - 1;
++
++		if (pci_remap_iospace(resource, start) < 0)
++			return AE_OK;
++
++		offset = 0;
++	} else
++		offset = addr.address.translation_offset;
++
++	if (insert_resource(root, resource)) {
++		dev_err(&info->bridge->dev,
++			"can't allocate host bridge window %pR\n",
++			resource);
++	} else {
++		if (addr.address.translation_offset)
++			dev_info(&info->bridge->dev, "host bridge window %pR "
++				 "(PCI address [%#llx-%#llx])\n",
++				 resource,
++				 resource->start - addr.address.translation_offset,
++				 resource->end - addr.address.translation_offset);
++		else
++			dev_info(&info->bridge->dev,
++				 "host bridge window %pR\n", resource);
++	}
++
++	pci_add_resource_offset(&info->resources, resource, offset);
++	info->res_num++;
++	return AE_OK;
++}
++
++static void free_pci_root_info_res(struct pci_root_info *info)
++{
++	kfree(info->name);
++	kfree(info->res);
++	info->res = NULL;
++	info->res_num = 0;
++	kfree(info->controller);
++	info->controller = NULL;
++}
++
++static void __release_pci_root_info(struct pci_root_info *info)
++{
++	int i;
++	struct resource *res;
++
++	for (i = 0; i < info->res_num; i++) {
++		res = &info->res[i];
++
++		if (!res->parent)
++			continue;
++
++		if (!(res->flags & (IORESOURCE_MEM | IORESOURCE_IO)))
++			continue;
++
++		release_resource(res);
++	}
++
++	free_pci_root_info_res(info);
++	kfree(info);
++}
++
++static void release_pci_root_info(struct pci_host_bridge *bridge)
++{
++	struct pci_root_info *info = bridge->release_data;
++
++	__release_pci_root_info(info);
++}
++
++static int
++probe_pci_root_info(struct pci_root_info *info, struct acpi_device *device,
++		int busnum, int domain)
++{
++	char *name;
++
++	name = kmalloc(16, GFP_KERNEL);
++	if (!name)
++		return -ENOMEM;
++
++	sprintf(name, "PCI Bus %04x:%02x", domain, busnum);
++	info->bridge = device;
++	info->name = name;
++
++	acpi_walk_resources(device->handle, METHOD_NAME__CRS, count_window,
++			&info->res_num);
++	if (info->res_num) {
++		info->res =
++			kzalloc_node(sizeof(*info->res) * info->res_num,
++				     GFP_KERNEL, info->controller->node);
++		if (!info->res) {
++			kfree(name);
++			return -ENOMEM;
++		}
++
++		info->res_num = 0;
++		acpi_walk_resources(device->handle, METHOD_NAME__CRS,
++			add_window, info);
++	} else
++		kfree(name);
++
++	return 0;
++}
++
++/* Root bridge scanning */
++struct pci_bus *pci_acpi_scan_root(struct acpi_pci_root *root)
++{
++	struct acpi_device *device = root->device;
++	int domain = root->segment;
++	int bus = root->secondary.start;
++	struct pci_controller *controller;
++	struct pci_root_info *info = NULL;
++	int busnum = root->secondary.start;
++	struct pci_bus *pbus;
++	int ret;
++
++	controller = alloc_pci_controller(domain);
++	if (!controller)
++		return NULL;
++
++	controller->companion = device;
++	controller->node = acpi_get_node(device->handle);
++
++	info = kzalloc(sizeof(*info), GFP_KERNEL);
++	if (!info) {
++		dev_err(&device->dev,
++				"pci_bus %04x:%02x: ignored (out of memory)\n",
++				domain, busnum);
++		kfree(controller);
++		return NULL;
++	}
++
++	info->controller = controller;
++	INIT_LIST_HEAD(&info->resources);
++
++	ret = probe_pci_root_info(info, device, busnum, domain);
++	if (ret) {
++		kfree(info->controller);
++		kfree(info);
++		return NULL;
++	}
++	/* insert busn resource at first */
++	pci_add_resource(&info->resources, &root->secondary);
++
++	pbus = pci_create_root_bus(NULL, bus, &pci_root_ops, controller,
++				   &info->resources);
++	if (!pbus) {
++		pci_free_resource_list(&info->resources);
++		__release_pci_root_info(info);
++		return NULL;
++	}
++
++	pci_set_host_bridge_release(to_pci_host_bridge(pbus->bridge),
++			release_pci_root_info, info);
++	pci_scan_child_bus(pbus);
++	return pbus;
++}
+diff --git a/drivers/pci/pci.c b/drivers/pci/pci.c
+index acc4b6e..64e7bf9 100644
+--- a/drivers/pci/pci.c
++++ b/drivers/pci/pci.c
+@@ -4508,47 +4508,55 @@ int pci_get_new_domain_nr(void)
+ #ifdef CONFIG_PCI_DOMAINS_GENERIC
+ void pci_bus_assign_domain_nr(struct pci_bus *bus, struct device *parent)
+ {
+-	static int use_dt_domains = -1;
+-	int domain = of_get_pci_domain_nr(parent->of_node);
+-
+-	/*
+-	 * Check DT domain and use_dt_domains values.
+-	 *
+-	 * If DT domain property is valid (domain >= 0) and
+-	 * use_dt_domains != 0, the DT assignment is valid since this means
+-	 * we have not previously allocated a domain number by using
+-	 * pci_get_new_domain_nr(); we should also update use_dt_domains to
+-	 * 1, to indicate that we have just assigned a domain number from
+-	 * DT.
+-	 *
+-	 * If DT domain property value is not valid (ie domain < 0), and we
+-	 * have not previously assigned a domain number from DT
+-	 * (use_dt_domains != 1) we should assign a domain number by
+-	 * using the:
+-	 *
+-	 * pci_get_new_domain_nr()
+-	 *
+-	 * API and update the use_dt_domains value to keep track of method we
+-	 * are using to assign domain numbers (use_dt_domains = 0).
+-	 *
+-	 * All other combinations imply we have a platform that is trying
+-	 * to mix domain numbers obtained from DT and pci_get_new_domain_nr(),
+-	 * which is a recipe for domain mishandling and it is prevented by
+-	 * invalidating the domain value (domain = -1) and printing a
+-	 * corresponding error.
+-	 */
+-	if (domain >= 0 && use_dt_domains) {
+-		use_dt_domains = 1;
+-	} else if (domain < 0 && use_dt_domains != 1) {
+-		use_dt_domains = 0;
+-		domain = pci_get_new_domain_nr();
+-	} else {
+-		dev_err(parent, "Node %s has inconsistent \"linux,pci-domain\" property in DT\n",
+-			parent->of_node->full_name);
+-		domain = -1;
+-	}
+-
+-	bus->domain_nr = domain;
++       static int use_dt_domains = -1;
++       int domain;
++
++       if (!acpi_disabled) {
++	       domain = PCI_CONTROLLER(bus)->segment;
++	       goto out;
++       }
++
++       domain = of_get_pci_domain_nr(parent->of_node);
++
++
++       /*
++        * Check DT domain and use_dt_domains values.
++        *
++        * If DT domain property is valid (domain >= 0) and
++        * use_dt_domains != 0, the DT assignment is valid since this means
++        * we have not previously allocated a domain number by using
++        * pci_get_new_domain_nr(); we should also update use_dt_domains to
++        * 1, to indicate that we have just assigned a domain number from
++        * DT.
++        *
++        * If DT domain property value is not valid (ie domain < 0), and we
++        * have not previously assigned a domain number from DT
++        * (use_dt_domains != 1) we should assign a domain number by
++        * using the:
++        *
++        * pci_get_new_domain_nr()
++        *
++        * API and update the use_dt_domains value to keep track of method we
++        * are using to assign domain numbers (use_dt_domains = 0).
++        *
++        * All other combinations imply we have a platform that is trying
++        * to mix domain numbers obtained from DT and pci_get_new_domain_nr(),
++        * which is a recipe for domain mishandling and it is prevented by
++        * invalidating the domain value (domain = -1) and printing a
++        * corresponding error.
++        */
++       if (domain >= 0 && use_dt_domains) {
++               use_dt_domains = 1;
++       } else if (domain < 0 && use_dt_domains != 1) {
++               use_dt_domains = 0;
++               domain = pci_get_new_domain_nr();
++       } else {
++               dev_err(parent, "Node %s has inconsistent \"linux,pci-domain\" property in DT\n",
++                       parent->of_node->full_name);
++               domain = -1;
++       }
++out:
++       bus->domain_nr = domain;
+ }
+ #endif
+ #endif
+-- 
+1.7.12.4
+

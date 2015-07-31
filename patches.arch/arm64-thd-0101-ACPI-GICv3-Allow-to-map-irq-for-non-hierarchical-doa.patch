@@ -1,0 +1,32 @@
+From 4c3d652a1b49bce9adce86df223b531a489030d3 Mon Sep 17 00:00:00 2001
+From: Tomasz Nowicki <tomasz.nowicki@linaro.org>
+Date: Thu, 27 Nov 2014 18:09:32 +0100
+Subject: [PATCH 101/131] ACPI, GICv3: Allow to map irq for non-hierarchical
+ doamin.
+Git-commit: faefc673054cf5aa013195a644dbebe16f5d59d5
+Patch-mainline: Queued in subsystem maintainer repository
+Git-repo: git://git.kernel.org/pub/scm/linux/kernel/git/rric/linux.git thunder/master-v4.1
+
+Signed-off-by: Tomasz Nowicki <tomasz.nowicki@linaro.org>
+
+Signed-off-by: Matthias Brugger <mbrugger@suse.com>
+
+---
+ drivers/irqchip/irq-gic-v3.c | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/drivers/irqchip/irq-gic-v3.c b/drivers/irqchip/irq-gic-v3.c
+index b4d5d6b..23372ff 100644
+--- a/drivers/irqchip/irq-gic-v3.c
++++ b/drivers/irqchip/irq-gic-v3.c
+@@ -789,6 +789,7 @@ static void gic_irq_domain_free(struct irq_domain *domain, unsigned int virq,
+ }
+ 
+ static const struct irq_domain_ops gic_irq_domain_ops = {
++	.map = gic_irq_domain_map,
+ 	.xlate = gic_irq_domain_xlate,
+ 	.alloc = gic_irq_domain_alloc,
+ 	.free = gic_irq_domain_free,
+-- 
+1.7.12.4
+

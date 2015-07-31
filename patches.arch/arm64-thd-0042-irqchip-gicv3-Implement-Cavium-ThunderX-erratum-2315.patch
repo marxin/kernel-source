@@ -1,0 +1,92 @@
+From 6fcf9c8f02467bd80dba8a388685a8d6417abe7b Mon Sep 17 00:00:00 2001
+From: Robert Richter <rrichter@cavium.com>
+Date: Mon, 29 Jun 2015 18:46:22 +0200
+Subject: [PATCH 042/131] irqchip, gicv3: Implement Cavium ThunderX erratum
+ 23154
+Git-commit: 2b7c4d22ad3df75f1d35dbddcc2d185187d385f6
+Patch-mainline: Queued in subsystem maintainer repository
+Git-repo: git://git.kernel.org/pub/scm/linux/kernel/git/rric/linux.git thunder/master-v4.1
+
+This patch implements Cavium ThunderX erratum 23154.
+
+The gicv3 of ThunderX requires a modified version for reading the IAR
+status to ensure data synchronization. Since this is in the fast-path
+and called with each interrupt, runtime patching is used using jump
+label patching for smallest overhead (no-op). This is the same
+technique as used for tracepoints.
+
+Signed-off-by: Robert Richter <rrichter@cavium.com>
+
+Signed-off-by: Matthias Brugger <mbrugger@suse.com>
+
+---
+ drivers/irqchip/irq-gic-v3.c | 37 ++++++++++++++++++++++++++++++++++++-
+ 1 file changed, 36 insertions(+), 1 deletion(-)
+
+diff --git a/drivers/irqchip/irq-gic-v3.c b/drivers/irqchip/irq-gic-v3.c
+index 4d1c4ce..b4d5d6b 100644
+--- a/drivers/irqchip/irq-gic-v3.c
++++ b/drivers/irqchip/irq-gic-v3.c
+@@ -112,14 +112,38 @@ static void gic_redist_wait_for_rwp(void)
+ }
+ 
+ /* Low level accessors */
+-static u64 __maybe_unused gic_read_iar(void)
++static u64 gic_read_iar_common(void)
++{
++	u64 irqstat;
++
++	asm volatile("mrs_s %0, " __stringify(ICC_IAR1_EL1) : "=r" (irqstat));
++	return irqstat;
++}
++
++/* Cavium ThunderX erratum 23154 */
++static u64 gic_read_iar_cavium_thunderx(void)
+ {
+ 	u64 irqstat;
+ 
++	asm volatile("nop;nop;nop;nop;");
++	asm volatile("nop;nop;nop;nop;");
+ 	asm volatile("mrs_s %0, " __stringify(ICC_IAR1_EL1) : "=r" (irqstat));
++	asm volatile("nop;nop;nop;nop;");
++	mb();
++
+ 	return irqstat;
+ }
+ 
++struct static_key is_cavium_thunderx = STATIC_KEY_INIT_FALSE;
++
++static u64 __maybe_unused gic_read_iar(void)
++{
++	if (static_key_false(&is_cavium_thunderx))
++		return gic_read_iar_common();
++	else
++		return gic_read_iar_cavium_thunderx();
++}
++
+ static void __maybe_unused gic_write_pmr(u64 val)
+ {
+ 	asm volatile("msr_s " __stringify(ICC_PMR_EL1) ", %0" : : "r" (val));
+@@ -770,8 +794,19 @@ static const struct irq_domain_ops gic_irq_domain_ops = {
+ 	.free = gic_irq_domain_free,
+ };
+ 
++static void gicv3_enable_cavium_thunderx(void *data)
++{
++	static_key_slow_inc(&is_cavium_thunderx);
++}
++
+ static const struct gic_capabilities gicv3_errata[] = {
+ 	{
++		.desc	= "GIC: Cavium erratum 23154",
++		.id	= 0xa100034c,	/* ThunderX pass 1.x */
++		.mask	= 0xffff0fff,
++		.init	= gicv3_enable_cavium_thunderx,
++	},
++	{
+ 	}
+ };
+ 
+-- 
+1.7.12.4
+

@@ -1,0 +1,57 @@
+From c8b80011ed84b240197d2345484ce847ac315e24 Mon Sep 17 00:00:00 2001
+From: Robert Richter <rrichter@cavium.com>
+Date: Wed, 20 May 2015 22:09:33 +0200
+Subject: [PATCH 124/131] arm64, acpi, iort: Remove iort function stubs
+Git-commit: cbb0c16710a00198e3cfb8f1172ab8b4daa97153
+Patch-mainline: Queued in subsystem maintainer repository
+Git-repo: git://git.kernel.org/pub/scm/linux/kernel/git/rric/linux.git thunder/master-v4.1
+
+Since IORT depends on ACPI, we make all callers to functions of iort.h
+depend on ACPI as well. Now we can remove all iort function stubs.
+
+Also changing iort.h by adding include files of all structs used in
+the file and making function better readable.
+
+Signed-off-by: Robert Richter <rrichter@cavium.com>
+
+Signed-off-by: Matthias Brugger <mbrugger@suse.com>
+
+---
+ include/linux/iort.h | 17 ++++++++---------
+ 1 file changed, 8 insertions(+), 9 deletions(-)
+
+diff --git a/include/linux/iort.h b/include/linux/iort.h
+index b6a06ef..843d4f3 100644
+--- a/include/linux/iort.h
++++ b/include/linux/iort.h
+@@ -19,19 +19,18 @@
+ #ifndef __IORT_H__
+ #define __IORT_H__
+ 
+-struct msi_controller;
++#ifdef CONFIG_ACPI
+ 
+ #ifdef CONFIG_IORT_TABLE
++
++#include <linux/msi.h>
++
+ int iort_pci_msi_chip_add(struct msi_controller *chip, u32 its_id);
+ void iort_pci_msi_chip_remove(struct msi_controller *chip);
+ struct msi_controller *iort_find_pci_msi_chip(int segment, unsigned int idx);
+-#else
+-static inline int
+-iort_pci_msi_chip_add(struct msi_controller *chip, u32 its_id) { return 0; }
+-static inline void
+-iort_pci_msi_chip_remove(struct msi_controller *chip) {}
+-static struct msi_controller *
+-iort_find_pci_msi_chip(int segment, unsigned int idx) { return NULL; }
+-#endif
++
++#endif /* CONFIG_IORT_TABLE */
++
++#endif /* CONFIG_ACPI */
+ 
+ #endif /* __IORT_H__ */
+-- 
+1.7.12.4
+

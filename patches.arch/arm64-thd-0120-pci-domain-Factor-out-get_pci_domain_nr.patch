@@ -1,0 +1,75 @@
+From e58c3ff8f0bba859855e3c5ece7b17b4f34394da Mon Sep 17 00:00:00 2001
+From: Robert Richter <rrichter@cavium.com>
+Date: Sun, 4 Jan 2015 18:37:22 +0100
+Subject: [PATCH 120/131] pci domain: Factor out get_pci_domain_nr()
+Git-commit: 72ff04c373c8716746df35bc82962c9a82029ae8
+Patch-mainline: Queued in subsystem maintainer repository
+Git-repo: git://git.kernel.org/pub/scm/linux/kernel/git/rric/linux.git thunder/master-v4.1
+
+Signed-off-by: Robert Richter <rrichter@cavium.com>
+
+Signed-off-by: Matthias Brugger <mbrugger@suse.com>
+
+---
+ drivers/pci/pci.c | 32 +++++++++++++++++++-------------
+ 1 file changed, 19 insertions(+), 13 deletions(-)
+
+diff --git a/drivers/pci/pci.c b/drivers/pci/pci.c
+index 7b79965..e65d29d 100644
+--- a/drivers/pci/pci.c
++++ b/drivers/pci/pci.c
+@@ -4506,15 +4506,15 @@ int pci_get_new_domain_nr(void)
+ }
+ 
+ #ifdef CONFIG_PCI_DOMAINS_GENERIC
+-void pci_bus_assign_domain_nr(struct pci_bus *bus, struct device *parent)
++static int get_pci_domain_nr(struct pci_bus *bus, struct device *parent)
+ {
+ 	static int use_dt_domains = -1;
+ 	int domain;
+ 
+-	if (!acpi_disabled) {
+-		domain = PCI_CONTROLLER(bus)->segment;
+-		goto out;
+-	}
++#ifdef CONFIG_ACPI
++	if (!acpi_disabled)
++		return PCI_CONTROLLER(bus)->segment;
++#endif
+ 
+ 	domain = of_get_pci_domain_nr(parent->of_node);
+ 
+@@ -4546,16 +4546,22 @@ void pci_bus_assign_domain_nr(struct pci_bus *bus, struct device *parent)
+ 	 */
+ 	if (domain >= 0 && use_dt_domains) {
+ 		use_dt_domains = 1;
+-	} else if (domain < 0 && use_dt_domains != 1) {
++		return domain;
++	}
++
++	if (domain < 0 && use_dt_domains != 1) {
+ 		use_dt_domains = 0;
+-		domain = pci_get_new_domain_nr();
+-	} else {
+-		dev_err(parent, "Node %s has inconsistent \"linux,pci-domain\" property in DT\n",
+-			parent->of_node->full_name);
+-		domain = -1;
++		return pci_get_new_domain_nr();
+ 	}
+-out:
+-	bus->domain_nr = domain;
++
++	dev_err(parent, "Node %s has inconsistent \"linux,pci-domain\" property in DT\n",
++		parent->of_node->full_name);
++	return -1;
++}
++
++void pci_bus_assign_domain_nr(struct pci_bus *bus, struct device *parent)
++{
++	bus->domain_nr = get_pci_domain_nr(bus, parent);
+ }
+ #endif
+ #endif
+-- 
+1.7.12.4
+

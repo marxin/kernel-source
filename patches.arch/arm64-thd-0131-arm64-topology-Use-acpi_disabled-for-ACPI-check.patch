@@ -1,0 +1,55 @@
+From 90fc45aaf764b2089bcd53675ce1fb4f07a3c42b Mon Sep 17 00:00:00 2001
+From: Robert Richter <rrichter@cavium.com>
+Date: Fri, 3 Jul 2015 19:47:12 +0200
+Subject: [PATCH 131/131] arm64: topology: Use acpi_disabled for ACPI check
+Git-commit: 269de6b598276a865d65bddbe919d5720c288b2d
+Patch-mainline: Queued in subsystem maintainer repository
+Git-repo: git://git.kernel.org/pub/scm/linux/kernel/git/rric/linux.git thunder/master-v4.1
+
+Signed-off-by: Robert Richter <rrichter@cavium.com>
+
+Signed-off-by: Matthias Brugger <mbrugger@suse.com>
+
+---
+ arch/arm64/kernel/topology.c | 7 ++++---
+ 1 file changed, 4 insertions(+), 3 deletions(-)
+
+diff --git a/arch/arm64/kernel/topology.c b/arch/arm64/kernel/topology.c
+index 8ca4ab2..3f14ae9 100644
+--- a/arch/arm64/kernel/topology.c
++++ b/arch/arm64/kernel/topology.c
+@@ -11,6 +11,7 @@
+  * for more details.
+  */
+ 
++#include <linux/acpi.h>
+ #include <linux/cpu.h>
+ #include <linux/cpumask.h>
+ #include <linux/init.h>
+@@ -257,20 +258,20 @@ void store_cpu_topology(unsigned int cpuid)
+ 		cpuid_topo->core_id    = MPIDR_AFFINITY_LEVEL(mpidr, 1);
+ 		cpuid_topo->cluster_id = MPIDR_AFFINITY_LEVEL(mpidr, 2) |
+ 					 MPIDR_AFFINITY_LEVEL(mpidr, 3) << 8;
+-	} else {
+ #ifdef CONFIG_ACPI
++	} else if (!acpi_disabled) {
+ 		/* Multiprocessor system : Single-thread per core */
+ 		cpuid_topo->thread_id  = -1;
+ 		cpuid_topo->core_id    = (((mpidr >> 8) & 0xff) * 16) + (mpidr & 0xff);
+ 		cpuid_topo->cluster_id = (cpuid_topo->core_id) > 47 ? 1:0;
+-#else
++#endif
++	} else {
+ 		/* Multiprocessor system : Single-thread per core */
+ 		cpuid_topo->thread_id  = -1;
+ 		cpuid_topo->core_id    = MPIDR_AFFINITY_LEVEL(mpidr, 0);
+ 		cpuid_topo->cluster_id = MPIDR_AFFINITY_LEVEL(mpidr, 1) |
+ 					 MPIDR_AFFINITY_LEVEL(mpidr, 2) << 8 |
+ 					 MPIDR_AFFINITY_LEVEL(mpidr, 3) << 16;
+-#endif
+ 	}
+ 
+ 	pr_debug("CPU%u: cluster %d core %d thread %d mpidr %#016llx\n",
+-- 
+1.7.12.4
+

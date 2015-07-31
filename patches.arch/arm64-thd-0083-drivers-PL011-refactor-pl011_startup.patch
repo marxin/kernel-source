@@ -1,0 +1,99 @@
+From cc63c1dc98c62320503f912a8815a31e1a21a361 Mon Sep 17 00:00:00 2001
+From: Andre Przywara <andre.przywara@arm.com>
+Date: Thu, 21 May 2015 17:26:15 +0100
+Subject: [PATCH 083/131] drivers: PL011: refactor pl011_startup()
+Git-commit: 867b8e8e89f2f72882d267be3e035978fdd45a4a
+Patch-mainline: v4.2-rc1
+7e175cf2de4b58f37140b01d5eecf809c60d0c5c
+
+Split the pl011_startup() function into smaller chunks to allow
+easier reuse later when adding SBSA support.
+
+Signed-off-by: Andre Przywara <andre.przywara@arm.com>
+Tested-by: Mark Langsdorf <mlangsdo@redhat.com>
+Tested-by: Naresh Bhat <nbhat@cavium.com>
+Signed-off-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+Signed-off-by: Robert Richter <rrichter@cavium.com>
+
+Signed-off-by: Matthias Brugger <mbrugger@suse.com>
+
+---
+ drivers/tty/serial/amba-pl011.c | 48 ++++++++++++++++++++++++-----------------
+ 1 file changed, 28 insertions(+), 20 deletions(-)
+
+diff --git a/drivers/tty/serial/amba-pl011.c b/drivers/tty/serial/amba-pl011.c
+index b4de23c..209aeb6 100644
+--- a/drivers/tty/serial/amba-pl011.c
++++ b/drivers/tty/serial/amba-pl011.c
+@@ -1556,6 +1556,32 @@ static void pl011_write_lcr_h(struct uart_amba_port *uap, unsigned int lcr_h)
+ 	}
+ }
+ 
++static int pl011_allocate_irq(struct uart_amba_port *uap)
++{
++	writew(uap->im, uap->port.membase + UART011_IMSC);
++
++	return request_irq(uap->port.irq, pl011_int, 0, "uart-pl011", uap);
++}
++
++/*
++ * Enable interrupts, only timeouts when using DMA
++ * if initial RX DMA job failed, start in interrupt mode
++ * as well.
++ */
++static void pl011_enable_interrupts(struct uart_amba_port *uap)
++{
++	spin_lock_irq(&uap->port.lock);
++
++	/* Clear out any spuriously appearing RX interrupts */
++	writew(UART011_RTIS | UART011_RXIS,
++	       uap->port.membase + UART011_ICR);
++	uap->im = UART011_RTIM;
++	if (!pl011_dma_rx_running(uap))
++		uap->im |= UART011_RXIM;
++	writew(uap->im, uap->port.membase + UART011_IMSC);
++	spin_unlock_irq(&uap->port.lock);
++}
++
+ static int pl011_startup(struct uart_port *port)
+ {
+ 	struct uart_amba_port *uap =
+@@ -1567,12 +1593,7 @@ static int pl011_startup(struct uart_port *port)
+ 	if (retval)
+ 		goto clk_dis;
+ 
+-	writew(uap->im, uap->port.membase + UART011_IMSC);
+-
+-	/*
+-	 * Allocate the IRQ
+-	 */
+-	retval = request_irq(uap->port.irq, pl011_int, 0, "uart-pl011", uap);
++	retval = pl011_allocate_irq(uap);
+ 	if (retval)
+ 		goto clk_dis;
+ 
+@@ -1595,20 +1616,7 @@ static int pl011_startup(struct uart_port *port)
+ 	/* Startup DMA */
+ 	pl011_dma_startup(uap);
+ 
+-	/*
+-	 * Finally, enable interrupts, only timeouts when using DMA
+-	 * if initial RX DMA job failed, start in interrupt mode
+-	 * as well.
+-	 */
+-	spin_lock_irq(&uap->port.lock);
+-	/* Clear out any spuriously appearing RX interrupts */
+-	 writew(UART011_RTIS | UART011_RXIS,
+-		uap->port.membase + UART011_ICR);
+-	uap->im = UART011_RTIM;
+-	if (!pl011_dma_rx_running(uap))
+-		uap->im |= UART011_RXIM;
+-	writew(uap->im, uap->port.membase + UART011_IMSC);
+-	spin_unlock_irq(&uap->port.lock);
++	pl011_enable_interrupts(uap);
+ 
+ 	return 0;
+ 
+-- 
+1.7.12.4
+

@@ -1,0 +1,54 @@
+From 0f3702526ed495a3c3938f98eb15ef03279d5840 Mon Sep 17 00:00:00 2001
+From: Tomasz Nowicki <tomasz.nowicki@linaro.org>
+Date: Thu, 11 Sep 2014 12:32:07 +0200
+Subject: [PATCH 105/131] ACPI, GICv3, ITS: Support for ITS subtable in ACPICA
+ code.
+Git-commit: 7ccf61051cf1ca20fd772fafc8f0648b694730e0
+Patch-mainline: Queued in subsystem maintainer repository
+Git-repo: git://git.kernel.org/pub/scm/linux/kernel/git/rric/linux.git thunder/master-v4.1
+
+This commit is not going to hit upstream, those should be provided as
+ACPICA release code. Only for test purposes.
+
+Signed-off-by: Tomasz Nowicki <tomasz.nowicki@linaro.org>
+
+Signed-off-by: Matthias Brugger <mbrugger@suse.com>
+
+---
+ include/acpi/actbl1.h | 13 ++++++++++++-
+ 1 file changed, 12 insertions(+), 1 deletion(-)
+
+diff --git a/include/acpi/actbl1.h b/include/acpi/actbl1.h
+index c401396..03f787b 100644
+--- a/include/acpi/actbl1.h
++++ b/include/acpi/actbl1.h
+@@ -673,7 +673,8 @@ enum acpi_madt_type {
+ 	ACPI_MADT_TYPE_GENERIC_DISTRIBUTOR = 12,
+ 	ACPI_MADT_TYPE_GENERIC_MSI_FRAME = 13,
+ 	ACPI_MADT_TYPE_GENERIC_REDISTRIBUTOR = 14,
+-	ACPI_MADT_TYPE_RESERVED = 15	/* 15 and greater are reserved */
++	ACPI_MADT_TYPE_GENERIC_ITS = 15,
++	ACPI_MADT_TYPE_RESERVED = 16	/* 15 and greater are reserved */
+ };
+ 
+ /*
+@@ -866,6 +867,16 @@ struct acpi_madt_generic_redistributor {
+ 	u32 length;
+ };
+ 
++/* 15: Generic Redistributor (ACPI 5.2) */
++
++struct acpi_madt_generic_its {
++	struct acpi_subtable_header header;
++	u16 reserved;		/* reserved - must be zero */
++	u32 its_id;
++	u64 base_address;
++
++};
++
+ /*
+  * Common flags fields for MADT subtables
+  */
+-- 
+1.7.12.4
+

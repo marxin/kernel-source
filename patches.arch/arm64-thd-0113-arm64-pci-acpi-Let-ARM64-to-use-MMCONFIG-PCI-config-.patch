@@ -1,0 +1,82 @@
+From 38c8f59278af688448e3b635181fa9f0e99e7dbc Mon Sep 17 00:00:00 2001
+From: Tomasz Nowicki <tomasz.nowicki@linaro.org>
+Date: Fri, 14 Nov 2014 11:17:35 +0100
+Subject: [PATCH 113/131] arm64, pci, acpi: Let ARM64 to use MMCONFIG PCI
+ config space accessors.
+Git-commit: 9b8a708e1d53e52b96654307c8aa6291bcfe6381
+Patch-mainline: Queued in subsystem maintainer repository
+Git-repo: git://git.kernel.org/pub/scm/linux/kernel/git/rric/linux.git thunder/master-v4.1
+
+Signed-off-by: Tomasz Nowicki <tomasz.nowicki@linaro.org>
+
+Signed-off-by: Matthias Brugger <mbrugger@suse.com>
+
+---
+ arch/arm64/Kconfig           |  3 +++
+ arch/arm64/include/asm/pci.h | 36 ++++++++++++++++++++++++++++++++++++
+ 2 files changed, 39 insertions(+)
+
+diff --git a/arch/arm64/Kconfig b/arch/arm64/Kconfig
+index 55181b4..0afd17c 100644
+--- a/arch/arm64/Kconfig
++++ b/arch/arm64/Kconfig
+@@ -277,6 +277,9 @@ config PCI_DOMAINS_GENERIC
+ config PCI_SYSCALL
+ 	def_bool PCI
+ 
++config PCI_MMCONFIG
++	def_bool PCI && ACPI
++
+ source "drivers/pci/Kconfig"
+ source "drivers/pci/pcie/Kconfig"
+ source "drivers/pci/hotplug/Kconfig"
+diff --git a/arch/arm64/include/asm/pci.h b/arch/arm64/include/asm/pci.h
+index ad3fb18..4e47457 100644
+--- a/arch/arm64/include/asm/pci.h
++++ b/arch/arm64/include/asm/pci.h
+@@ -27,6 +27,42 @@
+ extern int isa_dma_bridge_buggy;
+ 
+ #ifdef CONFIG_PCI
++
++#ifdef CONFIG_ACPI
++/*
++ * ARM64 PCI config space access primitives.
++ */
++static inline unsigned char mmio_config_readb(void __iomem *pos)
++{
++	return readb(pos);
++}
++
++static inline unsigned short mmio_config_readw(void __iomem *pos)
++{
++	return readw(pos);
++}
++
++static inline unsigned int mmio_config_readl(void __iomem *pos)
++{
++	return readl(pos);
++}
++
++static inline void mmio_config_writeb(void __iomem *pos, u8 val)
++{
++	writeb(val, pos);
++}
++
++static inline void mmio_config_writew(void __iomem *pos, u16 val)
++{
++	writew(val, pos);
++}
++
++static inline void mmio_config_writel(void __iomem *pos, u32 val)
++{
++	writel(val, pos);
++}
++#endif  /* CONFIG_ACPI */
++
+ static inline int pci_get_legacy_ide_irq(struct pci_dev *dev, int channel)
+ {
+ 	/* no legacy IRQ on arm64 */
+-- 
+1.7.12.4
+
