@@ -1,0 +1,133 @@
+From 3ec95a6720d2b20a27c7f3beba4a0b6a63f6b5c0 Mon Sep 17 00:00:00 2001
+From: Tomasz Nowicki <tomasz.nowicki@linaro.org>
+Date: Thu, 13 Nov 2014 15:48:24 +0100
+Subject: [PATCH 109/131] x86, acpi, pci: Move PCI config space accessors.
+Git-commit: c760eb1a8501ecb518810d32fdaecfabf9cde063
+Patch-mainline: Queued in subsystem maintainer repository
+Git-repo: git://git.kernel.org/pub/scm/linux/kernel/git/rric/linux.git thunder/master-v4.1
+
+We are going to use mmio_config_{} name convention across all architectures.
+Currently it belongs to asm/pci_x86.h header which should be included
+only for x86 specific files. From now on, those accessors are in asm/pci.h
+header which can be included in non-architecture code much easier.
+
+Signed-off-by: Tomasz Nowicki <tomasz.nowicki@linaro.org>
+Tested-by: Hanjun Guo <hanjun.guo@linaro.org>
+
+Signed-off-by: Matthias Brugger <mbrugger@suse.com>
+
+---
+ arch/x86/include/asm/pci.h     | 42 +++++++++++++++++++++++++++++++++++++++++
+ arch/x86/include/asm/pci_x86.h | 43 ------------------------------------------
+ 2 files changed, 42 insertions(+), 43 deletions(-)
+
+diff --git a/arch/x86/include/asm/pci.h b/arch/x86/include/asm/pci.h
+index 4e370a5..f2b132b 100644
+--- a/arch/x86/include/asm/pci.h
++++ b/arch/x86/include/asm/pci.h
+@@ -71,6 +71,48 @@ void pcibios_set_master(struct pci_dev *dev);
+ struct irq_routing_table *pcibios_get_irq_routing_table(void);
+ int pcibios_set_irq_routing(struct pci_dev *dev, int pin, int irq);
+ 
++/*
++ * AMD Fam10h CPUs are buggy, and cannot access MMIO config space
++ * on their northbrige except through the * %eax register. As such, you MUST
++ * NOT use normal IOMEM accesses, you need to only use the magic mmio-config
++ * accessor functions.
++ * In fact just use pci_config_*, nothing else please.
++ */
++static inline unsigned char mmio_config_readb(void __iomem *pos)
++{
++	u8 val;
++	asm volatile("movb (%1),%%al" : "=a" (val) : "r" (pos));
++	return val;
++}
++
++static inline unsigned short mmio_config_readw(void __iomem *pos)
++{
++	u16 val;
++	asm volatile("movw (%1),%%ax" : "=a" (val) : "r" (pos));
++	return val;
++}
++
++static inline unsigned int mmio_config_readl(void __iomem *pos)
++{
++	u32 val;
++	asm volatile("movl (%1),%%eax" : "=a" (val) : "r" (pos));
++	return val;
++}
++
++static inline void mmio_config_writeb(void __iomem *pos, u8 val)
++{
++	asm volatile("movb %%al,(%1)" : : "a" (val), "r" (pos) : "memory");
++}
++
++static inline void mmio_config_writew(void __iomem *pos, u16 val)
++{
++	asm volatile("movw %%ax,(%1)" : : "a" (val), "r" (pos) : "memory");
++}
++
++static inline void mmio_config_writel(void __iomem *pos, u32 val)
++{
++	asm volatile("movl %%eax,(%1)" : : "a" (val), "r" (pos) : "memory");
++}
+ 
+ #define HAVE_PCI_MMAP
+ extern int pci_mmap_page_range(struct pci_dev *dev, struct vm_area_struct *vma,
+diff --git a/arch/x86/include/asm/pci_x86.h b/arch/x86/include/asm/pci_x86.h
+index 763f19a..c66deeb 100644
+--- a/arch/x86/include/asm/pci_x86.h
++++ b/arch/x86/include/asm/pci_x86.h
+@@ -123,49 +123,6 @@ extern int __init pcibios_init(void);
+ extern int pci_legacy_init(void);
+ extern void pcibios_fixup_irqs(void);
+ 
+-/*
+- * AMD Fam10h CPUs are buggy, and cannot access MMIO config space
+- * on their northbrige except through the * %eax register. As such, you MUST
+- * NOT use normal IOMEM accesses, you need to only use the magic mmio-config
+- * accessor functions.
+- * In fact just use pci_config_*, nothing else please.
+- */
+-static inline unsigned char mmio_config_readb(void __iomem *pos)
+-{
+-	u8 val;
+-	asm volatile("movb (%1),%%al" : "=a" (val) : "r" (pos));
+-	return val;
+-}
+-
+-static inline unsigned short mmio_config_readw(void __iomem *pos)
+-{
+-	u16 val;
+-	asm volatile("movw (%1),%%ax" : "=a" (val) : "r" (pos));
+-	return val;
+-}
+-
+-static inline unsigned int mmio_config_readl(void __iomem *pos)
+-{
+-	u32 val;
+-	asm volatile("movl (%1),%%eax" : "=a" (val) : "r" (pos));
+-	return val;
+-}
+-
+-static inline void mmio_config_writeb(void __iomem *pos, u8 val)
+-{
+-	asm volatile("movb %%al,(%1)" : : "a" (val), "r" (pos) : "memory");
+-}
+-
+-static inline void mmio_config_writew(void __iomem *pos, u16 val)
+-{
+-	asm volatile("movw %%ax,(%1)" : : "a" (val), "r" (pos) : "memory");
+-}
+-
+-static inline void mmio_config_writel(void __iomem *pos, u32 val)
+-{
+-	asm volatile("movl %%eax,(%1)" : : "a" (val), "r" (pos) : "memory");
+-}
+-
+ #ifdef CONFIG_PCI
+ # ifdef CONFIG_ACPI
+ #  define x86_default_pci_init		pci_acpi_init
+-- 
+1.7.12.4
+
