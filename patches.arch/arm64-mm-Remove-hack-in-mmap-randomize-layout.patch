@@ -1,8 +1,8 @@
-From d6c763afab142a85e4770b4bc2a5f40f256d5c5d Mon Sep 17 00:00:00 2001
 From: Yann Droneaud <ydroneaud@opteya.com>
 Date: Mon, 17 Nov 2014 23:02:19 +0000
 Subject: [PATCH] arm64/mm: Remove hack in mmap randomize layout
-Patch-Mainline: v3.19-rc1 - asked for inclusion in v3.18, v3.14, v3.12, v3.10
+Git-commit: d6c763afab142a85e4770b4bc2a5f40f256d5c5d
+Patch-Mainline: v3.19-rc1
 References: bsc#937033
 
 Since commit 8a0a9bd4db63 ('random: make get_random_int() more
