@@ -304,31 +304,44 @@ if [ $# -ge 1 ]; then
 fi
 
 if test -z "$CONFIG"; then
-	if test "$VANILLA_ONLY" = 1; then
+	if test "$VANILLA_ONLY" = 1 || $VANILLA; then
 		CONFIG=$(uname -m)-vanilla
 	else
-		CONFIG=$(uname -m)-default
-		case "$CONFIG" in
-		i?86-*)
-			CONFIG=i386-pae
+		machine=$(uname -m)
+		case "$machine" in
+		i?86)
+			machine=i386
 		esac
+		if test -e "config/$machine/smp"; then
+			CONFIG=$machine-smp
+		elif test -e "config/$machine/pae"; then
+			CONFIG=$machine-pae
+		elif test -e "config/$machine/default"; then
+			CONFIG=$machine-default
+		elif test -e "config/$machine/rt"; then
+			CONFIG=$machine-rt
+		else
+			echo "Cannot determine default config for arch $machine"
+		fi
 	fi
 fi
 
-CONFIG_ARCH=${CONFIG%%-*}
-CONFIG_FLAVOR=${CONFIG##*-}
-if [ "$CONFIG" = "$CONFIG_ARCH" -o "$CONFIG" = "$CONFIG_FLAVOR" -o \
-		-z "$CONFIG_ARCH" -o -z "$CONFIG_FLAVOR" ]; then
-	echo "Invalid config spec: --config=ARCH-FLAVOR is expected."
-	usage
+if test -n "$CONFIG"; then
+	CONFIG_ARCH=${CONFIG%%-*}
+	CONFIG_FLAVOR=${CONFIG##*-}
+	if [ "$CONFIG" = "$CONFIG_ARCH" -o "$CONFIG" = "$CONFIG_FLAVOR" -o \
+			-z "$CONFIG_ARCH" -o -z "$CONFIG_FLAVOR" ]; then
+		echo "Invalid config spec: --config=ARCH-FLAVOR is expected."
+		usage
+	fi
 fi
 
 if [ $# -ne 0 ]; then
     usage
 fi
 
-if ! scripts/guards --prefix=config --list < config.conf | \
-     egrep -q '/(xen|ec2)$'; then
+if ! scripts/guards --prefix=config $(scripts/arch-symbols --list) < config.conf | \
+     egrep -q '/(xen|ec2|pv)$'; then
      echo "*** Xen configs are disabled; Skipping Xen patches." >&2
 
      SKIP_XEN=true
@@ -374,14 +387,6 @@ if [ ! -r series.conf ]; then
     echo "Configuration file \`series.conf' not found"
     exit 1
 fi
-if [ -e scripts/check-patches ]; then
-    scripts/check-patches || {
-	echo "Inconsistencies found."
-	echo "Please clean up series.conf and/or the patches directories!"
-	read
-    }
-fi
-
 if $have_arch_patches; then
     if [ -z "$ARCH_SYMBOLS" ]; then
         if [ -x ./arch-symbols ]; then
@@ -620,10 +625,17 @@ if test -n "$CONFIG"; then
     fi
 fi
 
+# Some archs we use for the config do not exist or have a different name in the
+# kernl source tree
+case $CONFIG_ARCH in
+	s390x) TAGS_ARCH=s390 ;;
+	ppc64|ppc64le) TAGS_ARCH=powerpc ;;
+	*) TAGS_ARCH=$CONFIG_ARCH ;;
+esac
 if $CTAGS; then
     if ctags --version > /dev/null; then
 	echo "[ Generating ctags (this may take a while)]"
-	make -s --no-print-directory -C "$PATCH_DIR" O="$SP_BUILD_DIR" tags
+	ARCH=$TAGS_ARCH make -s --no-print-directory -C "$PATCH_DIR" O="$SP_BUILD_DIR" tags
     else
 	echo "[ Could not generate ctags: ctags not found ]"
     fi
@@ -632,7 +644,7 @@ fi
 if $CSCOPE; then
     if cscope -V 2> /dev/null; then
 	echo "[ Generating cscope db (this may take a while)]"
-	make -s --no-print-directory -C "$PATCH_DIR" O="$SP_BUILD_DIR" cscope
+	ARCH=$TAGS_ARCH make -s --no-print-directory -C "$PATCH_DIR" O="$SP_BUILD_DIR" cscope
     else
 	echo "[ Could not generate cscope db: cscope not found ]"
     fi

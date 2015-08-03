@@ -44,11 +44,11 @@ _find_tarball()
     local version=$1 suffixes=$2 dir subdir major suffix
 
     set -- ${version//[.-]/ }
-    major=$1.$2
-    case "$major" in
-    3.*)
-        major=3.x
-    esac
+    if test $1 -le 2; then
+        major=$1.$2
+    else
+        major=$1.x
+    fi
     if test -z "$suffixes"; then
         if test -n "$(type -p xz)"; then
             suffixes="tar.xz tar.bz2"
@@ -110,8 +110,12 @@ get_tarball()
 
     tarball=$(_find_tarball "$version" "$suffix")
     if test -n "$tarball"; then
-        cp "$tarball" "$dest/linux-$version.$suffix.part" || exit
+        cp -p "$tarball" "$dest/linux-$version.$suffix.part" || exit
         mv "$dest/linux-$version.$suffix.part" "$dest/linux-$version.$suffix"
+        return
+    fi
+    # Reuse the locally generated tarball if already there
+    if test -e "$dest/linux-$version.$suffix"; then
         return
     fi
     echo "Warning: could not find linux-$version.$suffix, trying to create it from git" >&2
@@ -162,20 +166,35 @@ unpack_tarball()
     set +o pipefail
 }
 
+get_git_remote() {
+    local branch=$1
+    local remote
+
+    remote=$(git config --get branch.${branch}.remote)
+    remote=${remote:-"<repository>"}
+    echo "$remote"
+}
+
+get_git_user() {
+    local remote=$1
+    local user
+
+    if [ "$remote" ]; then
+        user=$(git remote -v show -n | awk '
+            /^'$remote'/ && /\(push\)$/ {
+                match($2, "^(ssh://)?(([^@]+)@)?", a)
+                print a[3]
+            }')
+    fi
+    user=${user:-$LOGNAME}
+    user=${user:-"<user>"}
+    echo "$user"
+}
+
 if $using_git && test -z "$CHECKED_GIT_HOOKS"; then
     export CHECKED_GIT_HOOKS=1
     if ! "$scripts_dir"/install-git-hooks --check; then
         echo "WARNING: You should run $scripts_dir/install-git-hooks to enable pre-commit checks." >&2
-    fi
-    suse_domains_re='(suse\.(de|com|cz)|novell\.com)'
-    kerncvs_re='(kerncvs(\.suse\.de)?|10\.10\.1\.75)'
-    if (echo $EMAIL; hostname -f) | grep -Eiq "aaa[@.]$suse_domains_re\\>" || \
-        git config remote.origin.url | grep -Eiq "\\<$kerncvs_re:"; then
-        # only warn when used in suse
-        if ! git var GIT_COMMITTER_IDENT | grep -Eiq "@$suse_domains_re>"; then
-            echo "WARNING: You should set your suse email address in git"  >&2
-            echo "WARNING: E.g. by running 'git config --global user.email <your login>@suse.de'" >&2
-        fi
     fi
 fi
 
