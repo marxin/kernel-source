@@ -2,9 +2,8 @@ From 506067c75d0fe7f25b890d78960c5fa01ace72c2 Mon Sep 17 00:00:00 2001
 From: Tirumalesh Chalamarla <tchalamarla@cavium.com>
 Date: Fri, 26 Jun 2015 12:12:23 -0700
 Subject: [PATCH 071/131] GICv3: Add ITS entry to THUNDER dts
-Git-commit: a7f6d37b28edbe01353e12e8d880dd1e60ada12c
-Patch-mainline: Queued in subsystem maintainer repository
-Git-repo: git://git.kernel.org/pub/scm/linux/kernel/git/rric/linux.git thunder/master-v4.1
+Git-commit: efc5120b8259243fa945d0028450c0a7a5a4b9ef
+Patch-mainline: v4.2-rc1
 
 The PCIe host controller uses MSIs provided by GICv3 ITS. Enable it on
 Thunder SoCs by adding an entry to DT.
