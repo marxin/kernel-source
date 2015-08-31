@@ -73,7 +73,6 @@ Source48:       macros.kernel-source
 Source49:       kernel-module-subpackage
 Source50:       kabi.pl
 Source51:       mkspec
-Source52:       kernel-source%variant.changes
 Source53:       kernel-source.spec.in
 Source54:       kernel-binary.spec.in
 Source55:       kernel-syms.spec.in
