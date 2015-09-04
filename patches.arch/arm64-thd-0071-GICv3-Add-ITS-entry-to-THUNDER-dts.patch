@@ -15,11 +15,9 @@ Signed-off-by: Robert Richter <rrichter@cavium.com>
 Signed-off-by: Matthias Brugger <mbrugger@suse.com>
 
 ---
- arch/arm64/boot/dts/cavium/thunder-88xx.dtsi | 9 +++++++++
+ arch/arm64/boot/dts/cavium/thunder-88xx.dtsi |    9 +++++++++
  1 file changed, 9 insertions(+)
 
-diff --git a/arch/arm64/boot/dts/cavium/thunder-88xx.dtsi b/arch/arm64/boot/dts/cavium/thunder-88xx.dtsi
-index d8c0bdc..9cb7cf9 100644
 --- a/arch/arm64/boot/dts/cavium/thunder-88xx.dtsi
 +++ b/arch/arm64/boot/dts/cavium/thunder-88xx.dtsi
 @@ -376,10 +376,19 @@
@@ -42,6 +40,3 @@ index d8c0bdc..9cb7cf9 100644
  		};
  
  		uaa0: serial@87e0,24000000 {
--- 
-1.7.12.4
-
