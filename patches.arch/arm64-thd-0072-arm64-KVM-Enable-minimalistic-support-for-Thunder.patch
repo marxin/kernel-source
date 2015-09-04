@@ -15,35 +15,11 @@ Signed-off-by: Robert Richter <rrichter@cavium.com>
 Signed-off-by: Matthias Brugger <mbrugger@suse.com>
 
 ---
- arch/arm64/include/asm/cputype.h     | 3 +++
- arch/arm64/include/uapi/asm/kvm.h    | 3 ++-
- arch/arm64/kvm/guest.c               | 6 ++++++
- arch/arm64/kvm/sys_regs_generic_v8.c | 2 ++
- 4 files changed, 13 insertions(+), 1 deletion(-)
+ arch/arm64/include/uapi/asm/kvm.h    |    3 ++-
+ arch/arm64/kvm/guest.c               |    6 ++++++
+ arch/arm64/kvm/sys_regs_generic_v8.c |    2 ++
+ 3 files changed, 10 insertions(+), 1 deletion(-)
 
-diff --git a/arch/arm64/include/asm/cputype.h b/arch/arm64/include/asm/cputype.h
-index a84ec60..f603dcd 100644
---- a/arch/arm64/include/asm/cputype.h
-+++ b/arch/arm64/include/asm/cputype.h
-@@ -63,6 +63,7 @@
- 	((partnum)		<< MIDR_PARTNUM_SHIFT))
- 
- #define ARM_CPU_IMP_ARM		0x41
-+#define ARM_CPU_IMP_CAVIUM		0x43
- #define ARM_CPU_IMP_APM		0x50
- 
- #define ARM_CPU_PART_AEM_V8	0xD0F
-@@ -72,6 +73,8 @@
- 
- #define APM_CPU_PART_POTENZA	0x000
- 
-+#define ARM_CPU_PART_THUNDER	0x0A1
-+
- #define ID_AA64MMFR0_BIGENDEL0_SHIFT	16
- #define ID_AA64MMFR0_BIGENDEL0_MASK	(0xf << ID_AA64MMFR0_BIGENDEL0_SHIFT)
- #define ID_AA64MMFR0_BIGENDEL0(mmfr0)	\
-diff --git a/arch/arm64/include/uapi/asm/kvm.h b/arch/arm64/include/uapi/asm/kvm.h
-index 61a86dc..e6f517a 100644
 --- a/arch/arm64/include/uapi/asm/kvm.h
 +++ b/arch/arm64/include/uapi/asm/kvm.h
 @@ -59,8 +59,9 @@ struct kvm_regs {
@@ -57,28 +33,24 @@ index 61a86dc..e6f517a 100644
  
  /* KVM_ARM_SET_DEVICE_ADDR ioctl id encoding */
  #define KVM_ARM_DEVICE_TYPE_SHIFT	0
-diff --git a/arch/arm64/kvm/guest.c b/arch/arm64/kvm/guest.c
-index 9535bd5..3751f37 100644
 --- a/arch/arm64/kvm/guest.c
 +++ b/arch/arm64/kvm/guest.c
-@@ -291,6 +291,12 @@ int __attribute_const__ kvm_target_cpu(void)
+@@ -291,6 +291,12 @@ int __attribute_const__ kvm_target_cpu(v
  			return KVM_ARM_TARGET_XGENE_POTENZA;
  		};
  		break;
 +	case ARM_CPU_IMP_CAVIUM:
 +		switch (part_number) {
-+		case ARM_CPU_PART_THUNDER:
++		case CAVIUM_CPU_PART_THUNDERX:
 +			return KVM_ARM_TARGET_CAVIUM_THUNDER;
 +		};
 +		break;
  	};
  
  	return -EINVAL;
-diff --git a/arch/arm64/kvm/sys_regs_generic_v8.c b/arch/arm64/kvm/sys_regs_generic_v8.c
-index 475fd29..0e48ee8 100644
 --- a/arch/arm64/kvm/sys_regs_generic_v8.c
 +++ b/arch/arm64/kvm/sys_regs_generic_v8.c
-@@ -94,6 +94,8 @@ static int __init sys_reg_genericv8_init(void)
+@@ -94,6 +94,8 @@ static int __init sys_reg_genericv8_init
  					  &genericv8_target_table);
  	kvm_register_target_sys_reg_table(KVM_ARM_TARGET_XGENE_POTENZA,
  					  &genericv8_target_table);
@@ -87,6 +59,3 @@ index 475fd29..0e48ee8 100644
  
  	return 0;
  }
--- 
-1.7.12.4
-
