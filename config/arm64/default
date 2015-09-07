@@ -1,6 +1,6 @@
 #
 # Automatically generated file; DO NOT EDIT.
-# Linux/arm64 4.1.5 Kernel Configuration
+# Linux/arm64 4.1.6 Kernel Configuration
 #
 CONFIG_ARM64=y
 CONFIG_64BIT=y
@@ -4234,7 +4234,7 @@ CONFIG_DRM_SAVAGE=m
 # CONFIG_DRM_VGEM is not set
 # CONFIG_DRM_VMWGFX is not set
 CONFIG_DRM_UDL=m
-CONFIG_DRM_AST=m
+# CONFIG_DRM_AST is not set
 CONFIG_DRM_MGAG200=m
 CONFIG_DRM_CIRRUS_QEMU=m
 CONFIG_DRM_QXL=m
