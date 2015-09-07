@@ -95,7 +95,7 @@ EOF
 done
 export LANG=POSIX
 
-[ -z "$build_dir" ] && build_dir=kernel-source$VARIANT
+[ -z "$build_dir" ] && build_dir=kernel-source$VARIANT$BS_SUFFIX
 if [ -z "$build_dir" ]; then
     echo "Please define the build directory with the --dir option" >&2
     exit 1
@@ -357,3 +357,8 @@ echo "cd $build_dir; ./mkspec ${mkspec_args[@]}"
 patches=$PWD
 cd "$build_dir"
 ./mkspec --patches "$patches" "${mkspec_args[@]}"
+if test -n "$BS_SUFFIX"; then
+	for f in *.spec *.changes; do
+		mv "$f" "${f%.*}$BS_SUFFIX.${f##*.}"
+	done
+fi
