@@ -5,7 +5,5 @@ VARIANT=
 # Hack
 BS_SUFFIX=-arm64
 # buildservice projects to build the kernel against
-OBS_PROJECT=openSUSE:Factory
-OBS_PROJECT_ARM=openSUSE:Factory:ARM
-OBS_PROJECT_PPC=openSUSE:Factory:PowerPC
-IBS_PROJECT=SUSE:SLE-12-SP1:GA
+OBS_PROJECT=SUSE:SLE-12-SP1:Update
+IBS_PROJECT=SUSE:SLE-12-SP1:Update
