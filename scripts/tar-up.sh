@@ -358,7 +358,7 @@ patches=$PWD
 cd "$build_dir"
 ./mkspec --patches "$patches" "${mkspec_args[@]}"
 if test -n "$BS_SUFFIX"; then
-	for f in *.spec *.changes; do
+	for f in *.spec; do
 		mv "$f" "${f%.*}$BS_SUFFIX.${f##*.}"
 	done
 fi
