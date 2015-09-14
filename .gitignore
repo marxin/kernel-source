@@ -12,6 +12,7 @@
 # package directories created by scripts/tar-up_and_run_mbuild.sh
 kernel-source
 kernel-source-rt
+kernel-source-arm64
 
 # default scratch area for scripts/sequence-patch.sh
 tmp
